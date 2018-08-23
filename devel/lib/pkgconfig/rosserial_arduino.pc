@@ -1,0 +1,8 @@
+prefix=/home/richard/Rover2018/devel
+
+Name: rosserial_arduino
+Description: Description of rosserial_arduino
+Version: 0.7.7
+Cflags: -I/home/richard/Rover2018/devel/include
+Libs: -L/home/richard/Rover2018/devel/lib 
+Requires: message_runtime
