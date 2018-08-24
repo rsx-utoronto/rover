@@ -21,14 +21,14 @@ int num = 1.00;
 
 void messageCb( const geometry_msgs::Twist& msg){
   
-  nh.loginfo("msg received");
+  //nh.loginfo("msg received");
   char resultAngular[8]; // Buffer big enough for 7-character float
   char resultLinear[8];
   dtostrf(msg.angular.z, 6, 2, resultAngular); // Leave room for too large numbers!
   dtostrf(msg.linear.x, 6, 2, resultLinear); // Leave room for too large numbers!
 
-  nh.loginfo(resultAngular);
-  nh.loginfo(resultLinear);
+  //nh.loginfo(resultAngular);
+  //nh.loginfo(resultLinear);
   
   if (msg.angular.z == 0.00)
   {
@@ -55,16 +55,18 @@ void messageCb( const geometry_msgs::Twist& msg){
     if (msg.angular.z == num)
     {
       doPivot(speedF);
+      nh.loginfo("pivot left");
     }
     else if (msg.angular.z == -num)
     {
       doPivot(speedB);
+      nh.loginfo("pivot right");
     }
   }
   digitalWrite(13, HIGH-digitalRead(13));   // blink the led
 }
 
-ros::Subscriber<geometry_msgs::Twist> sub("turtle1/cmd_vel", &messageCb );
+ros::Subscriber<geometry_msgs::Twist> sub("rover/drive", &messageCb );
 
 void setLeftSpd(int spd) {
       if(spd < 0) {
@@ -133,5 +135,7 @@ void loop()
   nh.spinOnce();
 
   delay(1);
+  
+  stop();
 }
 
