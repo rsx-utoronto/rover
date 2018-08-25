@@ -15,12 +15,16 @@ int directionPins[] = { 4, 2 };
 int speedl;
 int speedr;
 boolean driveMode;
-int speedF = 70;
-int speedB = -70;
+int speedF = 50;
+int speedB = -50;
 int num = 1.00;
+int count = 0;
+int count_reached = 500;
+boolean startCounting = false;
 
 void messageCb( const geometry_msgs::Twist& msg){
-  
+  startCounting = true;
+  count = 0;
   //nh.loginfo("msg received");
   char resultAngular[8]; // Buffer big enough for 7-character float
   char resultLinear[8];
@@ -47,7 +51,6 @@ void messageCb( const geometry_msgs::Twist& msg){
     else
     {
       stop();
-      nh.loginfo("stopping");
     }
   }
   else
@@ -114,6 +117,7 @@ void forward(int speedl, int speedr){
 
 // Stop the motor
 void stop(){
+    nh.loginfo("STOP");
     setLeftSpd(0);
     setRightSpd(0);
 }
@@ -136,6 +140,16 @@ void loop()
 
   delay(1);
   
-  stop();
+  if (startCounting)
+  {
+    count++; 
+  }
+  
+  if (count == count_reached)
+  {
+    count = 0;
+    stop();  
+    startCounting = false;
+  }
 }
 

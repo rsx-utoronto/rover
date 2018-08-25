@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <termios.h>
 #include <stdio.h>
+#include <boost/thread.hpp>
 
 #define KEYCODE_R 0x43 
 #define KEYCODE_L 0x44
@@ -36,6 +37,8 @@ TeleopRover::TeleopRover():
 
 int kfd = 0;
 struct termios cooked, raw;
+bool alreadyStopped = false;
+bool key_pressed = false;
 
 void quit(int sig)
 {
@@ -58,12 +61,11 @@ int main(int argc, char** argv)
 	return(0);
 }
 
-
 void TeleopRover::keyLoop()
 {
 	char c;
-	bool dirty=false;
-
+	bool dirty = false;
+ 
 	// get the console in raw mode                                                              
 	tcgetattr(kfd, &cooked);
 	memcpy(&raw, &cooked, sizeof(struct termios));
@@ -82,6 +84,7 @@ void TeleopRover::keyLoop()
 	    // get the next event from the keyboard  
 	    if(read(kfd, &c, 1) < 0)
 	    {
+	    	ROS_INFO("READkEYBOARDFAILED");
 	      	perror("read():");
 	      	exit(-1);
 	    }
@@ -96,24 +99,28 @@ void TeleopRover::keyLoop()
 	        	ROS_INFO("LEFT");
 		        angular_ = 1.0;
 		        dirty = true;
+		        alreadyStopped = false;
 		        break;
 		    case KEYCODE_R:
 		        ROS_DEBUG("RIGHT");
 		        ROS_INFO("RIGHT");
 		        angular_ = -1.0;
 		        dirty = true;
+		        alreadyStopped = false;
 		        break;
 		    case KEYCODE_U:
 		        ROS_DEBUG("UP");
 		        ROS_INFO("UP");
 		        linear_ = 1.0;
 		        dirty = true;
+		        alreadyStopped = false;
 		        break;
 		    case KEYCODE_D:
 		        ROS_DEBUG("DOWN");
 		        ROS_INFO("DOWN");
 		        linear_ = -1.0;
 		        dirty = true;
+		        alreadyStopped = false;
 		        break;
 		    case KEYCODE_SPACE:
 				ROS_DEBUG("STOP");
@@ -121,8 +128,18 @@ void TeleopRover::keyLoop()
 		        linear_ = 0.0;
 				angular_ = 0.0;
 		        dirty = true;
+		        alreadyStopped = false;
 		        break;
 		    default:
+		    	if (alreadyStopped = false)
+		    	{
+		    		linear_ = 0.0;
+					angular_ = 0.0;
+		        	dirty = true;
+		        	alreadyStopped = true;
+		        	ROS_INFO("STOP");
+		        	break;
+		    	}
 				continue;
 	    }
 
