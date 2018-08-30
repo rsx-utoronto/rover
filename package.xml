@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>Rover</name>
+  <name>rover_erc</name>
   <version>0.0.0</version>
   <description>The Rover package</description>
 
