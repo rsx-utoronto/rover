@@ -1,2 +1,0 @@
-Rover:rosserial/rosserial:rosserial/rosserial_arduino:rosserial/rosserial_client:rosserial/rosserial_embeddedlinux:rosserial/rosserial_mbed:rosserial/rosserial_msgs:rosserial/rosserial_python:rosserial/rosserial_server:rosserial/rosserial_test:rosserial/rosserial_tivac:rosserial/rosserial_vex_cortex:rosserial/rosserial_windows:rosserial/rosserial_xbee
--DCATKIN_DEVEL_PREFIX=/home/richard/Rover2018/devel -DCMAKE_INSTALL_PREFIX=/home/richard/Rover2018/install -G Unix Makefiles

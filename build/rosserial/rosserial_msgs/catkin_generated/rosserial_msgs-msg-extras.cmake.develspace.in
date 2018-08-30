@@ -1,2 +1,0 @@
-set(rosserial_msgs_MESSAGE_FILES "/home/richard/Rover2018/src/rosserial/rosserial_msgs/msg/Log.msg;/home/richard/Rover2018/src/rosserial/rosserial_msgs/msg/TopicInfo.msg")
-set(rosserial_msgs_SERVICE_FILES "/home/richard/Rover2018/src/rosserial/rosserial_msgs/srv/RequestMessageInfo.srv;/home/richard/Rover2018/src/rosserial/rosserial_msgs/srv/RequestParam.srv;/home/richard/Rover2018/src/rosserial/rosserial_msgs/srv/RequestServiceInfo.srv")
