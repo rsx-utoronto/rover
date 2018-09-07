@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Environment>
+    <Robot file="rsx_arm.dae" />
+</Environment>

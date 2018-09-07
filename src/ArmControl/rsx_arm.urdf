@@ -1,0 +1,129 @@
+<robot name="rsx_arm">
+  <link name="link0_base">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="35.5 24 0.1" />
+      </geometry>
+      <material name="Green">
+        <color rgba="0 1.0 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link1_waist">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="2 2 5.5" />
+      </geometry>
+      <material name="Red">
+        <color rgba="1.0 0 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link2_shoulder">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="36 2 2" />
+      </geometry>
+      <material name="Red">
+        <color rgba="1.0 0 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link3_elbow">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="35.683 2 2" />
+      </geometry>
+      <material name="Red">
+        <color rgba="1.0 0 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link4_wrist1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="4 3 2" />
+      </geometry>
+      <material name="Red">
+        <color rgba="1.0 0 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link5_wrist2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="18 2 2" />
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link6_wrist3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="4 3 2" />
+      </geometry>
+      <material name="Yellow">
+        <color rgba="1.0 1.0 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+    
+
+
+  <joint name="joint0_waist" type="continuous">
+    <parent link="link0_base"/>
+    <child link="link1_waist"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+   
+  <joint name="joint1_shoulder" type="continuous">
+    <parent link="link1_waist"/>
+    <child link="link2_shoulder"/>
+    <origin xyz="0 0 5.5" rpy="1.5707963 0 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+   
+  <joint name="joint2_elbow" type="continuous">
+    <parent link="link2_shoulder"/>
+    <child link="link3_elbow"/>
+    <origin xyz="36 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="joint3_wrist1" type="continuous">
+    <parent link="link3_elbow"/>
+    <child link="link4_wrist1"/>
+    <origin xyz="35.683 0 0" rpy="0 1.5707963 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="joint4_wrist2" type="continuous">
+    <parent link="link4_wrist1"/>
+    <child link="link5_wrist2"/>
+    <origin xyz="0 0 0" rpy="0 -1.5707963 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="joint5_wrist3" type="continuous">
+    <parent link="link5_wrist2"/>
+    <child link="link6_wrist3"/>
+    <origin xyz="18 0 0" rpy="0 1.5707963 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+</robot>
