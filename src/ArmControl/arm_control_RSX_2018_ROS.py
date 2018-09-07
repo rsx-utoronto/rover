@@ -427,7 +427,7 @@ def initializeJoystick():
 
 def setupVisualEnv():
     env = openravepy.Environment()
-    env.Load('src/arm_control/src/environment.xml')
+    env.Load('src/ArmControl/environment.xml')
     env.SetViewer('qtcoin')
     viewer = env.GetViewer()
     global robot
