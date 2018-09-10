@@ -32,7 +32,7 @@ TeleopRover::TeleopRover():
 	nh_.param("scale_angular", a_scale_, a_scale_);
 	nh_.param("scale_linear", l_scale_, l_scale_);
 
-	twist_pub_ = nh_.advertise<geometry_msgs::Twist>("rover/drive", 1);
+	twist_pub_ = nh_.advertise<geometry_msgs::Twist>("drive", 1);
 }
 
 int kfd = 0;
@@ -51,7 +51,7 @@ void quit(int sig)
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "drive_server");
+	ros::init(argc, argv, "drive_client");
 	TeleopRover teleop_rover;
 
 	signal(SIGINT,quit);
@@ -84,7 +84,7 @@ void TeleopRover::keyLoop()
 	    // get the next event from the keyboard  
 	    if(read(kfd, &c, 1) < 0)
 	    {
-	    	ROS_INFO("READkEYBOARDFAILED");
+	    	ROS_INFO("READKEYBOARDFAILED");
 	      	perror("read():");
 	      	exit(-1);
 	    }
