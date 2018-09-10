@@ -27,9 +27,9 @@ void quit(int sig)
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "science_client");
+	ros::init(argc, argv, "servo_sender");
 	ros::NodeHandle nh;
-	ros::Publisher message_pub = nh.advertise<std_msgs::String>("science", 1);
+	ros::Publisher message_pub = nh.advertise<std_msgs::String>("servo", 1);
 
 	signal(SIGINT,quit);
 	

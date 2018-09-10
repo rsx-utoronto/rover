@@ -51,7 +51,7 @@ void quit(int sig)
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "drive_client");
+	ros::init(argc, argv, "drive_sender");
 	TeleopRover teleop_rover;
 
 	signal(SIGINT,quit);
