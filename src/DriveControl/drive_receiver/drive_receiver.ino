@@ -69,7 +69,7 @@ void messageCb( const geometry_msgs::Twist& msg){
   digitalWrite(13, HIGH-digitalRead(13));   // blink the led
 }
 
-ros::Subscriber<geometry_msgs::Twist> sub("rover/drive", &messageCb );
+ros::Subscriber<geometry_msgs::Twist> sub("drive", &messageCb );
 
 void setLeftSpd(int spd) {
       if(spd < 0) {
