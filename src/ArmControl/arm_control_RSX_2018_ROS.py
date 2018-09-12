@@ -68,132 +68,138 @@ def forwardKinematics(dhTable):
 
 
 def inverseKinematics(dhTable, homTransMatrix):
-    d1 = dhTable[0][2]
-    a2 = dhTable[1][0]
-    d4 = dhTable[3][2]
-    d6 = dhTable[5][2]
+    try:
+        d1 = dhTable[0][2]
+        a2 = dhTable[1][0]
+        d4 = dhTable[3][2]
+        d6 = dhTable[5][2]
 
-    #print("HomTransMatrix: ")
-    #print(homTransMatrix)
-    
-    Rd = np.matrix( [ homTransMatrix[0][:3], homTransMatrix[1][:3], homTransMatrix[2][:3] ] )
-    #print("Rd: ")
-    #print(Rd)
-    od = np.matrix( [ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ] ).transpose()
-    #print("od: ")
-    #print(od)
+        #print("HomTransMatrix: ")
+        #print(homTransMatrix)
+        
+        Rd = np.matrix( [ homTransMatrix[0][:3], homTransMatrix[1][:3], homTransMatrix[2][:3] ] )
+        #print("Rd: ")
+        #print(Rd)
+        od = np.matrix( [ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ] ).transpose()
+        #print("od: ")
+        #print(od)
 
-    arD6 = np.matrix( [ 0,0,d6] ).transpose()
-    #print("arD6: ")
-    #print(arD6)
-    #print(arD6.transpose())
-    #print(Rd)
-    oc = od - Rd * arD6
-    #print(np.dot(Rd,arD6))
-    #print(np.dot(Rd,arD6.transpose()))
-    #print("oc: ")
-    #print(oc)
+        arD6 = np.matrix( [ 0,0,d6] ).transpose()
+        #print("arD6: ")
+        #print(arD6)
+        #print(arD6.transpose())
+        #print(Rd)
+        oc = od - Rd * arD6
+        #print(np.dot(Rd,arD6))
+        #print(np.dot(Rd,arD6.transpose()))
+        #print("oc: ")
+        #print(oc)
 
-    xc = oc.tolist()[0][0]
-    yc = oc.tolist()[1][0]
-    zc = oc.tolist()[2][0]
+        xc = oc.tolist()[0][0]
+        yc = oc.tolist()[1][0]
+        zc = oc.tolist()[2][0]
 
-    q1 = math.atan2(yc, xc)
-    
-    Dtemp = ( xc**2 + yc**2 + (zc-d1)**2 - a2**2 - d4**2 )/( 2*a2*d4 )
-    if abs(Dtemp) > 1:
-        print( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
+        q1 = math.atan2(yc, xc)
+        
+        Dtemp = ( xc**2 + yc**2 + (zc-d1)**2 - a2**2 - d4**2 )/( 2*a2*d4 )
+        if abs(Dtemp) > 1:
+            print( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
+            return dhTable
+        
+        q3 = math.atan2( Dtemp, math.sqrt(1 - Dtemp**2) ) # assumes we chose to always have 'elbow up' solution
+        
+        q2 = math.atan2( zc - d1, math.sqrt(xc**2 + yc**2) ) - math.atan2( d4*math.sin(q3-math.pi/2), a2+d4*math.cos(q3-math.pi/2) )
+
+        # start updating dhTable. Update with first 3 joints
+        updatedDHTable = copy.deepcopy(dhTable)
+        updatedDHTable[0][3] = q1
+        updatedDHTable[1][3] = q2
+        updatedDHTable[2][3] = q3
+        
+        H01 = np.matrix( homogenousTransform(updatedDHTable[0]) )
+        H12 = np.matrix( homogenousTransform(updatedDHTable[1]) )
+        H23 = np.matrix( homogenousTransform(updatedDHTable[2]) )
+        H03 = (H01 * H12 * H23).tolist()
+        R03 = np.matrix( [H03[0][:3], H03[1][:3], H03[2][:3]] )
+        #print("R03: ")
+        #print(R03)
+        #print(R03)
+        #print(R03.transpose())
+        R36 = R03.transpose() * Rd
+        #print("R36: ")
+        #print(R36)
+        #print( np.dot(R03, Rd) )
+        #print( np.dot(R03.transpose(), Rd) )
+
+        q4 = math.atan2( R36.tolist()[1][2], R36.tolist()[0][2] )
+        q5 = math.atan2( math.sqrt(1 - R36.tolist()[2][2]**2), R36.tolist()[2][2] )
+        q6 = math.atan2( R36.tolist()[2][1], -R36.tolist()[2][0] )
+
+        # updating DH table with the wrist stuff
+        updatedDHTable[3][3] = q4
+        updatedDHTable[4][3] = q5
+        updatedDHTable[5][3] = q6
+        
+        return updatedDHTable
+    except:
         return dhTable
-    
-    q3 = math.atan2( Dtemp, math.sqrt(1 - Dtemp**2) ) # assumes we chose to always have 'elbow up' solution
-    
-    q2 = math.atan2( zc - d1, math.sqrt(xc**2 + yc**2) ) - math.atan2( d4*math.sin(q3-math.pi/2), a2+d4*math.cos(q3-math.pi/2) )
-
-    # start updating dhTable. Update with first 3 joints
-    updatedDHTable = copy.deepcopy(dhTable)
-    updatedDHTable[0][3] = q1
-    updatedDHTable[1][3] = q2
-    updatedDHTable[2][3] = q3
-    
-    H01 = np.matrix( homogenousTransform(updatedDHTable[0]) )
-    H12 = np.matrix( homogenousTransform(updatedDHTable[1]) )
-    H23 = np.matrix( homogenousTransform(updatedDHTable[2]) )
-    H03 = (H01 * H12 * H23).tolist()
-    R03 = np.matrix( [H03[0][:3], H03[1][:3], H03[2][:3]] )
-    #print("R03: ")
-    #print(R03)
-    #print(R03)
-    #print(R03.transpose())
-    R36 = R03.transpose() * Rd
-    #print("R36: ")
-    #print(R36)
-    #print( np.dot(R03, Rd) )
-    #print( np.dot(R03.transpose(), Rd) )
-
-    q4 = math.atan2( R36.tolist()[1][2], R36.tolist()[0][2] )
-    q5 = math.atan2( math.sqrt(1 - R36.tolist()[2][2]**2), R36.tolist()[2][2] )
-    q6 = math.atan2( R36.tolist()[2][1], -R36.tolist()[2][0] )
-
-    # updating DH table with the wrist stuff
-    updatedDHTable[3][3] = q4
-    updatedDHTable[4][3] = q5
-    updatedDHTable[5][3] = q6
-    
-    return updatedDHTable
 
 
 def inverseKinematicsPositional(dhTable, homTransMatrix, rotationVector):
-    d1 = dhTable[0][2]
-    a2 = dhTable[1][0]
-    d4 = dhTable[3][2]
-    d6 = dhTable[5][2]
+    try:
+        d1 = dhTable[0][2]
+        a2 = dhTable[1][0]
+        d4 = dhTable[3][2]
+        d6 = dhTable[5][2]
 
-    #print("HomTransMatrix: ")
-    #print(homTransMatrix)
-    
-    Rd = np.matrix( [ homTransMatrix[0][:3], homTransMatrix[1][:3], homTransMatrix[2][:3] ] )
-    #print("Rd: ")
-    #print(Rd)
-    od = np.matrix( [ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ] ).transpose()
-    #print("od: ")
-    #print(od)
+        #print("HomTransMatrix: ")
+        #print(homTransMatrix)
+        
+        Rd = np.matrix( [ homTransMatrix[0][:3], homTransMatrix[1][:3], homTransMatrix[2][:3] ] )
+        #print("Rd: ")
+        #print(Rd)
+        od = np.matrix( [ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ] ).transpose()
+        #print("od: ")
+        #print(od)
 
-    arD6 = np.matrix( [ 0,0,d6] ).transpose()
-    #print("arD6: ")
-    #print(arD6)
-    #print(arD6.transpose())
-    #print(Rd)
-    oc = od - Rd * arD6
-    #print(np.dot(Rd,arD6))
-    #print(np.dot(Rd,arD6.transpose()))
-    #print("oc: ")
-    #print(oc)
+        arD6 = np.matrix( [ 0,0,d6] ).transpose()
+        #print("arD6: ")
+        #print(arD6)
+        #print(arD6.transpose())
+        #print(Rd)
+        oc = od - Rd * arD6
+        #print(np.dot(Rd,arD6))
+        #print(np.dot(Rd,arD6.transpose()))
+        #print("oc: ")
+        #print(oc)
 
-    xc = oc.tolist()[0][0]
-    yc = oc.tolist()[1][0]
-    zc = oc.tolist()[2][0]
+        xc = oc.tolist()[0][0]
+        yc = oc.tolist()[1][0]
+        zc = oc.tolist()[2][0]
 
-    q1 = math.atan2(yc, xc)
-    
-    Dtemp = ( xc**2 + yc**2 + (zc-d1)**2 - a2**2 - d4**2 )/( 2*a2*d4 )
-    if abs(Dtemp) > 1:
-        print( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
+        q1 = math.atan2(yc, xc)
+        
+        Dtemp = ( xc**2 + yc**2 + (zc-d1)**2 - a2**2 - d4**2 )/( 2*a2*d4 )
+        if abs(Dtemp) > 1:
+            print( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
+            return dhTable
+        
+        q3 = math.atan2( Dtemp, math.sqrt(1 - Dtemp**2) ) # assumes we chose to always have 'elbow up' solution
+        
+        q2 = math.atan2( zc - d1, math.sqrt(xc**2 + yc**2) ) - math.atan2( d4*math.sin(q3-math.pi/2), a2+d4*math.cos(q3-math.pi/2) )
+
+        # start updating dhTable. Update with first 3 joints
+        updatedDHTable = copy.deepcopy(dhTable)
+        updatedDHTable[0][3] = q1
+        updatedDHTable[1][3] = q2
+        updatedDHTable[2][3] = q3
+        updatedDHTable[3][3] = rotationVector[1]
+        updatedDHTable[4][3] = rotationVector[0]
+        updatedDHTable[5][3] = rotationVector[2]
+        
+        return updatedDHTable
+    except:
         return dhTable
-    
-    q3 = math.atan2( Dtemp, math.sqrt(1 - Dtemp**2) ) # assumes we chose to always have 'elbow up' solution
-    
-    q2 = math.atan2( zc - d1, math.sqrt(xc**2 + yc**2) ) - math.atan2( d4*math.sin(q3-math.pi/2), a2+d4*math.cos(q3-math.pi/2) )
-
-    # start updating dhTable. Update with first 3 joints
-    updatedDHTable = copy.deepcopy(dhTable)
-    updatedDHTable[0][3] = q1
-    updatedDHTable[1][3] = q2
-    updatedDHTable[2][3] = q3
-    updatedDHTable[3][3] = rotationVector[1]
-    updatedDHTable[4][3] = rotationVector[0]
-    updatedDHTable[5][3] = rotationVector[2]
-    
-    return updatedDHTable
 
 
 def updateHomTransMatrix(homTransMatrix, DHTable, translationVector, rotationVector):
