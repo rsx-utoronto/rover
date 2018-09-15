@@ -128,14 +128,14 @@ void loop() {
   //Serial.print("\t Moisture: ");    Serial.print(soil_moisture_0);
   //Serial.print("\t Maxim: ");       Serial.print(air_temp_maxim);
   //Serial.print("\t LM35: ");        Serial.print(air_temp_lm35);
-  Serial.print("Timestamp: ");              Serial.print(millis());
-  Serial.print("\t MLX ambient: ");         Serial.print(mlx.readAmbientTempC());
-  Serial.print("\t MLX Object: ");          Serial.print(mlx.readObjectTempC());
-  Serial.print("\t BME680 Temp: ");         Serial.print(bme.temperature);
-  Serial.print("\t Pressure: ");            Serial.print(bme.pressure);
-  Serial.print("\t Humidity: ");            Serial.print(bme.humidity);
-  Serial.print("\t VOCs (kOhms): ");        Serial.print(bme.gas_resistance / 1000.0);
-  Serial.print("\t Altitude wrt SL (m): "); Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.print("Timestamp: ");              Serial.print(millis());                               Serial.print(" ms");
+  Serial.print("\t MLX amb: ");             Serial.print(mlx.readAmbientTempC());                 Serial.print(" degC");          
+  Serial.print("\t MLX Obj: ");             Serial.print(mlx.readObjectTempC());                  Serial.print(" degC");
+  Serial.print("\t BME680 Temp: ");         Serial.print(bme.temperature);                        Serial.print(" degC");
+  Serial.print("\t Pressure: ");            Serial.print(bme.pressure);                           Serial.print(" hpa");
+  Serial.print("\t Humidity: ");            Serial.print(bme.humidity);                           Serial.print(" \%");
+  Serial.print("\t VOCs (kOhms): ");        Serial.print(bme.gas_resistance / 1000.0);            Serial.print(" kOhm");
+  Serial.print("\t Altitude: ");            Serial.print(bme.readAltitude(1013.25));              Serial.print(" m");
   Serial.println();
   
   for (int i = 0; i < 8; i++) {
@@ -162,7 +162,7 @@ void loop() {
     c = 'A';
   }
   */
-  delay(250);
+  delay(1000);
 }
 
 float adc_read(char ch) {
