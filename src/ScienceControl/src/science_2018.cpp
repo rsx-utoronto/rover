@@ -8,6 +8,7 @@
 #include "Adafruit_BME680.h"
 #include <Adafruit_MLX90614.h>
 #include <Servo.h>
+#include <sensors_3304.h>
 
 Adafruit_BME680 bme; // I2C
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
@@ -54,6 +55,9 @@ void setup() {
   servo[1].write(door_closed_angle[1]);
   servo[2].write(door_closed_angle[2]);
   servo[3].write(door_closed_angle[3]);
+  Serial.println("Calibrating...");
+  calibrate_sensors();
+  Serial.println("Done.");
 }
 
 void loop() {
@@ -113,8 +117,10 @@ void loop() {
     }
   }
 
+  Serial.print("RAW ANALOG: ");
   for (int i = 0; i < 8; i++) {
-    as[i] = adc_read(i);
+    Serial.print(adc_read(i));
+    Serial.print(" ");
   }
 
   // air_temp_maxim = get_DS18S20_air_temp(DS18S20_PIN);
@@ -125,32 +131,21 @@ void loop() {
   //Serial.print("\t Moisture: ");    Serial.print(soil_moisture_0);
   //Serial.print("\t Maxim: ");       Serial.print(air_temp_maxim);
   //Serial.print("\t LM35: ");        Serial.print(air_temp_lm35);
-  // Serial.print("Timestamp: ");              Serial.print(millis());                               Serial.print(" ms");
-  // Serial.print("\t MLX amb: ");             Serial.print(mlx.readAmbientTempC());                 Serial.print(" degC");          
-  // Serial.print("\t MLX Obj: ");             Serial.print(mlx.readObjectTempC());                  Serial.print(" degC");
-  // Serial.print("\t BME680 Temp: ");         Serial.print(bme.temperature);                        Serial.print(" degC");
-  // Serial.print("\t Pressure: ");            Serial.print(bme.pressure);                           Serial.print(" hpa");
-  // Serial.print("\t Humidity: ");            Serial.print(bme.humidity);                           Serial.print(" \%");
-  // Serial.print("\t VOCs (kOhms): ");        Serial.print(bme.gas_resistance / 1000.0);            Serial.print(" kOhm");
-  // Serial.print("\t Altitude: ");            Serial.print(bme.readAltitude(1013.25));              Serial.print(" m");
-  // Serial.println();
+  Serial.print("Timestamp: ");              Serial.print(millis());                               Serial.print(" ms");
+  Serial.print("\t MLX amb: ");             Serial.print(mlx.readAmbientTempC());                 Serial.print(" degC");          
+  Serial.print("\t MLX Obj: ");             Serial.print(mlx.readObjectTempC());                  Serial.print(" degC");
+  Serial.print("\t BME680 Temp: ");         Serial.print(bme.temperature);                        Serial.print(" degC");
+  Serial.print("\t Pressure: ");            Serial.print(bme.pressure);                           Serial.print(" hpa");
+  Serial.print("\t Humidity: ");            Serial.print(bme.humidity);                           Serial.print(" \%");
+  Serial.print("\t VOCs (kOhms): ");        Serial.print(bme.gas_resistance / 1000.0);            Serial.print(" kOhm");
+  Serial.print("\t Altitude: ");            Serial.print(bme.readAltitude(1013.25));              Serial.print(" m ");
   
-Serial.print("H2: "); Serial.print()
-
-  for (int i = 0; i < 8; i++) {
-    Serial.print("\t ");
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.print(as[i],5);
-  }
-  Serial.println();
+  printSensors();
   
-  /*
-  air_temp_ch0 = (5.0 * as[0] * 100.0);
-  Serial.print("\t CH0TMP: ");
-  air_temp_ch0 = Serial.read();
-  Serial.print(air_temp_ch0);
-  */
+  // air_temp_ch0 = (5.0 * as[0] * 100.0);
+  // Serial.print("\t CH0TMP: ");
+  // air_temp_ch0 = Serial.read();
+  // Serial.print(air_temp_ch0);
 
   // put your main code here, to run repeatedly:
 
@@ -162,59 +157,6 @@ Serial.print("H2: "); Serial.print()
   }
   */
   //delay(1000);
-}
-
-int adc_read_3008(char ch) {
-  int a = 0;
-  char i;
-  digitalWrite(ADC_SELECTN, 0); //init conversation
-  clk_out(1);// start bit
-  clk_out(1);// CONFIG MODE: SINGLE (O for differential
-  clk_out((ch & 4) >> 2);
-  clk_out((ch & 2) >> 1);
-  clk_out(ch & 1);
-  delayMicroseconds(4); // Wait for sample (way longer than necessary)
-  clk_out(0); // Don't care
-  for (i = 0; i < (10 + 1); i++) {
-    a = (a << 1) + clk_in();
-  }
-  digitalWrite(ADC_SELECTN, 1); // end conversation
-  return a;
-}
-
-void clk_out(char b) {
-  digitalWrite(SCK, 0);
-  delayMicroseconds(4); // probably removable
-  digitalWrite(MOSI, b);
-  digitalWrite(SCK, 1);
-  delayMicroseconds(4); // probably removable
-  return;
-}
-
-char clk_in(void) {
-  char a;
-  digitalWrite(SCK, 0);
-  a = digitalRead(MISO);
-  digitalWrite(SCK, 1);
-  return a;
-}
-
-int adc_read_3304(char ch) {
-  int a = 0;
-  char i;
-  digitalWrite(ADC_SELECTN, 0); //init conversation
-  clk_out(1);// start bit
-  clk_out(1);// CONFIG MODE: SINGLE (O for differential)
-  clk_out((ch & 4) >> 2);
-  clk_out((ch & 2) >> 1);
-  clk_out(ch & 1);
-  delayMicroseconds(4); // Wait for sample (way longer than necessary)
-  clk_out(0); // Don't care
-  for (i = 0; i < (13 + 1); i++) {
-    a = (a << 1) + clk_in();
-  }
-  digitalWrite(ADC_SELECTN, 1); // end conversation
-  return a;
 }
 
 void setup_BME(void) {
