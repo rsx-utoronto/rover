@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <sensors_3304.h>
+#include <science_2018.h>
 
 float e = 2.7182818284590452353602874713527;
 float RL[8] = {10, 10, 20, 10, 200, 10, 10, 10};
