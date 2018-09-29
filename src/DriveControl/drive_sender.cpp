@@ -5,6 +5,14 @@
 #include <stdio.h>
 #include <boost/thread.hpp>
 
+#define KEYCODE_0 0x30 
+#define KEYCODE_1 0x31
+#define KEYCODE_2 0x32
+#define KEYCODE_3 0x33
+#define KEYCODE_4 0x34
+#define KEYCODE_s 0x73
+#define KEYCODE_c 0x63
+#define KEYCODE_o 0x6f
 #define KEYCODE_R 0x43 
 #define KEYCODE_L 0x44
 #define KEYCODE_U 0x41
@@ -33,6 +41,7 @@ TeleopRover::TeleopRover():
 	nh_.param("scale_linear", l_scale_, l_scale_);
 
 	twist_pub_ = nh_.advertise<geometry_msgs::Twist>("drive", 1);
+	
 }
 
 int kfd = 0;
@@ -122,6 +131,7 @@ void TeleopRover::keyLoop()
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
+	
 		    case KEYCODE_SPACE:
 				ROS_DEBUG("STOP");
 		        ROS_INFO("STOP");

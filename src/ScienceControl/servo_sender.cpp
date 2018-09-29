@@ -13,6 +13,30 @@
 #define KEYCODE_c 0x63
 #define KEYCODE_o 0x6f
 
+class TeleopRover{
+    public:
+        TeleopRover();
+        void keyLoop();
+
+    private:
+        ros::NodeHandle nh_;
+        double linear_, angular_, l_scale_, a_scale_;
+        ros::Publisher message_pub;
+};
+
+TeleopRover::TeleopRover():
+	linear_(0),
+  	angular_(0),
+  	l_scale_(1.0),
+  	a_scale_(1.0)
+{
+	nh_.param("scale_angular", a_scale_, a_scale_);
+	nh_.param("scale_linear", l_scale_, l_scale_);
+
+	message_pub = nh_.advertise<std_msgs::String>("servo", 1);
+	
+}
+
 int kfd = 0;
 struct termios cooked, raw;
 bool alreadyStopped = false;
@@ -20,19 +44,27 @@ bool key_pressed = false;
 
 void quit(int sig)
 {
-	(void) sig;
+	(void)sig;
 	tcsetattr(kfd, TCSANOW, &cooked);
+	ros::shutdown();
 	exit(0);
 }
+
 
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "servo_sender");
-	ros::NodeHandle nh;
-	ros::Publisher message_pub = nh.advertise<std_msgs::String>("servo", 1);
+	TeleopRover teleop_rover;
 
 	signal(SIGINT,quit);
-	
+
+	teleop_rover.keyLoop();
+	  
+	return(0);
+}
+
+void TeleopRover::keyLoop()
+{
 	char c;
 	bool dirty = false;
  
@@ -44,9 +76,10 @@ int main(int argc, char** argv)
 	raw.c_cc[VEOL] = 1;
 	raw.c_cc[VEOF] = 2;
 	tcsetattr(kfd, TCSANOW, &raw);
-
+	std_msgs::String msg;
 	puts("Reading from keyboard");
 	puts("---------------------------");
+	puts("Use arrow keys to move the servo.");
 
 	for(;;)
 	{
@@ -58,7 +91,7 @@ int main(int argc, char** argv)
 	      	exit(-1);
 	    }
 
-	    std_msgs::String msg;
+	    linear_=angular_=0;
 	    ROS_DEBUG("value: 0x%02X\n", c);
 	  
 	    switch(c)
@@ -97,13 +130,13 @@ int main(int argc, char** argv)
 				continue;
 	    }
 
-	    if(dirty ==true)
+	     if(dirty ==true)
 	    {
 	      message_pub.publish(msg);    
 	      dirty=false;
 	    }
 	  }
 
-	return(0);
-}
 
+	  return;
+}
