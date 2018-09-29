@@ -5,10 +5,6 @@
 #define SCK 3
 #define MISO 2
 #define MOSI A2
-#define ADC_SELECTN A3
-// I got two different chips. Hardware compatible but different software!
-//#define ADC_MODEL 3008
-#define ADC_MODEL 3304
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define DS18S20_PIN 4 // pin for maxim digital air temp sensor
 #define LM35_PIN A3 // pin for lm35 analog air temp sensor
