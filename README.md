@@ -23,3 +23,19 @@ To run this package:
   rosrun rover_erc "name of the node"
   
   
+---To run Drive---
+
+1) roscore 
+2) Upload the Drive_receiver Arduino code on the Arduidno
+3) Run the receiver node using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600
+4) On the separate command window, use this command: rosrun rover_erc drive_sender
+5) Control the rover using the arrow keys
+
+---
+---To run SLAM---
+
+1) roscore
+2) on Jetson (Or any device with the stereo camera and RTABMAP setup): roslaunch rover_erc traverse.launch
+3) on the groundstation computer: rosrun rviz rviz
+
+---
