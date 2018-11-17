@@ -15,8 +15,8 @@ To make a visual model of the arm follow these steps:
 To run using ROS, steps (make sure you have the joystick connected beforehand):
 1. Make sure that your computer is configured properly. The catkin package should be made. In  ~/.bashrc file make sure you export correct ROS_MASTER_URI and ROS_IP (Note: be careful when using ROS_IP together with ROS_HOSTNAME, as they are mostly mutually exclusive)
 2. to run the Master, type "roscore" in the command line
-3. to run the Arm Listener, which listenes for the angle values (usually run on the rover computer), type "rosrun rover_erc arm_listener_ROS.py"
-4. to run the control script (usually run on the ground station computer controlling the arm), in the root of the cloned from github "rover" folder type "rosrun rover_erc arm_control_RSX_2018_ROS.py"
+3. to run the Arm Listener, which listenes for the angle values (usually run on the rover computer), type "rosrun rover arm_listener_ROS.py"
+4. to run the control script (usually run on the ground station computer controlling the arm), in the root of the cloned from github "rover" folder type "rosrun rover arm_control_RSX_2018_ROS.py"
 
 For more info about how to communicate on network with ROS, google ROS Publishers, ROS Subscribers, ROS Topics, ROS Nodes
 
