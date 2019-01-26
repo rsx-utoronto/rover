@@ -17,10 +17,18 @@ int speedr;
 boolean driveMode;
 int speedF = 50;
 int speedB = -50;
+int speedPrevF= 50; 
+int speedPrevB= -50; 
+/*int speedP = 50;*/
 int num = 1.00;
 int count = 0;
 int count_reached = 500;
+
 boolean startCounting = false;
+
+char result[100];// Charcter array for final loginfo display message
+char fspd[50], bspd[50], pspd[50];
+const char *message; 
 
 void messageCb( const geometry_msgs::Twist& msg){
   startCounting = true;
@@ -30,23 +38,97 @@ void messageCb( const geometry_msgs::Twist& msg){
   char resultLinear[8];
   dtostrf(msg.angular.z, 6, 2, resultAngular); // Leave room for too large numbers!
   dtostrf(msg.linear.x, 6, 2, resultLinear); // Leave room for too large numbers!
-
+  
   //nh.loginfo(resultAngular);
   //nh.loginfo(resultLinear);
   
+  sprintf(fspd,"%d",speedF);;// Converts speedF to appropriate type for loginfo display
+  sprintf(bspd, "%d", speedB);;// Converts speedF to appropriate type for loginfo display
+  /*sprintf(pspd, "%d", speedP);*/;// Converts speedF to appropriate type for loginfo display
+  
+  if (msg.linear.x == 25.00 || msg.linear.x == 50.00 || msg.linear.x == 75.00||msg.linear.x == 100.00||msg.linear.x == 125.00 || msg.linear.x == -1.5 || msg.linear.x == 1.5)
+  {
+    speedPrevF = speedF;
+    speedPrevB = speedB;
+    
+    if (msg.linear.x== 25.00)
+    {   
+      speedF = 25;
+      speedB = -25; 
+      /*speedP = 25;*/
+      message = "25";
+    } else if (msg.linear.x == 50.0)
+    {
+      speedF = 50;
+      speedB = -50; 
+      /*speedP = 50;*/
+      message = "50";
+    }else if (msg.linear.x == 75.0)
+    {
+      speedF = 75;
+      speedB = -75; 
+      /*speedP = 75;*/
+      message = "75";
+    } else if (msg.linear.x == 100.0)
+    {
+      speedF = 100;
+      speedB = -100; 
+      /*speedP = 100;*/
+      message = "100";
+    } else if (msg.linear.x == 125.0)
+    {
+      speedF = 125;
+      speedB = -125; 
+      /*speedP = 125;*/
+      message = "125";
+    } else if (msg.linear.x == 1.5)
+    {
+      if (speedF <= 115){
+        speedF += 10;
+        speedB +=-10; 
+        /*speedP +=10;*/
+        message = "+10";
+      }
+      else {
+        message = "cannot increase more";
+      }
+    } 
+    else {
+      if (speedF >= 10) {
+        speedF -= 10;
+        speedB -=-10; 
+        /*speedP -=10;*/
+        message = "-10";
+      }
+      else {
+        message = "cannot decrease more";
+      }
+    } 
+    strcpy(result,message);
+    nh.loginfo(result);
+  }
+  
   if (msg.angular.z == 0.00)
   {
-    if (msg.linear.x == num)
+    if (msg.linear.x == 1.00)
     {
-      setLeftSpd(speedF);
-      setRightSpd(speedF);
-      nh.loginfo("moving forward");
+      /*setLeftSpd(speedF);
+      setRightSpd(speedF);*/
+      accel(speedF, speedPrevF);
+      message = "forward @ ";
+      strcpy(result,message);// Combines the output message with the appropriate speed 
+      strcat(result,fspd);
+      nh.loginfo(result);
     }
-    else if (msg.linear.x == -num)
+    else if (msg.linear.x == -1.00)
     {
-      setLeftSpd(speedB);
-      setRightSpd(speedB);
-      nh.loginfo("moving backward");
+      /*setLeftSpd(-speedF);
+      setRightSpd(-speedF);*/
+      accel(speedB, speedPrevB); 
+      message = "backward @ ";
+      strcpy(result,message);// Combines the output message with the appropriate speed 
+      strcat(result,bspd);
+      nh.loginfo(result);
     }
     else
     {
@@ -55,15 +137,21 @@ void messageCb( const geometry_msgs::Twist& msg){
   }
   else
   {
-    if (msg.angular.z == num)
+    if (msg.angular.z == 1.00)
     {
       doPivot(speedF);
-      nh.loginfo("pivot left");
+      message = "left @ ";
+      strcpy(result,message);// Combines the output message with the appropriate speed 
+      strcat(result,fspd);
+      nh.loginfo(result);
     }
-    else if (msg.angular.z == -num)
+    else if (msg.angular.z == -1.00)
     {
-      doPivot(speedB);
-      nh.loginfo("pivot right");
+      doPivot(-speedF);
+      message = "right @ ";
+      strcpy(result,message);// Combines the output message with the appropriate speed 
+      strcat(result,fspd);
+      nh.loginfo(result);
     }
   }
   digitalWrite(13, HIGH-digitalRead(13));   // blink the led
@@ -89,7 +177,6 @@ void setLeftSpd(int spd) {
 void setRightSpd(int spd) {
     if(spd < 0) {
         digitalWrite(directionPins[1], LOW);
-
         for(int i=3; i<6; i++) {
             analogWrite(speedPins[i], -spd);
         }
@@ -101,6 +188,23 @@ void setRightSpd(int spd) {
             analogWrite(speedPins[i], spd);
         }
     }
+}
+
+void accel(int spd, int speedPrev) {
+    if (spd > speedPrev){
+       speedPrev = speedPrev + 1; 
+       setRightSpd(speedPrev);
+       setLeftSpd(speedPrev); 
+    } 
+    else if (spd < speedPrev){
+        speedPrev = speedPrev - 1; 
+        setRightSpd(speedPrev);
+        setLeftSpd(speedPrev); 
+    } 
+    else {
+        setRightSpd(spd);
+        setLeftSpd(spd); 
+    }  
 }
 
 // Pivot either direction
@@ -118,8 +222,10 @@ void forward(int speedl, int speedr){
 // Stop the motor
 void stop(){
     nh.loginfo("STOP");
+  //  speedF = 0;
     setLeftSpd(0);
     setRightSpd(0);
+    
 }
 
 void setup()

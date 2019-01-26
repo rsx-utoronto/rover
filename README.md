@@ -1,7 +1,7 @@
 # Rover Software
 All the software for the rover. Started using ROS
 
-Package name: rover_erc
+Package name: rover
 
 Nodes:
 Drive_server_node: drive_server
