@@ -84,7 +84,7 @@ class AutonomousRover:
         # The Math.atan2() function returns the angle in the 
         # plane (in radians) between the positive x-axis and the ray from (0,0)
         # to the point (x,y), for Math.atan2(y,x). Converted to degrees
-        target_angle = math.degrees(math.atan2(y, x))
+        target_angle = math.degrees(math.atan2(yDiff, xDiff))
         if (target_angle < 0):
             target_angle = 360 + target_angle
 
