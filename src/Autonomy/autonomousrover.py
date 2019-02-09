@@ -27,8 +27,9 @@ class AutonomousRover:
         # Permissible errors, destination reached if value smaller than this.
         self.xError = errorx
         self.yError = errory
-        # Initial speed.
-        self.speed = 70
+        # Initial speed. Arbitrary value. Adjusted by testing.
+        self.lin_vel = 0.3
+        self.ref_ang_vel = 1
       
         self.timeOut = False
         self.arrived = False
@@ -124,29 +125,18 @@ class AutonomousRover:
         if angle_from_rover >= 0:
             #Turn right
             if angle_from_rover < 85:
-                #Turn appropriately: higher the angle, bigger the turn (right speed decreases)
-                left_speed = self.speed
-                right_speed = self.speed * abs(math.cos(math.radians(abs(angle_from_rover))))
-            elif angle_from_rover > 95:
-                #Backwards
-                angle_from_rover = 180 - angle_from_rover
-                left_speed = -self.speed
-                right_speed = -self.speed * abs(math.cos(math.radians(abs(angle_from_rover))))
+                angular_speed = self.ref_ang_speed * abs(math.cos(math.radians(abs(angle_from_rover))))
+            #For large values just turn
             else:
-                left_speed = self.speed
-                right_speed = 0
+                angular_speed = reg_ang_speed
+                self.lin_vel = 0 #stop and turn
         else:
             #Turn left
             if abs(angle_from_rover) < 85:
-                left_speed = self.speed * abs(math.cos(math.radians(abs(angle_from_rover))))
-                right_speed = self.speed
-            elif abs(angle_from_rover) > 95:
-                #Backwards
-                angle_from_rover = 180 - abs(angle_from_rover)
-                left_speed = -self.speed * abs(math.cos(math.radians(abs(angle_from_rover))))
-                right_speed = -self.speed
+                angular_speed = -self.ref_ang_speed * abs(math.cos(math.radians(abs(angle_from_rover))))
+            #For large angles just turn
             else:
-                left_speed = 0
-                right_speed = self.speed
+                angular_speed = -reg_ang_speed
+                self.lin_vel = 0 #stop and turn
 
         print("Left speed: " + str(left_speed) + " Right speed: " + str(right_speed))

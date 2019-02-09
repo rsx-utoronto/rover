@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from std_msgs.msg import Float32MultiArray
+from geometry_msgs.msg import Twist
 import time
 from datetime import datetime
 import json
@@ -18,7 +18,8 @@ from autonomousrover import *
 def move_towards_the_ball(server, destination_markers, xError, yError, headError, center_of_frame, time_delay_between_markers, DIST_FROM_TENNISBALL):
 
     # Initialize publisher
-    pub = rospy.Publisher('drive', float32, queue_size = 10)    #create custom msg for stable publishing
+    
+    pub = rospy.Publisher('drive', Twist, queue_size = 10)    #create custom msg for stable publishing
     rospy.init_node('speed_talker', anonymous=true)
     rate = rospy.Rate(10) # Frequency: 10Hz
 
@@ -70,8 +71,8 @@ def move_towards_the_ball(server, destination_markers, xError, yError, headError
                 #Angle is from 0 to 53 degrees
                 if (not ball_found):
                     print("looking for the rover")
-                    left_speed = rover.speed
-                    right_speed = 0
+                    angular_speed = self.reg_ang_vel
+                    self.lin_vel = 0
                 else:
                     print("angle from the right edge: " + str(ang))
                     #desired angle reached
@@ -80,12 +81,12 @@ def move_towards_the_ball(server, destination_markers, xError, yError, headError
                     #Move towards the desired angle (Not completely necessary)
                     if ((ang - center_of_frame) > 0):
                         #Turn right
-                        left_speed = rover.speed
-                        right_speed = 0
+                        angular_speed = self.reg_ang_vel
+                        self.lin_vel = 0
                     else:
                         #Turn left
-                        left_speed = 0
-                        right_speed = rover.speed
+                        angular_speed = -self.reg_ang_vel
+                        self.lin_vel = 0                        
                 # Turn the rover until angle from the rover is oriented towards the tennis ball
                 speed = [right_speed, left_speed]       #get rid after custom msg built########
                 pub.publish(speed) 
@@ -111,11 +112,6 @@ def move_towards_the_ball(server, destination_markers, xError, yError, headError
     camera.release()
     # out.release()
     cv2.destroyAllWindows()
-
-# Publishes speed info to the 'drive' topic
-def talker ():
-
-
 
 if __name__ == '__main__':
 
