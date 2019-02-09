@@ -12,14 +12,13 @@
 #define KEYCODE_4 0x34
 #define KEYCODE_5 0x35
 #define KEYCODE_6 0x36
-#define KEYCODE_s 0x73
-#define KEYCODE_c 0x63
-#define KEYCODE_o 0x6f
+#define KEYCODE_7 0x37
+#define KEYCODE_8 0x38
+#define KEYCODE_9 0x39
 #define KEYCODE_R 0x43 
 #define KEYCODE_L 0x44
 #define KEYCODE_U 0x41
 #define KEYCODE_D 0x42
-#define KEYCODE_Q 0x71
 #define KEYCODE_SPACE 0x20
 
 class TeleopRover{
@@ -105,79 +104,86 @@ void TeleopRover::keyLoop()
 	  
 	    switch(c)
 	    {
-	      	case KEYCODE_L:
+	      	case KEYCODE_4:
 	        	ROS_DEBUG("LEFT");
 	        	ROS_INFO("LEFT");
 		        angular_ = 1.0;
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
-		    case KEYCODE_R:
+		    case KEYCODE_6:
 		        ROS_DEBUG("RIGHT");
 		        ROS_INFO("RIGHT");
 		        angular_ = -1.0;
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
-		    case KEYCODE_U:
+		    case KEYCODE_8:
 		        ROS_DEBUG("UP");
 		        ROS_INFO("UP");
 		        linear_ = 1.0;
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
-		    case KEYCODE_D:
+		    case KEYCODE_2:
 		        ROS_DEBUG("DOWN");
 		        ROS_INFO("DOWN");
 		        linear_ = -1.0;
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
-			case KEYCODE_2:
-				ROS_DEBUG("2");
-		        ROS_INFO("2");
-		        linear_= 25.0;
-		        dirty = true;
-		        alreadyStopped = false;
-		      break;
-		    case KEYCODE_3:
-				ROS_DEBUG("3");
-		        ROS_INFO("3");
-		        linear_= 50.0;
-		        dirty = true;
-		        alreadyStopped = false;
-		      break;
-		    case KEYCODE_4:
-				ROS_DEBUG("4");
-		        ROS_INFO("4");
-		        linear_= 75.0;
-		        dirty = true;
-		        alreadyStopped = false;
-		      break;
-		    case KEYCODE_5:
-				ROS_DEBUG("5");
-		        ROS_INFO("5");
-		        linear_= 100.0;
-		        dirty = true;
-		        alreadyStopped = false;
-		      break;
-		    case KEYCODE_6:
-				ROS_DEBUG("6");
-		        ROS_INFO("6");
-		        linear_= 125.0;
-		        dirty = true;
-		        alreadyStopped = false;
-		      break;
 		    case KEYCODE_1:
-				ROS_DEBUG("1");
-		        ROS_INFO("1");
+		        ROS_DEBUG("LEFT B");
+		        ROS_INFO("LEFT B");
+		        angular_ = -0.5;
+		        dirty = true;
+		        alreadyStopped = false;
+		        break;
+		    case KEYCODE_3:
+		        ROS_DEBUG("RIGHT B");
+		        ROS_INFO("RIGHT B");
+		        angular_ = -1.5;
+		        dirty = true;
+		        alreadyStopped = false;
+		        break;
+		     case KEYCODE_7:
+		        ROS_DEBUG("LEFT F");
+		        ROS_INFO("LEFT F");
+		        angular_ = 0.5;
+		        dirty = true;
+		        alreadyStopped = false;
+		        break;
+		    case KEYCODE_9:
+		        ROS_DEBUG("RIGHT F");
+		        ROS_INFO("RIGHT F");
+		        angular_ = 1.5;
+		        dirty = true;
+		        alreadyStopped = false;
+		        break;
+		    case KEYCODE_U:
+				ROS_DEBUG("INC");
+		        ROS_INFO("INC");
 		        linear_= 1.5; //Positive increment 
 		        dirty = true;
 		        alreadyStopped = false;
 		      break;
-		    case KEYCODE_0:
-				ROS_DEBUG("0");
-		        ROS_INFO("0");
+		    case KEYCODE_R:
+				ROS_DEBUG("INC");
+		        ROS_INFO("INC");
+		        linear_= 1.5; //Positive increment 
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_D:
+				ROS_DEBUG("DEC");
+		        ROS_INFO("DEC");
+		        linear_= -1.5;//Negative increment 
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_L:
+				ROS_DEBUG("DEC");
+		        ROS_INFO("DEC");
 		        linear_= -1.5;//Negative increment 
 		        dirty = true;
 		        alreadyStopped = false;
