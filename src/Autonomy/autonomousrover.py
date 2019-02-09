@@ -125,18 +125,20 @@ class AutonomousRover:
         if angle_from_rover >= 0:
             #Turn right
             if angle_from_rover < 85:
-                angular_speed = self.ref_ang_speed * abs(math.cos(math.radians(abs(angle_from_rover))))
+                angular_velocity = self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
+                self.lin_vel = 0.3
             #For large values just turn
             else:
-                angular_speed = reg_ang_speed
+                angular_velocity = self.reg_ang_vel
                 self.lin_vel = 0 #stop and turn
         else:
             #Turn left
             if abs(angle_from_rover) < 85:
-                angular_speed = -self.ref_ang_speed * abs(math.cos(math.radians(abs(angle_from_rover))))
+                self.lin_vel = 0.3
+                angular_velocity = -self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
             #For large angles just turn
             else:
-                angular_speed = -reg_ang_speed
+                angular_velocity = -self.reg_ang_vel
                 self.lin_vel = 0 #stop and turn
 
         print("Left speed: " + str(left_speed) + " Right speed: " + str(right_speed))

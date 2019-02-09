@@ -71,7 +71,7 @@ def move_towards_the_ball(server, destination_markers, xError, yError, headError
                 #Angle is from 0 to 53 degrees
                 if (not ball_found):
                     print("looking for the rover")
-                    angular_speed = self.reg_ang_vel
+                    angular_velocity = self.reg_ang_vel
                     self.lin_vel = 0
                 else:
                     print("angle from the right edge: " + str(ang))
@@ -81,27 +81,30 @@ def move_towards_the_ball(server, destination_markers, xError, yError, headError
                     #Move towards the desired angle (Not completely necessary)
                     if ((ang - center_of_frame) > 0):
                         #Turn right
-                        angular_speed = self.reg_ang_vel
+                        angular_velocity = self.reg_ang_vel
                         self.lin_vel = 0
                     else:
                         #Turn left
-                        angular_speed = -self.reg_ang_vel
+                        angular_velocity = -self.reg_ang_vel
                         self.lin_vel = 0                        
                 # Turn the rover until angle from the rover is oriented towards the tennis ball
-                speed = [right_speed, left_speed]       #get rid after custom msg built########
-                pub.publish(speed) 
+                speed_msg.linear.x = self.lin_vel
+                speed_msg.angular.z = angular_velocity
+                pub.publish(speed_msg) 
                 rate.sleep()
             print("distance to the ball: " + str(dis))
 
             #Drive the rover forward towards the ball
-            speed = rover.speed
-            pub.publish(speed)  ###new msgs
+            speed_msg.linear.x = self.lin_vel
+            speed_msg.angular.z = 0
+            pub.publish(speed_msg)
             rate.sleep()
         print("Arrived at the destination")
 
         #Stop the rover, onto the next marker
-        speed = 0
-        pub.publish(speed)          #create new msg######
+        speed_msg.linear.x = 0
+        speed_msg.angular.z = 0
+        pub.publish(speed_msg)
         rate.sleep()
 
         #Stop for ~30 sec. just to show that the task has been accomplished
@@ -140,7 +143,11 @@ if __name__ == '__main__':
 
     move_towards_the_ball(server, destination_markers, xError, yError, error_range_of_tennisball, center_of_frame, time_delay_between_markers, error_dist_of_tennisball_from_rover)
 
-    #put a stop thing here#########
+    #Stop the rover
+    speed_msg.linear.x = 0
+    speed_msg.angular.z = 0
+    pub.publish(speed_msg)
+    rate.sleep()
 
 
 
