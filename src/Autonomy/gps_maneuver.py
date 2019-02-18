@@ -9,6 +9,8 @@ import math
 
 # Rover Class
 class Rover:
+    # pub = rospy.Publisher('drive', Twist, queue_size=10)
+
     def __init__(self, latErrorThreshold, lonErrorThreshold, target):
         # Destination reached if errors are smaller than following.
         self.latThreshold = latErrorThreshold
@@ -21,12 +23,17 @@ class Rover:
         self.targetLatLon = target
         # Useful Flags
         self.destinationReached = False
+        # Initialize rover head-latlon. Run fails otherwise.
+        self.latitude = 0
+        self.longitude = 0
+        self.head = 0
 
     # Pulls GPS and Magnetometer values from the INS.
     def listenerPublisher(self):         
         rospy.Subscriber('/gps', GPS, self.callbackGPS)
         rospy.Subscriber('/mag', MagneticField, self.callbackMAG)
         self.pub = rospy.Publisher('drive', Twist, queue_size=10)
+        self.velocity = Twist()
         # Sets up the rover and publishes to drive.
         while not self.destinationReached:
             self.setupRover()
@@ -118,7 +125,7 @@ class Rover:
     def driveRover(self):
         self.velocity.linear.x = self.linearVelocity
         self.velocity.angular.z = self.angularVelocity
-        self.pub(self.velocity)
+        self.pub.publish(self.velocity)
         
 if __name__ == '__main__':
     print("Autonomous Driving!")
@@ -128,7 +135,7 @@ if __name__ == '__main__':
     lonErrorThreshold = 0.00002
     
     # Destination Coordinates.
-    destination = [(1, 1)]
+    destination = [1, 1]
 
     # Autonomous Driving.
     rover = Rover(latErrorThreshold, lonErrorThreshold, destination)
