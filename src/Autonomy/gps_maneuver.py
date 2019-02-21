@@ -9,8 +9,8 @@ import math
 
 # Rover Class
 class Rover:
-    # pub = rospy.Publisher('drive', Twist, queue_size=10)
-
+    # ---> Forward
+    
     def __init__(self, latErrorThreshold, lonErrorThreshold, target):
         # Destination reached if errors are smaller than following.
         self.latThreshold = latErrorThreshold
@@ -26,7 +26,7 @@ class Rover:
         # Initialize rover head-latlon. Run fails otherwise.
         self.latitude = 0
         self.longitude = 0
-        self.head = 0
+        self.heading = 0
 
     # Pulls GPS and Magnetometer values from the INS.
     def listenerPublisher(self):         
@@ -35,10 +35,10 @@ class Rover:
         self.pub = rospy.Publisher('drive', Twist, queue_size=10)
         self.velocity = Twist()
         # Sets up the rover and publishes to drive.
-        while not self.destinationReached:
+        while not (self.destinationReached or rospy.is_shutdown()):
             self.setupRover()
             self.driveRover()
-            rospy.sleep(1)  # Do I need to sleep or constantly publish? Check drive code
+            rospy.sleep(1)  # Sleeps for 1 second.
 
     # Stores GPS data.
     def callbackGPS(self, data):
@@ -49,10 +49,19 @@ class Rover:
     def callbackMAG(self, data):
         xMag = data.magnetic_field.x
         yMag = data.magnetic_field.y
-        # !!!!!!!!!DONT KNOW WHAT AXIS THE ANGLE IS WITH RESPECT TO!!!!!!!!!!!!!!!!!!!
-        # ASSUMING POSITIVE Y-AXIS (North), CW positive CCW negative.
-        # latlon should be geographical, maybe need to add offset to this value
-        self.head = math.degrees(math.atan2(xMag, yMag))    
+        # Calculates the magnetic compass heading.
+        if(yMag > 0):
+            self.heading = 90 - math.degrees(math.atan2(xMag, yMag))
+        elif(yMag < 0):
+            self.heading = 270 - math.degrees(math.atan2(xMag, yMag))
+        elif(yMag == 0 and xMag < 0):
+            self.heading = 180
+        else:
+            self.heading = 0
+        # Correction for declination
+        # Toronto: -10.44; Hanksville Utah: +10.5
+        # Add for -ve; Subtract for +ve
+        self.heading = self.heading + 10.44
 
     # Calculates heading and latlon differences of rover from target.  
     # Returns true if destination reached, else returns false.
@@ -78,13 +87,13 @@ class Rover:
             targetAngle = 360 + targetAngle # Fixes negative values.
 
         # Changes head values to unit circle degree measurement with postive x-axis reference. 
-        if (self.head >= 0):
-            if(self.head <= 90):
-                refinedHead = 90 - self.head
+        if (self.heading >= 0):
+            if(self.heading <= 90):
+                refinedHead = 90 - self.heading
             else:
-                refinedHead = 360 - (self.head - 90)
+                refinedHead = 360 - (self.heading - 90)
         else:
-            refinedHead = 90 + abs(self.head)
+            refinedHead = 90 + abs(self.heading)
 
         # Angle to turn to point toward target.
         angleDifference = refinedHead - targetAngle
