@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # ROS imports
 import rospy
+from nav_msgs.msg import Odometry
 from inertial_sense.msg import GPS
 from sensor_msgs.msg import MagneticField
 from geometry_msgs.msg import Twist
 # Utility imports
 import math
+import numpy as np
+from tf.transformations import euler_from_quaternion
 
 # Rover Class
 class Rover:
@@ -27,11 +30,15 @@ class Rover:
         self.latitude = 0
         self.longitude = 0
         self.heading = 0
+        
+        self.first_time = False
+        self.offset = 0
 
     # Pulls GPS and Magnetometer values from the INS.
     def listenerPublisher(self):         
         rospy.Subscriber('/gps', GPS, self.callbackGPS)
-        rospy.Subscriber('/mag', MagneticField, self.callbackMAG)
+        # rospy.Subscriber('/mag', MagneticField, self.callbackMAG)
+        rospy.Subscriber('/ins', Odometry, self.callbackHEAD)
         self.pub = rospy.Publisher('drive', Twist, queue_size=10)
         self.velocity = Twist()
         # Sets up the rover and publishes to drive.
@@ -44,24 +51,53 @@ class Rover:
     def callbackGPS(self, data):
         self.latitude = data.latitude
         self.longitude = data.longitude
+        print "position: ", self.latitude, ',', self.longitude, '\n'
 
+    # Deprecated Function.
+    """
     # Calculates rover heading w.r.t. True North.
     def callbackMAG(self, data):
         xMag = data.magnetic_field.x
         yMag = data.magnetic_field.y
         # Calculates the magnetic compass heading.
-        if(yMag > 0):
-            self.heading = 90 - math.degrees(math.atan2(xMag, yMag))
-        elif(yMag < 0):
-            self.heading = 270 - math.degrees(math.atan2(xMag, yMag))
-        elif(yMag == 0 and xMag < 0):
-            self.heading = 180
-        else:
-            self.heading = 0
+        self.heading = 90 - math.degrees(math.atan2(xMag, yMag))
+        # if(yMag > 0):
+        #     self.heading = 90 - math.degrees(math.atan2(xMag, yMag))
+        # elif(yMag < 0):
+        #     self.heading = 270 - math.degrees(math.atan2(xMag, yMag))
+        # elif(yMag == 0 and xMag < 0):
+        #     self.heading = 180
+        # else:
+        #     self.heading = 0
+
+        print "HEADING: ", self.heading, '\n'
         # Correction for declination
         # Toronto: -10.44; Hanksville Utah: +10.5
-        # Add for -ve; Subtract for +ve
-        self.heading = self.heading + 10.44
+        # Add for -ve; Subtract for +ve, as (heading - decValue)
+        # Declination probably accounted for by gps topic.
+        # self.heading = self.heading + 10.44
+    """
+
+    # Calculate the rover heading using ins quaternions.
+    def callbackHEAD(self, data):
+        quaternion = (
+            data.pose.pose.orientation.x,
+            data.pose.pose.orientation.y,
+            data.pose.pose.orientation.z,
+            data.pose.pose.orientation.w
+        )
+
+        # Euler = row[0], pitch[1], yaw[2].
+        euler = euler_from_quaternion(quaternion) 
+        # Heading = Yaw.
+
+        if(not self.first_time):
+            self.offset = euler[2]
+            self.first_time = True
+        # wrap this into pi
+        self.heading = euler[2] - self.offset
+        self.heading = ( self.heading + np.pi) % (2 * np.pi ) - np.pi
+        print self.heading, '\n'       
 
     # Calculates heading and latlon differences of rover from target.  
     # Returns true if destination reached, else returns false.
@@ -74,6 +110,8 @@ class Rover:
         # latlon difference.
         latDiff = targetLat - self.latitude
         lonDiff = targetLon - self.longitude
+
+        print "DIFFERENCE", latDiff, ',', lonDiff, '\n'
 
         # Check if destination reached.
         if(abs(latDiff) < self.latThreshold and abs(lonDiff) < self.lonThreshold):
@@ -140,13 +178,21 @@ if __name__ == '__main__':
     print("Autonomous Driving!")
 
     # Acceptable Errors.
-    latErrorThreshold = 0.00002
-    lonErrorThreshold = 0.00002
+    latErrorThreshold = 0.0002
+    lonErrorThreshold = 0.0002
     
     # Destination Coordinates.
-    destination = [1, 1]
+    destination = [43.659886, -79.396514] #GB
 
     # Autonomous Driving.
     rover = Rover(latErrorThreshold, lonErrorThreshold, destination)
     rospy.init_node('rover_autonomy', anonymous=True)
     rover.listenerPublisher()
+
+""" 
+    NOTES:
+    SET LAUNCH FILE PARAMS FOR INS.
+    - CHANGE GPS_LLA
+    - CHANGE DECLINATION - TORONTO: -10.44, Hanksville Utah: +10.5
+    - CHANGE INCLINATION - TORONTO: 69.56
+"""
