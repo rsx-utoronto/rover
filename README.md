@@ -61,4 +61,64 @@ To run using ROS, steps (make sure you have the joystick connected beforehand):
 
 For using the arm camera, go through the camera manual. Its IP is 192.168.0.10 (make sure the network is 192.168.*.*)
 ---
+---
+---To run Arduino files through terminal---
 
+1) Install the package
+```
+sudo apt-get install arduino-mk
+```
+2) Install pySerial
+```
+apt-get install python-serial
+```
+3) Make a file named "Makefile" in the same folder as your arduino file
+4) Declare the following variables in the document
+```
+ARDUINO_DIR – Directory where Arduino is installed
+ARDMK_DIR – Directory where you have copied the makefile
+AVR_TOOLS_DIR – Directory where avr tools are installed
+BOARD_TAG     = uno
+MONITOR_PORT  = /dev/ttyACM# 
+```
+5) Add at the end
+```
+include /usr/share/arduino/Arduino.mk
+```
+If that didn't work, try this instead
+```
+include $(ARDMK_DIR)/Arduino.mk
+```
+Example of Makefile
+```
+ARDUINO_DIR = /usr/share/arduino
+ARDMK_DIR=/usr/share/arduino
+AVR_TOOLS_DIR=/usr
+BOARD_TAG =uno
+MONITOR_PORT =/dev/ttyACM0
+include /usr/share/arduino/Arduino.mk
+``` 
+To run Arduino code using the terminal, change directory to the same folder as the arduino file and the Makefile
+
+To compile
+    ```
+   	make
+    ```
+    
+To upload
+    ```
+	  make upload
+    ```
+    
+To open serial monitor
+    ```
+	  make monitor
+    ```
+
+Additional Links:
+
+https://github.com/sudar/Arduino-Makefile
+
+https://hardwarefun.com/tutorials/compiling-arduino-sketches-using-makefile
+
+https://hackaday.com/2015/10/01/arduino-development-theres-a-makefile-for-that/
