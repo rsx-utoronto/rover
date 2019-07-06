@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<launch>
+	
+	   <group ns="planner">
+	      <remap from="openni_points" to="/planner_cloud"/>
+	      <remap from="map" to="/camera/rtabmap/proj_map"/>
+	      <remap from="move_base_simple/goal" to="/planner_goal"/>
+	
+	      <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		 <rosparam file="$(find rover)/launch/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+	      	 <rosparam file="$(find rover)/launch/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		 <rosparam file="$(find rover)/launch/config/local_costmap_params.yaml" command="load" />
+		 <rosparam file="$(find rover)/launch/config/global_costmap_params.yaml" command="load" />
+		 <rosparam file="$(find rover)/launch/config/base_local_planner_params.yaml" command="load" />
+	      </node>
+	   </group>
+
+ 	
+	<group ns="camera">
+		<node pkg="nodelet" type="nodelet" name="stereo_nodelet"  args="manager"/>
+
+		<!-- RTAB-map Node-->
+		<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+		  <arg name="rtabmap_args"		value="--delete_db_on_start" />
+		  <arg name="depth_topic"             	value="/rover/camera/camera/depth/image_raw"/>
+		  <arg name="frame_id"                  value="base_link" />
+		  <arg name="approx_sync"		value="false"/>
+		  <arg name="rtabmapviz"		value="true"/>
+		  <arg name="rviz"			value="false"/>
+		</include>
+		
+
+ 	      <!-- Generate a point cloud from the disparity image -->
+	      <node pkg="nodelet" type="nodelet" name="disparity2cloud" args="load rtabmap_ros/point_cloud_xyz stereo_nodelet">
+		 <remap from="disparity/image"       to="disparity"/>
+		 <remap from="disparity/camera_info" to="right/camera_info"/>
+		 <remap from="cloud"                to="/camera/rtabmap/cloud_obstacles"/>
+		 
+		 <param name="voxel_size" type="double" value="0.05"/>
+		 <param name="decimation" type="int" value="4"/>
+		 <param name="max_depth" type="double" value="4"/>
+	      </node>
+
+	      <!-- Create point cloud for the local planner -->
+	      <node pkg="nodelet" type="nodelet" name="obstacles_detection" args="load rtabmap_ros/obstacles_detection stereo_nodelet" output="screen">
+		 <remap from="cloud" to="/camera/rtabmap/cloud_obstacles"/>
+		 <remap from="obstacles" to="/planner_cloud"/>
+
+		 <param name="frame_id" type="string" value="zed_camera_center"/>
+		 <param name="map_frame_id" type="string" value="map"/>
+		 <param name="Grid/MinClusterSize" type="int" value="20"/>
+		 <param name="Grid/MaxObstacleHeight" type="double" value="0.4"/>
+	     </node>
+
+	</group>
+	
+
+
+
+	
+</launch>
