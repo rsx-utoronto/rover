@@ -23,10 +23,11 @@ To run this package:
 ---To run Drive---
 
 1) roscore 
-2) Upload the Drive_receiver Arduino code on the Arduidno
-3) Run the receiver node using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600
-4) On the separate command window, use this command: rosrun rover drive_sender
-5) Control the rover using the arrow keys
+2) Upload the Drive_receiver Arduino code on the Arduino
+3) To ssh into the Nvidia Jetson: ssh nvidia@itsipaddress
+4) Run the receiver node using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600
+5) On the separate command window, use this command: rosrun rover drive_sender
+6) Control the rover using the arrow keys
 
 ---
 ---To run SLAM---
