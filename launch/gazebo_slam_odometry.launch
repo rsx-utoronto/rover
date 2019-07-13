@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
     <group ns="rtabmap">
         <node pkg="nodelet" type="nodelet" name="rgbd_sync" args="standalone rtabmap_ros/rgbd_sync" output="screen">
