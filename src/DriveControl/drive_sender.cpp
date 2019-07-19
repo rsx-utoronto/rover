@@ -10,6 +10,8 @@
 #define KEYCODE_2 0x32
 #define KEYCODE_3 0x33
 #define KEYCODE_4 0x34
+#define KEYCODE_5 0x35
+#define KEYCODE_6 0x36
 #define KEYCODE_s 0x73
 #define KEYCODE_c 0x63
 #define KEYCODE_o 0x6f
@@ -131,7 +133,55 @@ void TeleopRover::keyLoop()
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
-	
+			case KEYCODE_2:
+				ROS_DEBUG("2");
+		        ROS_INFO("2");
+		        linear_= 25.0;
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_3:
+				ROS_DEBUG("3");
+		        ROS_INFO("3");
+		        linear_= 50.0;
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_4:
+				ROS_DEBUG("4");
+		        ROS_INFO("4");
+		        linear_= 75.0;
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_5:
+				ROS_DEBUG("5");
+		        ROS_INFO("5");
+		        linear_= 100.0;
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_6:
+				ROS_DEBUG("6");
+		        ROS_INFO("6");
+		        linear_= 125.0;
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_1:
+				ROS_DEBUG("1");
+		        ROS_INFO("1");
+		        linear_= 1.5; //Positive increment 
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
+		    case KEYCODE_0:
+				ROS_DEBUG("0");
+		        ROS_INFO("0");
+		        linear_= -1.5;//Negative increment 
+		        dirty = true;
+		        alreadyStopped = false;
+		      break;
 		    case KEYCODE_SPACE:
 				ROS_DEBUG("STOP");
 		        ROS_INFO("STOP");
@@ -140,6 +190,7 @@ void TeleopRover::keyLoop()
 		        dirty = true;
 		        alreadyStopped = false;
 		        break;
+
 		    default:
 		    	if (alreadyStopped = false)
 		    	{

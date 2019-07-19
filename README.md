@@ -3,7 +3,6 @@ ROS Package: Kinetic
 
 Package name: rover
 
-
 To clone this package:
 
 1) Create a folder (name doesn't matter)
