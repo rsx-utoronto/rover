@@ -1,13 +1,7 @@
 # Rover Software
-All the software for the rover. Started using ROS
-ROS Kinetic
+ROS Package: Kinetic
 
 Package name: rover
-
-Nodes:
-Drive_server_node: drive_server
-Drive_client_node: drive_client (Arduino code)
-... (Add more nodes)
 
 
 To clone this package:
@@ -15,10 +9,12 @@ To clone this package:
 1) Create a folder (name doesn't matter)
 2) Create a src folder inside
 3) git clone this repository into this src folder
+4) cd ../..
+5) catkin_make
 
 To run this package:
 
-1) Compile the package by running this command in the base folder (the folder you created):
+1) Compile the package by running this command in the project folder (the folder you created):
   catkin_make
 2) Run each nodes by typing in this command:
   rosrun rover "name of the node"
@@ -27,10 +23,11 @@ To run this package:
 ---To run Drive---
 
 1) roscore 
-2) Upload the Drive_receiver Arduino code on the Arduidno
-3) Run the receiver node using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600
-4) On the separate command window, use this command: rosrun rover drive_sender
-5) Control the rover using the arrow keys
+2) Upload the Drive_receiver Arduino code on the Arduino
+3) To ssh into the Nvidia Jetson: ssh nvidia@itsipaddress
+4) Run the receiver node using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600
+5) On the separate command window, use this command: rosrun rover drive_sender
+6) Control the rover using the arrow keys
 
 ---
 ---To run SLAM---
@@ -61,64 +58,5 @@ To run using ROS, steps (make sure you have the joystick connected beforehand):
 
 For using the arm camera, go through the camera manual. Its IP is 192.168.0.10 (make sure the network is 192.168.*.*)
 ---
----
----To run Arduino files through terminal---
 
-1) Install the package
-```
-sudo apt-get install arduino-mk
-```
-2) Install pySerial
-```
-apt-get install python-serial
-```
-3) Make a file named "Makefile" in the same folder as your arduino file
-4) Declare the following variables in the document
-```
-ARDUINO_DIR – Directory where Arduino is installed
-ARDMK_DIR – Directory where you have copied the makefile
-AVR_TOOLS_DIR – Directory where avr tools are installed
-BOARD_TAG     = uno
-MONITOR_PORT  = /dev/ttyACM# 
-```
-5) Add at the end
-```
-include /usr/share/arduino/Arduino.mk
-```
-If that didn't work, try this instead
-```
-include $(ARDMK_DIR)/Arduino.mk
-```
-Example of Makefile
-```
-ARDUINO_DIR = /usr/share/arduino
-ARDMK_DIR=/usr/share/arduino
-AVR_TOOLS_DIR=/usr
-BOARD_TAG =uno
-MONITOR_PORT =/dev/ttyACM0
-include /usr/share/arduino/Arduino.mk
-``` 
-To run Arduino code using the terminal, change directory to the same folder as the arduino file and the Makefile
 
-To compile
-    ```
-   	make
-    ```
-    
-To upload
-    ```
-	  make upload
-    ```
-    
-To open serial monitor
-    ```
-	  make monitor
-    ```
-
-Additional Links:
-
-https://github.com/sudar/Arduino-Makefile
-
-https://hardwarefun.com/tutorials/compiling-arduino-sketches-using-makefile
-
-https://hackaday.com/2015/10/01/arduino-development-theres-a-makefile-for-that/

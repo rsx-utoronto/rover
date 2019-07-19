@@ -1,0 +1,8 @@
+global_costmap:
+  global_frame: map
+  robot_base_frame: base_link
+  update_frequency: 0.5
+  publish_frequency: 0.5
+  static_map: true
+  observation_sources: point_cloud_sensor
+
