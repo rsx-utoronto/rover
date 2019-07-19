@@ -25,6 +25,8 @@ int speedB = -100;
 int speedPrevF= 100; 
 int speedPrevB= -100; 
 
+int hack = 2;
+
 int num = 1.00;
 int count = 0;
 int count_reached = 500;
@@ -41,11 +43,11 @@ void messageCb( const geometry_msgs::Twist& msg){
   //nh.loginfo("msg received");
   char resultAngular[8]; // Buffer big enough for 7-character float
   char resultLinear[8];
-  dtostrf(msg.angular.z, 6, 2, resultAngular); // Leave room for too large numbers!
-  dtostrf(msg.linear.x, 6, 2, resultLinear); // Leave room for too large numbers!
+  //dtostrf(msg.angular.z, 6, 2, resultAngular); // Leave room for too large numbers!
+  //dtostrf(msg.linear.x, 6, 2, resultLinear); // Leave room for too large numbers!
 
-  nh.loginfo(resultAngular);
-  nh.loginfo(resultLinear);
+  //nh.loginfo(resultAngular);
+  //nh.loginfo(resultLinear);
   
   //nh.loginfo(resultAngular);
   //nh.loginfo(resultLinear);
@@ -91,7 +93,7 @@ void messageCb( const geometry_msgs::Twist& msg){
       message = "125";
     } else if (msg.linear.x == 1.5)
     {
-      if (speedF <= 115){
+      if (speedF <= 175){
         speedF += 10;
         speedB +=-10; 
         /*speedP +=10;*/
@@ -123,10 +125,10 @@ void messageCb( const geometry_msgs::Twist& msg){
       /*setLeftSpd(speedF);
       setRightSpd(speedF);*/
       accel(speedF, speedPrevF);
-      message = "forward @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,fspd);
-      nh.loginfo(result);
+      //message = "forward @ ";
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,fspd);
+      nh.loginfo(fspd);
     }
     else if (msg.linear.x == -1.00)
     {
@@ -134,9 +136,9 @@ void messageCb( const geometry_msgs::Twist& msg){
       setRightSpd(-speedF);*/
       accel(speedB, speedPrevB); 
       message = "backward @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,bspd);
-      nh.loginfo(result);
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,bspd);
+      nh.loginfo(bspd);
     }
     else
     {
@@ -148,18 +150,18 @@ void messageCb( const geometry_msgs::Twist& msg){
     if (msg.angular.z == 1.00)
     {
       doPivot(speedF);
-      message = "left @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,fspd);
-      nh.loginfo(result);
+      //message = "left @ ";
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,fspd);
+      nh.loginfo(fspd);
     }
     else if (msg.angular.z == -1.00)
     {
       doPivot(-speedF);
-      message = "right @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,fspd);
-      nh.loginfo(result);
+      //message = "right @ ";
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,fspd);
+      nh.loginfo(bspd);
     }
   }
 //  digitalWrite(13, HIGH-digitalRead(13));   // blink the led
@@ -186,18 +188,26 @@ void setRightSpd(int spd) {
     if(spd < 0) {
         digitalWrite(directionPins[1], LOW);
         analogWrite(speedPins[3], -spd);
-        for(int i=4; i<6; i++) {
-            digitalWrite(directionPins[i - 2], HIGH);
-            analogWrite(speedPins[i], -spd);
-        }
+        digitalWrite(directionPins[4 - 2], HIGH);
+        analogWrite(speedPins[4], -spd/hack);
+        digitalWrite(directionPins[5 - 2], HIGH);
+        analogWrite(speedPins[5], -spd);
+//        for(int i=4; i<6; i++) {
+//            digitalWrite(directionPins[i - 2], HIGH);
+//            analogWrite(speedPins[i], -spd);
+//        }
     }
     else {
         digitalWrite(directionPins[1], HIGH);
         analogWrite(speedPins[3], spd);
-        for(int i=4; i<6; i++) {
-            digitalWrite(directionPins[i - 2], LOW);
-            analogWrite(speedPins[i], -spd);
-        }
+        digitalWrite(directionPins[4 - 2], LOW);
+        analogWrite(speedPins[4], -spd/hack);
+        digitalWrite(directionPins[5 - 2], LOW);
+        analogWrite(speedPins[5], -spd);
+//        for(int i=4; i<6; i++) {
+//            digitalWrite(directionPins[i - 2], LOW);
+//            analogWrite(speedPins[i], -spd);
+//        }
     }
 }
 
