@@ -1,6 +1,6 @@
 {
     "terminal.integrated.env.linux": {
-        "PATH": "/home/richard/.platformio/penv/bin:/home/richard/.platformio/penv:/home/richard/bin:/home/richard/.local/bin:/opt/ros/kinetic/bin:/home/richard/bin:/home/richard/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "PATH": "/home/wasteofspace/.platformio/penv/bin:/home/wasteofspace/.platformio/penv:/opt/ros/kinetic/bin:/home/wasteofspace/.local/share/umake/bin:/home/wasteofspace/bin:/home/wasteofspace/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
         "PLATFORMIO_CALLER": "vscode"
     },
     "terminal.integrated.env.windows": {
