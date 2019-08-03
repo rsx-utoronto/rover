@@ -86,7 +86,8 @@ void TeleopRover::keyLoop()
 	std_msgs::String msg;
 	puts("Reading from keyboard");
 	puts("---------------------------");
-	puts("Use arrow keys to move the servo.");
+	puts("Select servo 1-6 or 0(all)");
+	puts("o -> open; c -> close");
 
 	for(;;)
 	{
