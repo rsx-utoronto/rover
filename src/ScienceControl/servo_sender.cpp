@@ -12,6 +12,7 @@
 #define KEYCODE_4 0x34
 #define KEYCODE_5 0x35
 #define KEYCODE_6 0x36
+#define KEYCODE_7 0x37
 #define KEYCODE_s 0x73
 #define KEYCODE_c 0x63		
 #define KEYCODE_o 0x6f
@@ -86,7 +87,7 @@ void TeleopRover::keyLoop()
 	std_msgs::String msg;
 	puts("Reading from keyboard");
 	puts("---------------------------");
-	puts("Select servo 1-6 or 0(all)");
+	puts("Select servo 1-6 or 7(all)");
 	puts("o -> open; c -> close");
 
 	for(;;)
@@ -103,11 +104,11 @@ void TeleopRover::keyLoop()
 	    ROS_DEBUG("value: 0x%02X\n", c);
 
 		// Update servo choice.
-		if(c==KEYCODE_0 || c==KEYCODE_1 || c==KEYCODE_2 || c==KEYCODE_3 || c==KEYCODE_4 || c==KEYCODE_5 || c==KEYCODE_6) {
+		if(c==KEYCODE_7 || c==KEYCODE_1 || c==KEYCODE_2 || c==KEYCODE_3 || c==KEYCODE_4 || c==KEYCODE_5 || c==KEYCODE_6) {
 			switch(c)
 			{
-				case KEYCODE_0:
-					servo = 0;
+				case KEYCODE_7:
+					servo = 7;
 					ROS_INFO("SELECTED ALL SERVOS");
 					break;
 				case KEYCODE_1:
@@ -143,9 +144,9 @@ void TeleopRover::keyLoop()
 				case KEYCODE_o:
 					switch(servo)
 					{
-						case 0:
+						case 7:
 							ROS_INFO("OPEN ALL SERVOS");
-							msg.data = "0o";
+							msg.data = "7o";
 							dirty = true;
 							break;
 						case 1:
@@ -183,9 +184,9 @@ void TeleopRover::keyLoop()
 				case KEYCODE_c:
 					switch(servo)
 					{
-						case 0:
+						case 7:
 							ROS_INFO("CLOSE ALL SERVOS");
-							msg.data = "0c";
+							msg.data = "7c";
 							dirty = true;
 							break;						
 						case 1:
