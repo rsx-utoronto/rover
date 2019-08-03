@@ -10,7 +10,7 @@
 ros::NodeHandle  nh;
 
 int speedPins[] = {3, 5, 6, 9, 10, 11 };
-int directionPins[] = {2, 4, 7, 8};
+int directionPins[] = {23, 25, 2, 4, 7, 8};
 int rel1 = 12;
 int rel2 = 13;
 int rel3 = A5;
@@ -76,14 +76,14 @@ ros::Subscriber<geometry_msgs::Twist> sub("drive", &messageCb );
 
 void setLeftSpd(int spd) {
       if(spd < 0) {
-          digitalWrite(directionPins[0], HIGH);
           for(int i=0; i<3; i++) {
+              digitalWrite(directionPins[i], HIGH);
               analogWrite(speedPins[i], -spd);
           }
       }
       else {
-          digitalWrite(directionPins[0], LOW);
           for(int i=0; i<3; i++) {
+              digitalWrite(directionPins[i], LOW);
               analogWrite(speedPins[i], spd);
           }
       }
@@ -91,19 +91,19 @@ void setLeftSpd(int spd) {
 
 void setRightSpd(int spd) {
     if(spd < 0) {
-        digitalWrite(directionPins[1], LOW);
+        digitalWrite(directionPins[3], LOW);
         analogWrite(speedPins[3], -spd);
         for(int i=4; i<6; i++) {
-            digitalWrite(directionPins[i - 2], HIGH);
-            analogWrite(speedPins[i], -spd);
-        }
+              digitalWrite(directionPins[i], HIGH);
+              analogWrite(speedPins[i], -spd);
+          }
     }
     else {
-        digitalWrite(directionPins[1], HIGH);
+        digitalWrite(directionPins[3], HIGH);
         analogWrite(speedPins[3], spd);
         for(int i=4; i<6; i++) {
-            digitalWrite(directionPins[i - 2], LOW);
-            analogWrite(speedPins[i], -spd);
+            digitalWrite(directionPins[i], LOW);
+            analogWrite(speedPins[i], spd);
         }
     }
 }
