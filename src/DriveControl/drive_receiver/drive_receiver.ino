@@ -10,7 +10,7 @@
 ros::NodeHandle  nh;
 
 int speedPins[] = {3, 5, 6, 9, 10, 11 };
-int directionPins[] = {23, 25, 2, 4, 7 8};
+int directionPins[] = {23, 25, 2, 4, 7, 8};
 int rel1 = 12;
 int rel2 = 13;
 int rel3 = A5;
@@ -36,6 +36,10 @@ boolean startCounting = false;
 char result[100];// Charcter array for final loginfo display message
 char fspd[50], bspd[50], pspd[50];
 const char *message; 
+
+void accel(int, int);
+void stop();
+void doPivot(int);
 
 void messageCb( const geometry_msgs::Twist& msg){
   startCounting = true;
