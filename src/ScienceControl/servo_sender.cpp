@@ -107,24 +107,31 @@ void TeleopRover::keyLoop()
 			{
 				case KEYCODE_0:
 					servo = 0;
+					ROS_INFO("SELECTED ALL SERVOS");
 					break;
 				case KEYCODE_1:
 					servo = 1;
+					ROS_INFO("SELECTED SERVO 1");
 					break;
 				case KEYCODE_2:
 					servo = 2;
+					ROS_INFO("SELECTED SERVO 2");
 					break;
 				case KEYCODE_3:
 					servo = 3;
+					ROS_INFO("SELECTED SERVO 3");
 					break;
 				case KEYCODE_4:
 					servo = 4;
+					ROS_INFO("SELECTED SERVO 4");
 					break;
 				case KEYCODE_5:
 					servo = 5;
+					ROS_INFO("SELECTED SERVO 5");
 					break;
 				case KEYCODE_6:
 					servo = 6;
+					ROS_INFO("SELECTED SERVO 6");
 					break;																									
 			}
 		}
@@ -132,7 +139,7 @@ void TeleopRover::keyLoop()
 		else if(c==KEYCODE_c || c==KEYCODE_o) {
 			switch(c)
 			{
-				case KEYCODE_c:
+				case KEYCODE_o:
 					switch(servo)
 					{
 						case 0:
@@ -172,7 +179,7 @@ void TeleopRover::keyLoop()
 							break;
 					}
 					break;
-				case KEYCODE_o:
+				case KEYCODE_c:
 					switch(servo)
 					{
 						case 0:
