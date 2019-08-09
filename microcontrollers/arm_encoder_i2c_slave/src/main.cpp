@@ -1,36 +1,32 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-// The Addresses are relative, so A->B->C, then A being the master, then B must be 2 and C must be 3 and so on...
 #define slave_address 1
-
-// Set Apin as -1 if not used
-// #define outputA -1  <- A1 & B1 are disabled
 
 #if slave_address == 1
     #define total_no_of_sensors 2
-    #define outputA 4
+    #define outputA 4 // shoulder rotation
     #define outputB 5
-    #define outputA2 9
+    #define outputA2 9 // shoulder pitch
     #define outputB2 10
-    #define outputA3 11
-    #define outputB3 12
+    #define outputA3 -1
+    #define outputB3 -1
 #elif slave_address == 2
     #define total_no_of_sensors 2
-    #define outputA 4
+    #define outputA 4 // forearm rotation
     #define outputB 5
-    #define outputA2 11
+    #define outputA2 11 // elbow
     #define outputB2 12
     #define outputA3 -1
     #define outputB3 -1
 #elif slave_address == 3
     #define total_no_of_sensors 2
-    #define outputA 4
+    #define outputA 4 // wrist right
     #define outputB 5
-    #define outputA2 11
-    #define outputB2 12
-    #define outputA3 -1
-    #define outputB3 -1
+    #define outputA2 9 // wrist left
+    #define outputB2 10
+    #define outputA3 11 // gripper
+    #define outputB3 12
 #endif
 
 int outputA_pins[total_no_of_sensors] = { 0 };
@@ -42,17 +38,16 @@ int bLastStates[total_no_of_sensors] = { 0 };
 int aLastStates[total_no_of_sensors] = { 0 };
 byte Sensor_value_bytes[2] = { 7 };
 
-int currentSensor = 0; // Returns Sensor_value of <currentSensor>
-/*
-A - 0
-A2 - 1
-A3 - 2
- */
+int currentSensor = 0;
+// encoder 1: 0
+// encoder 2: 1
+// encoder 3: 2
+
 void receiveEvent(int numBytes);
 void requestEvent();
 
 void setup() {
-    Wire.begin(slave_address); // put your setup code here, to run once:
+    Wire.begin(slave_address);
     Wire.onReceive(receiveEvent);
     Wire.onRequest(requestEvent);
     Serial.begin(115200);
