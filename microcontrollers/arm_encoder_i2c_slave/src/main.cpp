@@ -10,8 +10,8 @@
 
 #define outputA 4
 #define outputB 5
-#define outputA2 9
-#define outputB2 8
+#define outputA2 11
+#define outputB2 12
 #define outputA3 -1
 #define outputB3 -1
 
@@ -19,8 +19,10 @@ int outputA_pins[total_no_of_sensors] = { 0 };
 int outputB_pins[total_no_of_sensors] = { 0 };
 int Sensor_values[total_no_of_sensors] = { 0 };
 int aStates[total_no_of_sensors] = { 0 };
+int bStates[total_no_of_sensors] = { 0 };
+int bLastStates[total_no_of_sensors] = { 0 };
 int aLastStates[total_no_of_sensors] = { 0 };
-byte Sensor_value_bytes[2] = { 0 };
+byte Sensor_value_bytes[2] = { 7 };
 
 int currentSensor = 0; // Returns Sensor_value of <currentSensor>
 /*
@@ -28,14 +30,14 @@ A - 0
 A2 - 1
 A3 - 2
  */
-void receiveEvent(int Sensor_no);
+void receiveEvent(int numBytes);
 void requestEvent();
 
 void setup() {
     Wire.begin(slave_address); // put your setup code here, to run once:
     Wire.onReceive(receiveEvent);
-    Wire.onRequest(requestEvent); //put in code to make sure the slave knows how to handle a request from the master
-    Serial.begin(9600);
+    Wire.onRequest(requestEvent);
+    Serial.begin(115200);
 
     // Setting all pin values
     int i = 0;
@@ -60,42 +62,44 @@ void setup() {
         pinMode(outputA_pins[i], INPUT);
         pinMode(outputB_pins[i], INPUT);
         aLastStates[i] = digitalRead(outputA_pins[i]);
+        bLastStates[i] = digitalRead(outputB_pins[i]);
     }
 }
 
 void loop() {
-    Serial.println(5);
-    /* 
+    
     // Go through n number of sensors and update them all
     for (int i = 0; i < total_no_of_sensors; i++) {
         aStates[i] = digitalRead(outputA_pins[i]);  // Reads the "current" state of the outputA[i]
-        
-        // If the previous and the current state of the outputA[i] are different, that means a Pulse has occured
-        if (aStates[i] != aLastStates[i]) {
-
-            // If the outputB[i] st_ate is different to the outputA[i] state, that means the encoder is rotating clockwise
-            if (digitalRead(outputB_pins[i]) != aStates[i]) {
-
-                Sensor_values[i] = Sensor_values[i] + 1;
-            } else {
-                Sensor_values[i] = Sensor_values[i] - 1;
-            }
+        bStates[i] = digitalRead(outputB_pins[i]);
+        if(aStates[i] != aLastStates[i]){
+          if(aStates[i]){
+            bStates[i] ? Sensor_values[i]--:Sensor_values[i]++;
+          } else{
+            bStates[i] ? Sensor_values[i]++:Sensor_values[i]--;
+          }
         }
-        aLastStates[i] = aStates[i]; // Updates the previous state of the outputA[i] with the current state
-        Serial.println(outputA_pins[i]);
-        Serial.println(Sensor_values[i]);
-        Serial.println("\n");
+
+        if(bLastStates[i] != bStates[i]){
+          if(bStates[i]){
+            aStates[i] ? Sensor_values[i]++:Sensor_values[i]--;
+            
+          }else{
+            aStates[i] ? Sensor_values[i]--:Sensor_values[i]++;
+          }
+        }
+        bLastStates[i] = bStates[i];
+        aLastStates[i] = aStates[i];
     }
-    delay(10); // might not be needed maybe*/
+    Serial.println(Sensor_values[0]);
+    //delay(); // might not be needed maybe
 }
 
-void receiveEvent(int num_bytes) {
+void receiveEvent(int numBytes) {
 
-    while (Wire.available()) { // slave may send less than requested
-
-        // Set currentSensor so the desired sensor is reported
-        currentSensor = Wire.read();
-    }
+    // Set currentSensor so the desired sensor is reported
+    currentSensor = Wire.read();
+    Serial.println(currentSensor);
 }
 
 void requestEvent() {
@@ -108,9 +112,13 @@ void requestEvent() {
     }
     Wire.write(Sensor_value_bytes, total_no_of_sensors*2);
     */
-    Sensor_value_bytes[0] = (Sensor_values[currentSensor] >> 8) & (0xFF);
-    Sensor_value_bytes[1] = (Sensor_values[currentSensor]) & (0xFF);
+    Sensor_value_bytes[0] = ((Sensor_values[0])>>8)&(0xFF);
+    Sensor_value_bytes[1] = (Sensor_values[0])&(0xFF);
+//    Serial.println(Sensor_values[0]);
+//    Serial.println(Sensor_values[1]);
+//    Serial.println(Sensor_values[2]);
     Wire.write(Sensor_value_bytes, 2);
-
+  //  Wire.write(Sensor_value_bytes[1]);
+    
     // May need to adjust the number of bytes
 }
