@@ -2,18 +2,36 @@
 #include <Wire.h>
 
 // The Addresses are relative, so A->B->C, then A being the master, then B must be 2 and C must be 3 and so on...
-#define slave_address 0
-#define total_no_of_sensors 2
+#define slave_address 1
 
 // Set Apin as -1 if not used
 // #define outputA -1  <- A1 & B1 are disabled
 
-#define outputA 4
-#define outputB 5
-#define outputA2 11
-#define outputB2 12
-#define outputA3 -1
-#define outputB3 -1
+#if slave_address == 1
+    #define total_no_of_sensors 2
+    #define outputA 4
+    #define outputB 5
+    #define outputA2 9
+    #define outputB2 10
+    #define outputA3 11
+    #define outputB3 12
+#elif slave_address == 2
+    #define total_no_of_sensors 2
+    #define outputA 4
+    #define outputB 5
+    #define outputA2 11
+    #define outputB2 12
+    #define outputA3 -1
+    #define outputB3 -1
+#elif slave_address == 3
+    #define total_no_of_sensors 2
+    #define outputA 4
+    #define outputB 5
+    #define outputA2 11
+    #define outputB2 12
+    #define outputA3 -1
+    #define outputB3 -1
+#endif
 
 int outputA_pins[total_no_of_sensors] = { 0 };
 int outputB_pins[total_no_of_sensors] = { 0 };
