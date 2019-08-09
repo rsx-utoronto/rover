@@ -29,8 +29,8 @@
     #define outputB3 12
 #endif
 
-int outputA_pins[total_no_of_sensors] = { 0 };
-int outputB_pins[total_no_of_sensors] = { 0 };
+const int outputA_pins[3] = {4, 9, 11};
+const int outputB_pins[3] = {5, 10, 12};
 int Sensor_values[total_no_of_sensors] = { 0 };
 int aStates[total_no_of_sensors] = { 0 };
 int bStates[total_no_of_sensors] = { 0 };
@@ -51,24 +51,6 @@ void setup() {
     Wire.onReceive(receiveEvent);
     Wire.onRequest(requestEvent);
     Serial.begin(115200);
-
-    // Setting all pin values
-    int i = 0;
-    if (outputA != -1) {
-        outputA_pins[i] = outputA;
-        outputB_pins[i] = outputB;
-        i++;
-    }
-    if (outputA2 != -1) {
-        outputA_pins[i] = outputA2;
-        outputB_pins[i] = outputB2;
-        i++;
-    }
-    if (outputA3 != -1) {
-        outputA_pins[i] = outputA3;
-        outputB_pins[i] = outputB3;
-        i++;
-    }
 
     // Setting all pinModes and Sensor states
     for (i = 0; i < total_no_of_sensors; i++) {
@@ -116,15 +98,6 @@ void receiveEvent(int numBytes) {
 }
 
 void requestEvent() {
-
-    // Bit Manipulation so an entire integer can be sent
-    /*
-    for (int i = 0; i < total_no_of_sensors; i++) {
-        Sensor_value_bytes[2*i] = (Sensor_values[i]>>8)&(0xFF);
-        Sensor_value_bytes[2*i + 1] = (Sensor_values[i])&(0xFF);
-    }
-    Wire.write(Sensor_value_bytes, total_no_of_sensors*2);
-    */
     Sensor_value_bytes[0] = ((Sensor_values[0])>>8)&(0xFF);
     Sensor_value_bytes[1] = (Sensor_values[0])&(0xFF);
 //    Serial.println(Sensor_values[0]);
