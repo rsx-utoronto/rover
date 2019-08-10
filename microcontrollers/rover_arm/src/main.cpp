@@ -2,12 +2,25 @@
 #include <Stream.h>
 #include <PID_v1.h>
 #include <main.h>
+#include <WSWire.h>
 
+#define ENC_DEBUG 0
+#define GRIP_ENCODER_MISSING 1
+
+#define Controller_address 0
+
+#define total_no_of_slaves 3
+#define total_no_of_sensors 7
+const int slave_address[3]     = {1, 2, 3};
+const int sensors_per_slave[3] = {2, 2, 3};
 // IDs for each of the joints and motors
 typedef enum joint {  SHR,   SHP,   ELB,   FAR,   WPI,   WRO,   GRP};
 typedef enum motor {M_SHR, M_SHP, M_ELB, M_FAR, M_WRL, M_WRR, M_GRP};
 
-double goal_pos[7] = {0, 0, 0, 0, 0, 0, 0};         // The goal position for each MOTOR
+// map from the order the sensors are addressed with I2C to the internal model
+const int logical_to_physical_sens_map[7] = {M_SHR, M_SHP, M_FAR, M_ELB, M_WRR, M_WRL, M_GRP};
+
+double goal_pos[14] = {0, 0, 0, 0, 0, 0, 0};         // The goal position for each MOTOR
 volatile int actual_pos[7] = {0, 0, 0, 0, 0, 0, 0}; // The reading of each MOTOR encoder
 double actual_pos_float[7] = {0, 0, 0, 0, 0, 0, 0}; // Floating point copy of above for PID lib
 double vel[7] = {0, 0, 0, 0, 0, 0, 0};              // The PWM voltage to apply to each MOTOR
@@ -22,18 +35,14 @@ double Ki[7] = {1,     0.8,    0,  1.0,    1,    1,   0};
 double Kd[7] = {0.06, 0.05, 0.05, 0.05, 0.04, 0.04,   0};
 
 // Pins for each motor
-const char dirPin[7] = {12, 10, 13, 9, 11, 15, 14};
-const char pwmPin[7] = {7, 5, 8, 4, 6, 2, 3};
+const char dirPin[7] = {22, 23, 4, 6, 8, 10, 12};
+const char pwmPin[7] = {2, 3, 5, 7, 9, 11, 13};
 
 const char spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
 
 // Flags
 bool running = true;          // Used for emergency stopping
 bool manual_override = false; // Used for the 'm' command
-
-// Pins for A and B output of each encoder
-const char enc_A[7] = {38, 24, 21, 32, 46, 52, 34};
-const char enc_B[7] = {44, 26, 20, 48, 50, 42, 30};
 
 // PID objects operate on the values of vel[] directly
 // Change to REVERSE if PID control is backwards
@@ -46,12 +55,14 @@ PID PID_5(&actual_pos_float[5], &vel[5], &goal_pos[5], Kp[5], Ki[5], Kd[5], REVE
 PID PID_6(&actual_pos_float[6], &vel[6], &goal_pos[6], Kp[6], Ki[6], Kd[6], REVERSE);
 
 void setup() {
+    Wire.begin(Controller_address); // put your setup code here, to run once:
+    Wire.onReceive(receiveEvent);
     Serial.begin(115200);
     while (!Serial);
     Serial.setTimeout(2); // Set the timeout to 2ms, otherwise parsing can hang for up to a second
     Serial.println("Serial initialized.");
     drivers_initilize();
-    setup_interrupts();
+    //setup_interrupts();
     starting_position();
     setup_PID();
     Serial.println("drivers and encoders initialized.");
@@ -61,6 +72,7 @@ unsigned long last_print = millis();
 unsigned long last_override = 0;
 
 void loop() {
+    get_encoder_values();
     if (Serial.available()) {
         switch (Serial.read()) {
             case 'p': // Move to absolute position within limits
@@ -100,6 +112,7 @@ void loop() {
                 break;
             case 'a':                // print encoder positions
                 PRINT_encoder_positions();
+               // TEST_motor_pins();
                 break;
             default:
                 Serial.println("parse err");
@@ -120,6 +133,65 @@ void loop() {
     update_velocity();
 }
 
+void get_encoder_values() {
+    int logical_sens_no = 0;
+    int sens_val;
+    int x;
+
+    for(int slave_addr = 1; slave_addr <= 3; slave_addr++) {
+        Wire.requestFrom(slave_addr, 6); // request 6 bytes from slave
+        int i = 0;
+        byte read_bytes[6];
+        while (Wire.available() && i < 6) {
+            read_bytes[i] = Wire.read();
+            i++;
+        }
+        #if ENC_DEBUG
+            Serial.print("a=");
+            Serial.print(slave_addr);
+            Serial.print(", r=");
+            Serial.print(i);
+            Serial.print(", raw: ");
+            for(int i = 0; i < 6; i++){
+                Serial.print(read_bytes[i]);
+                Serial.print(", ");
+            }
+        #endif
+        for (int i = 0; i < sensors_per_slave[slave_addr - 1]; i++) { // for each sensor attatched to the slave
+            x = logical_to_physical_sens_map[logical_sens_no]; // map it to the proper sensor in the model
+            sens_val = (read_bytes[2 * i] << 8) | read_bytes[2 * i + 1]; // convert bytes to int
+            actual_pos[x] = sens_val;
+            logical_sens_no++;
+        }
+    }
+    #if ENC_DEBUG
+        for (int i = 0; i < 6; i++) {
+            Serial.print("ap[");
+            Serial.print(i);
+            Serial.print("] = ");
+            Serial.print(actual_pos[i]);
+            Serial.print(", ");
+        }
+        Serial.println();
+    #endif
+}
+
+void receiveEvent(int number_of_bytes) {
+    if(Wire.available()){
+        //delay(100);
+        while (Wire.available()) {
+            int sensor_no = Wire.read();
+            byte a = Wire.read(); // sensor_no
+            byte b = Wire.read();
+
+
+            actual_pos[sensor_no] = a;
+            actual_pos[sensor_no] = (actual_pos[sensor_no] << 8 )| b;
+            
+        }
+    }
+}
+
 void updatePID() {
     actual_pos_float[0] = (double) actual_pos[0];
     PID_0.Compute();
@@ -133,8 +205,12 @@ void updatePID() {
     PID_4.Compute();
     actual_pos_float[5] = (double) actual_pos[5];
     PID_5.Compute();
+    #if GRIP_ENCODER_MISSING == 1
+    vel[6] = goal_pos[6]; // if the grip encoder is missing, skip computation and just write the velocity
+    #else
     actual_pos_float[6] = (double) actual_pos[6];
     PID_6.Compute();
+    #endif
 }
 
 void update_goals(bool no_limits = false, bool absolute = true) {
@@ -180,7 +256,7 @@ void update_goals(bool no_limits = false, bool absolute = true) {
 void direct_velocity_control(){
     int raw_vel[7];
     for (int i = 0; i < 7; i++) {
-        raw_vel[i] = Serial.parseInt();
+        raw_vel[i] = Serial.parseInt();   
     }
     vel[0] = raw_vel[0];
     vel[1] = -raw_vel[1];
@@ -189,14 +265,21 @@ void direct_velocity_control(){
     // Translate IK spherical model to differential wrist
     vel[4] = -raw_vel[4] - raw_vel[5];  // tilt + rot
     vel[5] = -raw_vel[4] + raw_vel[5]; // tilt + rot
+    //Serial.println(vel[5]);
     // Take into account spherical wrist rotation for the gripper output
-    vel[6] = raw_vel[6] + ((double) raw_vel[5] * 1680.0/(26.9*64.0));
+    vel[6] = raw_vel[6];
 }
 
 void update_velocity() {
     for (int i = 0; i < 7; i++) {
         if (running) {
-            digitalWrite(dirPin[i], vel[i] > 0);
+            int dir;
+            if(vel[i] > 0) {
+                dir = HIGH;
+            } else {
+                dir = LOW;
+            }
+            digitalWrite(dirPin[i], dir);
             analogWrite(pwmPin[i], abs(vel[i]));
         } else {
             // e-stop activated, stop running
@@ -210,28 +293,6 @@ void drivers_initilize() {
         pinMode(dirPin[i], OUTPUT);
         pinMode(pwmPin[i], OUTPUT);
     }
-}
-
-void setup_interrupts() {
-    for(int i = 0; i < 7; i++) {
-        pinMode(enc_A[i], INPUT);
-        pinMode(enc_B[i], INPUT);
-    }
-    // same with 
-    attachInterrupt(digitalPinToInterrupt(enc_A[0]), A0_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[0]), B0_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_A[1]), A1_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[1]), B1_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_A[2]), A2_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[2]), B2_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_A[3]), A3_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[3]), B3_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_A[4]), A4_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[4]), B4_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_A[5]), A5_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[5]), B5_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_A[6]), A6_handler, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(enc_B[6]), B6_handler, CHANGE);
 }
 
 void setup_PID(){
@@ -266,151 +327,7 @@ void starting_position() {
     }
 }
 
-void A0_handler() {
-    if (digitalRead(enc_A[0])) { // rising edge
-        digitalRead(enc_B[0]) ? actual_pos[0]-- : actual_pos[0]++;
-    } else { // falling edge
-        digitalRead(enc_B[0]) ? actual_pos[0]++ : actual_pos[0]--;
-    }
-}
-
-void B0_handler() {
-    if (digitalRead(enc_B[0])) { // rising edge
-        digitalRead(enc_A[0]) ? actual_pos[0]++ : actual_pos[0]--;
-    } else { // falling edge
-        digitalRead(enc_A[0]) ? actual_pos[0]-- : actual_pos[0]++;
-    }
-}
-
-void A1_handler() {
-    if (digitalRead(enc_A[1])) { // rising edge
-        digitalRead(enc_B[1]) ? actual_pos[1]-- : actual_pos[1]++;
-    } else { // falling edge
-        digitalRead(enc_B[1]) ? actual_pos[1]++ : actual_pos[1]--;
-    }
-}
-
-void B1_handler() {
-    if (digitalRead(enc_B[1])) { // rising edge
-        digitalRead(enc_A[1]) ? actual_pos[1]++ : actual_pos[1]--;
-    } else { // falling edge
-        digitalRead(enc_A[1]) ? actual_pos[1]-- : actual_pos[1]++;
-    }
-}
-
-void A2_handler() {
-    if (digitalRead(enc_A[2])) { // rising edge
-        digitalRead(enc_B[2]) ? actual_pos[2]-- : actual_pos[2]++;
-    } else { // falling edge
-        digitalRead(enc_B[2]) ? actual_pos[2]++ : actual_pos[2]--;
-    }
-}
-
-void B2_handler() {
-    if (digitalRead(enc_B[2])) { // rising edge
-        digitalRead(enc_A[2]) ? actual_pos[2]++ : actual_pos[2]--;
-    } else { // falling edge
-        digitalRead(enc_A[2]) ? actual_pos[2]-- : actual_pos[2]++;
-    }
-}
-
-void A3_handler() {
-    if (digitalRead(enc_A[3])) { // rising edge
-        digitalRead(enc_B[3]) ? actual_pos[3]-- : actual_pos[3]++;
-    } else { // falling edge
-        digitalRead(enc_B[3]) ? actual_pos[3]++ : actual_pos[3]--;
-    }
-}
-
-void B3_handler() {
-    if (digitalRead(enc_B[3])) { // rising edge
-        digitalRead(enc_A[3]) ? actual_pos[3]++ : actual_pos[3]--;
-    } else { // falling edge
-        digitalRead(enc_A[3]) ? actual_pos[3]-- : actual_pos[3]++;
-    }
-}
-
-void A4_handler() {
-    if (digitalRead(enc_A[4])) { // rising edge
-        digitalRead(enc_B[4]) ? actual_pos[4]-- : actual_pos[4]++;
-    } else { // falling edge
-        digitalRead(enc_B[4]) ? actual_pos[4]++ : actual_pos[4]--;
-    }
-}
-
-void B4_handler() {
-    if (digitalRead(enc_B[4])) { // rising edge
-        digitalRead(enc_A[4]) ? actual_pos[4]++ : actual_pos[4]--;
-    } else { // falling edge
-        digitalRead(enc_A[4]) ? actual_pos[4]-- : actual_pos[4]++;
-    }
-}
-
-void A5_handler() {
-    if (digitalRead(enc_A[5])) { // rising edge
-        digitalRead(enc_B[5]) ? actual_pos[5]-- : actual_pos[5]++;
-    } else { // falling edge
-        digitalRead(enc_B[5]) ? actual_pos[5]++ : actual_pos[5]--;
-    }
-}
-
-void B5_handler() {
-    if (digitalRead(enc_B[5])) { // rising edge
-        digitalRead(enc_A[5]) ? actual_pos[5]++ : actual_pos[5]--;
-    } else { // falling edge
-        digitalRead(enc_A[5]) ? actual_pos[5]-- : actual_pos[5]++;
-    }
-}
-
-void A6_handler() {
-    if (digitalRead(enc_A[6])) { // rising edge
-        digitalRead(enc_B[6]) ? actual_pos[6]-- : actual_pos[6]++;
-    } else { // falling edge
-        digitalRead(enc_B[6]) ? actual_pos[6]++ : actual_pos[6]--;
-    }
-}
-
-void B6_handler() {
-    if (digitalRead(enc_B[6])) { // rising edge
-        digitalRead(enc_A[6]) ? actual_pos[6]++ : actual_pos[6]--;
-    } else { // falling edge
-        digitalRead(enc_A[6]) ? actual_pos[6]-- : actual_pos[6]++;
-    }
-}
-
 // Testing functions
-void TEST_find_encoder_pins() {
-    while(true){
-        for(int i = 2; i <= 53; i++){
-            pinMode(i, INPUT);
-        }
-        for(int i = 2; i <= 53; i++){
-            Serial.print(i);
-            Serial.print(digitalRead(i) ? 'X' : ' ');
-            Serial.print(' ');
-        }
-        Serial.println();
-    }
-}
-
-void TEST_print_encoder_pins(){
-    for(int i = 0; i < 7; i++) {
-        pinMode(enc_A[i], INPUT);
-        pinMode(enc_B[i], INPUT);
-    }
-    while(true){
-        Serial.print("A: ");
-        for(int i = 0; i < 7; i++) {
-            Serial.print(digitalRead(enc_A[i]));
-        }
-        Serial.print(" B: ");
-        for(int i = 0; i < 7; i++) {
-            Serial.print(digitalRead(enc_B[i]));
-        }
-        Serial.println();
-    }
-}
-
 void PRINT_encoder_positions(){
     Serial.print("Goals: ");
     for (int i = 0; i < 7; i++) {
