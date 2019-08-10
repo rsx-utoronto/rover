@@ -72,8 +72,8 @@ void requestEvent() { // Report back the value of the sensor requested
     digitalWrite(LED_BUILTIN, 1);
     byte out_bytes[6];
     for (int i = 0; i < 3; i++) {
-        out_bytes[2 * i] = (Sensor_values[0] >> 8) & 0xFF;
-        out_bytes[2 * i + 1] = Sensor_values[0] & 0xFF;
+        out_bytes[2 * i] = (Sensor_values[i] >> 8) & 0xFF;
+        out_bytes[2 * i + 1] = Sensor_values[i] & 0xFF;
     }
     Wire.write(out_bytes, 6);
     digitalWrite(LED_BUILTIN, 0);
