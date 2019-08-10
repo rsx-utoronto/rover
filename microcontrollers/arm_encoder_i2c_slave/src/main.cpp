@@ -10,7 +10,6 @@ int aStates[3] = { 0 };
 int bStates[3] = { 0 };
 int bLastStates[3] = { 0 };
 int aLastStates[3] = { 0 };
-byte Sensor_value_bytes[2] = { 7 };
 
 int currentSensor = 0;
 
@@ -22,6 +21,7 @@ void setup() {
     Wire.onReceive(receiveEvent);
     Wire.onRequest(requestEvent);
     Serial.begin(115200);
+    pinMode(LED_BUILTIN, INPUT);
 
     // Setting all pinModes and Sensor states
     for (int i = 0; i < 3; i++) {
@@ -65,14 +65,16 @@ void loop() {
 }
 
 void receiveEvent(int numBytes) {
-    // Set currentSensor so the desired sensor is reported
-    currentSensor = Wire.read();
-    // Serial.println(currentSensor);
+    // nothing
 }
 
-void requestEvent() {
-    // Report back the value of the sensor requested
-    Sensor_value_bytes[0] = ((Sensor_values[0]) >> 8) & (0xFF);
-    Sensor_value_bytes[1] = (Sensor_values[0]) & (0xFF);
-    Wire.write(Sensor_value_bytes, 2);
+void requestEvent() { // Report back the value of the sensor requested
+    digitalWrite(LED_BUILTIN, 1);
+    byte out_bytes[6];
+    for (int i = 0; i < 3; i++) {
+        out_bytes[2 * i] = (Sensor_values[0] >> 8) & 0xFF;
+        out_bytes[2 * i + 1] = Sensor_values[0] & 0xFF;
+    }
+    Wire.write(out_bytes, 6);
+    digitalWrite(LED_BUILTIN, 0);
 }
