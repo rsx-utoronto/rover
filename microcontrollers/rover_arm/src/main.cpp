@@ -133,13 +133,11 @@ void loop() {
 }
 
 void get_encoder_values() {
-    logicical_sensor_no = 0;
+    int logical_sens_no = 0;
     for(int slave_addr = 1; slave_addr <= 3; slave_addr++) {
         #if DEBUG
             Serial.print("Requesting slave_addr = ");
             Serial.print(slave_addr);
-            Serial.print(", slave_sens_no = ");
-            Serial.print(slave_sens_no);
             Serial.print(", logical_sens_no = ");
             Serial.print(logical_sens_no);
         #endif
@@ -158,7 +156,7 @@ void get_encoder_values() {
                 Serial.print(x);
                 Serial.print("] = ");
                 Serial.print(sens_val);
-                Serial.print(", ")
+                Serial.print(", ");
             #endif
             logical_sens_no++;
         }
