@@ -4,6 +4,8 @@
 #include <main.h>
 #include <Wire.h>
 
+#define DEBUG 1
+
 #define Controller_address 0
 
 #define total_no_of_slaves 3
@@ -70,7 +72,6 @@ unsigned long last_override = 0;
 
 void loop() {
     get_encoder_values();
-
     if (Serial.available()) {
         switch (Serial.read()) {
             case 'p': // Move to absolute position within limits
@@ -135,6 +136,14 @@ void get_encoder_values() {
     int logical_sens_no = 0;
     for(int slave_addr = 1; slave_addr <= 3; slave_addr++) {
         for(int slave_sens_no = 0; slave_sens_no < sensors_per_slave[slave_addr - 1]; slave_sens_no++) {
+            #if DEBUG
+            Serial.print("Requesting slave_addr = ");
+            Serial.print(slave_addr);
+            Serial.print(", slave_sens_no = ");
+            Serial.print(slave_sens_no);
+            Serial.print(", logical_sens_no = ");
+            Serial.print(logical_sens_no);
+            #endif
             Wire.beginTransmission(slave_addr); // transmit to device
             Wire.write(slave_sens_no);        // sends which sensor attached to the slave is desired
             Wire.endTransmission();    // stop transmitting
@@ -143,6 +152,17 @@ void get_encoder_values() {
             byte a = Wire.read();
             byte b = Wire.read();
             actual_pos[logical_to_physical_sens_map[logical_sens_no]] = (a << 8) | b;
+            #if DEBUG
+            Serial.print("... Received a = ");
+            Serial.print(a);
+            Serial.print(", b = ");
+            Serial.print(b);
+            Serial.print(", actual_pos[");
+            Serial.print(logical_to_physical_sens_map[logical_sens_no]);
+            Serial.print("] = ");
+            Serial.print(actual_pos[logical_to_physical_sens_map[logical_sens_no]]);
+            Serial.println();
+            #endif
             logical_sens_no++;
         }
     }
