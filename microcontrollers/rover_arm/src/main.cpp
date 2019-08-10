@@ -8,11 +8,14 @@
 
 #define total_no_of_slaves 3
 #define total_no_of_sensors 7
-//int Sensor_values[total_no_of_sensors] = { 0 };
-int Sensors_per_slave[total_no_of_slaves] = {2,2,3};
+const int slave_address[3]     = {1, 2, 3};
+const int sensors_per_slave[3] = {2, 2, 3};
 // IDs for each of the joints and motors
 typedef enum joint {  SHR,   SHP,   ELB,   FAR,   WPI,   WRO,   GRP};
 typedef enum motor {M_SHR, M_SHP, M_ELB, M_FAR, M_WRL, M_WRR, M_GRP};
+
+// map from the order the sensors are addressed with I2C to the internal model
+const int logical_to_physical_sens_map[7] = {M_SHR, M_SHP, M_FAR, M_ELB, M_WRR, M_WRL, M_GRP};
 
 double goal_pos[14] = {0, 0, 0, 0, 0, 0, 0};         // The goal position for each MOTOR
 volatile int actual_pos[7] = {0, 0, 0, 0, 0, 0, 0}; // The reading of each MOTOR encoder
@@ -37,10 +40,6 @@ const char spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
 // Flags
 bool running = true;          // Used for emergency stopping
 bool manual_override = false; // Used for the 'm' command
-
-// Pins for A and B output of each encoder
-const char enc_A[7] = {38, 24, 21, 32, 46, 52, 34};
-const char enc_B[7] = {44, 26, 20, 48, 50, 42, 30};
 
 // PID objects operate on the values of vel[] directly
 // Change to REVERSE if PID control is backwards
@@ -70,8 +69,9 @@ unsigned long last_print = millis();
 unsigned long last_override = 0;
 
 void loop() {
+    get_encoder_values();
+
     if (Serial.available()) {
-        // receiveEvent(4);
         switch (Serial.read()) {
             case 'p': // Move to absolute position within limits
                 Serial.read(); // there should be a space, discard it.
@@ -131,20 +131,37 @@ void loop() {
     update_velocity();
 }
 
-void receiveEvent(int number_of_bytes) {
-  if(Wire.available()){
-    //delay(100);
-    while (Wire.available()) {
-        int sensor_no = Wire.read();
-        byte a = Wire.read(); // sensor_no
-        byte b = Wire.read();
+void get_encoder_values() {
+    int logical_sens_no = 0;
+    for(int slave_addr = 1; slave_addr <= 3; slave_addr++) {
+        for(int slave_sens_no = 0; slave_sens_no < sensors_per_slave[slave_addr - 1]; slave_sens_no++) {
+            Wire.beginTransmission(slave_addr); // transmit to device
+            Wire.write(slave_sens_no);        // sends which sensor attached to the slave is desired
+            Wire.endTransmission();    // stop transmitting
 
-
-        actual_pos[sensor_no] = a;
-        actual_pos[sensor_no] = (actual_pos[sensor_no] << 8 )| b;
-        
+            Wire.requestFrom(slave_addr, 2);    // request info from slave device i
+            byte a = Wire.read();
+            byte b = Wire.read();
+            actual_pos[logical_to_physical_sens_map[logical_sens_no]] = (a << 8) | b;
+            logical_sens_no++;
+        }
     }
-  }
+}
+
+void receiveEvent(int number_of_bytes) {
+    if(Wire.available()){
+        //delay(100);
+        while (Wire.available()) {
+            int sensor_no = Wire.read();
+            byte a = Wire.read(); // sensor_no
+            byte b = Wire.read();
+
+
+            actual_pos[sensor_no] = a;
+            actual_pos[sensor_no] = (actual_pos[sensor_no] << 8 )| b;
+            
+        }
+    }
 }
 
 void updatePID() {
@@ -293,24 +310,6 @@ void TEST_find_encoder_pins() {
     }
 }
 
-void TEST_print_encoder_pins(){
-    for(int i = 0; i < 7; i++) {
-        pinMode(enc_A[i], INPUT);
-        pinMode(enc_B[i], INPUT);
-    }
-    while(true){
-        Serial.print("A: ");
-        for(int i = 0; i < 7; i++) {
-            Serial.print(digitalRead(enc_A[i]));
-        }
-        Serial.print(" B: ");
-        for(int i = 0; i < 7; i++) {
-            Serial.print(digitalRead(enc_B[i]));
-        }
-        Serial.println();
-    }
-}
-
 void PRINT_encoder_positions(){
     Serial.print("Goals: ");
     for (int i = 0; i < 7; i++) {
@@ -392,4 +391,4 @@ void PRINT_oscilloscope(int motor){
         last_print = millis();
         Serial.println(last_print);
     }
-}'
+}
