@@ -267,7 +267,7 @@ void direct_velocity_control(){
     vel[5] = -raw_vel[4] + raw_vel[5]; // tilt + rot
     //Serial.println(vel[5]);
     // Take into account spherical wrist rotation for the gripper output
-    vel[6] = raw_vel[6] + ((double) raw_vel[5] * 1680.0/(26.9*64.0));
+    vel[6] = raw_vel[6];
 }
 
 void update_velocity() {
