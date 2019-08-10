@@ -133,37 +133,32 @@ void loop() {
 }
 
 void get_encoder_values() {
-    int logical_sens_no = 0;
+    logicical_sensor_no = 0;
     for(int slave_addr = 1; slave_addr <= 3; slave_addr++) {
-        for(int slave_sens_no = 0; slave_sens_no < sensors_per_slave[slave_addr - 1]; slave_sens_no++) {
-            #if DEBUG
+        #if DEBUG
             Serial.print("Requesting slave_addr = ");
             Serial.print(slave_addr);
             Serial.print(", slave_sens_no = ");
             Serial.print(slave_sens_no);
             Serial.print(", logical_sens_no = ");
             Serial.print(logical_sens_no);
-            #endif
-            Wire.beginTransmission(slave_addr); // transmit to device
-            Serial.print(" (trans)");
-            Wire.write(slave_sens_no);        // sends which sensor attached to the slave is desired
-            Serial.print(" (write)");
-            Wire.endTransmission();    // stop transmitting
-            Serial.print(" (end)");
-            Wire.requestFrom(slave_addr, 2);    // request info from slave device i
-            byte a = Wire.read();
-            byte b = Wire.read();
-            actual_pos[logical_to_physical_sens_map[logical_sens_no]] = (a << 8) | b;
+        #endif
+        Wire.requestFrom(slave_addr, 6); // request 6 bytes from slave
+        int i = 0;
+        byte read_bytes[6];
+        while (Wire.available() && i < 6) {
+            read_bytes[i] = Wire.read();
+        }
+        for (int i = 0; i < sensors_per_slave[slave_addr]; i++) { // for each sensor attatched to the slave
+            int x = logical_to_physical_sens_map[logical_sens_no]; // map it to the proper sensor in the model
+            int sens_val = (read_bytes[2 * i] << 8) | read_bytes[2 * i + 1]; // convert bytes to int
+            actual_pos[x] = sens_val;
             #if DEBUG
-            Serial.print("... Received a = ");
-            Serial.print(a);
-            Serial.print(", b = ");
-            Serial.print(b);
-            Serial.print(", actual_pos[");
-            Serial.print(logical_to_physical_sens_map[logical_sens_no]);
-            Serial.print("] = ");
-            Serial.print(actual_pos[logical_to_physical_sens_map[logical_sens_no]]);
-            Serial.println();
+                Serial.print(", actual_pos[");
+                Serial.print(x);
+                Serial.print("] = ");
+                Serial.print(sens_val);
+                Serial.print(", ")
             #endif
             logical_sens_no++;
         }
