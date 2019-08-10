@@ -4,7 +4,7 @@
 #include <main.h>
 #include <WSWire.h>
 
-#define DEBUG 1
+#define ENC_DEBUG 0
 
 #define Controller_address 0
 
@@ -134,36 +134,45 @@ void loop() {
 
 void get_encoder_values() {
     int logical_sens_no = 0;
+    int sens_val;
+    int x;
+
     for(int slave_addr = 1; slave_addr <= 3; slave_addr++) {
-        #if DEBUG
-            Serial.print("Requesting slave_addr = ");
-            Serial.print(slave_addr);
-            Serial.print(", logical_sens_no = ");
-            Serial.print(logical_sens_no);
-        #endif
         Wire.requestFrom(slave_addr, 6); // request 6 bytes from slave
         int i = 0;
         byte read_bytes[6];
         while (Wire.available() && i < 6) {
             read_bytes[i] = Wire.read();
+            i++;
         }
-        for (int i = 0; i < sensors_per_slave[slave_addr]; i++) { // for each sensor attatched to the slave
-            int x = logical_to_physical_sens_map[logical_sens_no]; // map it to the proper sensor in the model
-            int sens_val = (read_bytes[2 * i] << 8) | read_bytes[2 * i + 1]; // convert bytes to int
-            actual_pos[x] = sens_val;
-            #if DEBUG
-                Serial.print(", ap[");
-                Serial.print(x);
-                Serial.print("] = ");
-                Serial.print(sens_val);
+        #if ENC_DEBUG
+            Serial.print("a=");
+            Serial.print(slave_addr);
+            Serial.print(", r=");
+            Serial.print(i);
+            Serial.print(", raw: ");
+            for(int i = 0; i < 6; i++){
+                Serial.print(read_bytes[i]);
                 Serial.print(", ");
-            #endif
+            }
+        #endif
+        for (int i = 0; i < sensors_per_slave[slave_addr - 1]; i++) { // for each sensor attatched to the slave
+            x = logical_to_physical_sens_map[logical_sens_no]; // map it to the proper sensor in the model
+            sens_val = (read_bytes[2 * i] << 8) | read_bytes[2 * i + 1]; // convert bytes to int
+            actual_pos[x] = sens_val;
             logical_sens_no++;
         }
-        #if DEBUG
-            Serial.println();
-        #endif
     }
+    #if ENC_DEBUG
+        for (int i = 0; i < 6; i++) {
+            Serial.print("ap[");
+            Serial.print(i);
+            Serial.print("] = ");
+            Serial.print(actual_pos[i]);
+            Serial.print(", ");
+        }
+        Serial.println();
+    #endif
 }
 
 void receiveEvent(int number_of_bytes) {
