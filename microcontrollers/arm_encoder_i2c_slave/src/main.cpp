@@ -55,8 +55,12 @@ void loop() {
         }
         bLastStates[i] = bStates[i];
         aLastStates[i] = aStates[i];
+        // Serial.print(i);
+        // Serial.print(" = ");
+        // Serial.print(Sensor_values[i]);
+        // Serial.print(", ");
     }
-    // Serial.println(Sensor_values[0]);
+    // Serial.println();
     // delay(); // might not be needed maybe
 }
 

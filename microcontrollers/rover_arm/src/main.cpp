@@ -2,7 +2,7 @@
 #include <Stream.h>
 #include <PID_v1.h>
 #include <main.h>
-#include <Wire.h>
+#include <WSWire.h>
 
 #define DEBUG 1
 
@@ -145,9 +145,11 @@ void get_encoder_values() {
             Serial.print(logical_sens_no);
             #endif
             Wire.beginTransmission(slave_addr); // transmit to device
+            Serial.print(" (trans)");
             Wire.write(slave_sens_no);        // sends which sensor attached to the slave is desired
+            Serial.print(" (write)");
             Wire.endTransmission();    // stop transmitting
-
+            Serial.print(" (end)");
             Wire.requestFrom(slave_addr, 2);    // request info from slave device i
             byte a = Wire.read();
             byte b = Wire.read();
