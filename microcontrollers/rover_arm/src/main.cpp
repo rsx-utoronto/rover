@@ -154,7 +154,7 @@ void get_encoder_values() {
             int sens_val = (read_bytes[2 * i] << 8) | read_bytes[2 * i + 1]; // convert bytes to int
             actual_pos[x] = sens_val;
             #if DEBUG
-                Serial.print(", actual_pos[");
+                Serial.print(", ap[");
                 Serial.print(x);
                 Serial.print("] = ");
                 Serial.print(sens_val);
@@ -162,6 +162,9 @@ void get_encoder_values() {
             #endif
             logical_sens_no++;
         }
+        #if DEBUG
+            Serial.println();
+        #endif
     }
 }
 
