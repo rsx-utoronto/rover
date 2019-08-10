@@ -5,6 +5,7 @@
 #include <WSWire.h>
 
 #define ENC_DEBUG 0
+#define GRIP_ENCODER_MISSING 1
 
 #define Controller_address 0
 
@@ -204,8 +205,12 @@ void updatePID() {
     PID_4.Compute();
     actual_pos_float[5] = (double) actual_pos[5];
     PID_5.Compute();
+    #if GRIP_ENCODER_MISSING == 1
+    vel[6] = goal_pos[6]; // if the grip encoder is missing, skip computation and just write the velocity
+    #else
     actual_pos_float[6] = (double) actual_pos[6];
     PID_6.Compute();
+    #endif
 }
 
 void update_goals(bool no_limits = false, bool absolute = true) {
@@ -268,12 +273,12 @@ void direct_velocity_control(){
 void update_velocity() {
     for (int i = 0; i < 7; i++) {
         if (running) {
-        int dir;
-        if(vel[i] > 0) {
-            dir = HIGH;
-        } else {
-            dir = LOW;
-        }
+            int dir;
+            if(vel[i] > 0) {
+                dir = HIGH;
+            } else {
+                dir = LOW;
+            }
             digitalWrite(dirPin[i], dir);
             analogWrite(pwmPin[i], abs(vel[i]));
         } else {
