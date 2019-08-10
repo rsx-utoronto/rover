@@ -569,7 +569,7 @@ def getJoystickDirection():
             # if storedInd == 3 and modeOfOperation == 3:
             #     if savedJointAngles[5] > 0:
             #         directionVector[storedInd] = storedVal
-            #     else:
+            #     else:on
             #         directionVector[storedInd] = -storedVal
             # else:
             directionVector[storedInd] = storedVal
@@ -922,8 +922,8 @@ def directControl():
                 modElem = -1.0
         joystickDirection[i] = modElem
         i += 1
-    print("Current joystick direction:")
-    print(joystickDirection)
+    # print("Current joystick direction:")
+    # print(joystickDirection)
     # get the current joint angles of the arm
     global savedJointAngles
     jointAngles = copy.deepcopy(savedJointAngles)
