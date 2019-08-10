@@ -328,20 +328,6 @@ void starting_position() {
 }
 
 // Testing functions
-void TEST_find_encoder_pins() {
-    while(true){
-        for(int i = 2; i <= 53; i++){
-            pinMode(i, INPUT);
-        }
-        for(int i = 2; i <= 53; i++){
-            Serial.print(i);
-            Serial.print(digitalRead(i) ? 'X' : ' ');
-            Serial.print(' ');
-        }
-        Serial.println();
-    }
-}
-
 void PRINT_encoder_positions(){
     Serial.print("Goals: ");
     for (int i = 0; i < 7; i++) {
