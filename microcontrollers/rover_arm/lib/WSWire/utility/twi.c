@@ -342,7 +342,7 @@ static volatile uint32_t twi_toutc;
 uint8_t twi_tout(uint8_t ini)
 {
 	if (ini) twi_toutc=0; else twi_toutc++;	
-	if (twi_toutc>=100000UL) {
+	if (twi_toutc>=10000UL) {
 		twi_toutc=0;
 		twi_init();
 		return 1;
