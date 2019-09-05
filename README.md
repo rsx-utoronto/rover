@@ -17,23 +17,42 @@ To run this package:
   catkin_make
 2) Run each nodes by typing in this command:
   rosrun rover "name of the node"
----
   
----To run Drive---
+---To start SSH into the Nvidia Jetson---
+command: ssh nvidia@192.168.0.100 (Jetson ip address)
+password: nvidia
 
-1) roscore 
-2) Upload the Drive_receiver Arduino code on the Arduino
-3) To ssh into the Nvidia Jetson: ssh nvidia@itsipaddress
-4) Run the receiver node using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600
-5) On the separate command window, use this command: rosrun rover drive_sender
+---
+---IP Settings to look into if there is a comm issue---
+Go into Bashrc: ~/.bashrc
+scroll to the bottom and find two lines: ROS_MASTER_URI and ROS_IP
+set ROS_MASTER_URI to the Jetson ipAddress
+set ROS_IP to the current device's ipAddress
+type: ifconfig to find the current ip address
+
+type: source ~/.bashrc to set the changes into effect
+Restart all the terminals if it still doesn't work
+
+---
+---To run Drive---
+Shortcut commands (works on the rsx laptop and the jetson): 
+nvidia (ssh into nvidia)
+core (start roscore)
+drive1 (run drive receiver node)
+drive2 (run drive sender node)
+
+1) Upload the Drive_receiver Arduino code on the Arduino
+2) ssh into the nvidia jetson and run roscore
+4) Run the receiver node in the jetson using this command (***using your port number): rosrun rosserial_python serial_node.py _port:=/dev/ttyACM# _baud:=57600 or drive1
+5) On the separate command window, use this command: rosrun rover drive_sender or drive2
 6) Control the rover using the arrow keys
 
 ---
----To run SLAM---
+---To run SLAM (Autonomy)---
 
 1) roscore
 2) on Jetson (Or any device with the stereo camera and RTABMAP setup): roslaunch rover traverse.launch
-3) on the groundstation computer: rosrun rviz rviz
+3) on the groundstation computer: rosrun rviz rviz to visualize the rover
 
 ---
 ---To run ARM---
