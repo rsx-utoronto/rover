@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
 
 void setup() {
   // put your setup code here, to run once:
