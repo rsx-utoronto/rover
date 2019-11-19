@@ -109,3 +109,5 @@ sudo apt install ros-kinetic-ddynamic-reconfigure
 ```
 
 - Install the `realsense2_camera` package using the instructions [here](https://github.com/IntelRealSense/realsense-ros#installation-instructions). You've already completed Step 1 and 2.
+
+git checkout 7743b01cb46c37d2a873c2bc99a683d9c8de3b32
