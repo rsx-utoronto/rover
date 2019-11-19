@@ -54,20 +54,20 @@ void rgb_mode_callback( const std_msgs::String& control_msg){
 	if (s.equals(String("blank"))) {
 		mode = modes::blank;
 		nh.logdebug("Set mode to blank");
-	} else if (s.equals(String("setall")) {
+	} else if (s.equals(String("setall"))) {
 		mode = modes::setall;
 		nh.logdebug("Set mode to setall");
 	} else {
-		s.equals(String("blank");
+		s.equals(String("blank"));
 		nh.logerror("Recieved an invalid mode string, blanking!");
 	}
 }
 
 void setall_color_callback( const std_msgs::ColorRGBA& rgb){
 	// Convert from floats to uint32_t
-	uint32_t r = ColorRGBA.r * 0xFF;
-	uint32_t g = ColorRGBA.g * 0xFF;
-	uint32_t b = ColorRGBA.b * 0xFF;
+	uint32_t r = rgb.r * 0xFF;
+	uint32_t g = rgb.g * 0xFF;
+	uint32_t b = rgb.b * 0xFF;
 	// create the color we will set
 	setall_color = (r << 16) | (g <<  8) | b;
 }
