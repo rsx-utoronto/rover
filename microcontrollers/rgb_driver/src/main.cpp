@@ -1,23 +1,25 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include <ros.h>
+#include <std_msgs/String.h>
 #include <main.h>
 
 #define LED_PIN 6
 #define LED_COUNT 60
 
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ400);
-// Argument 1 = Number of pixels in NeoPixel strip
-// Argument 2 = Arduino pin number (most are valid)
-// Argument 3 = Pixel type flags, add together as needed:
-//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
-//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
-//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-//   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-
+// Define some basic colors
 #define RED strip.Color(255,   0,   0)
 #define GRN strip.Color(  0, 255,   0)
 #define BLU strip.Color(  0,   0, 255)
+
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ400);
+
+////////////////////////////////////////////////////////////////////////////////
+// Set up ROS stuff
+////////////////////////////////////////////////////////////////////////////////
+ros::NodeHandle nh;
+
+ros::Subscriber<std_msgs::String> sub("rgb_control", &rgb_control_callback );
 
 void setup() {
 	strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
@@ -38,6 +40,10 @@ void loop() {
 
 	rainbow(10);             // Flowing rainbow cycle along the whole strip
 	theaterChaseRainbow(50); // Rainbow-enhanced theaterChase variant
+}
+
+void rgb_control_callback( const std_msgs::String& control_msg){
+	
 }
 
 // Fill strip pixels one after another with a color. Strip is NOT cleared
