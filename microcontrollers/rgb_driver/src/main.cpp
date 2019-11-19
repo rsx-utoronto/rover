@@ -2,48 +2,74 @@
 #include <Adafruit_NeoPixel.h>
 #include <ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/ColorRGBA.h>
 #include <main.h>
 
 #define LED_PIN 6
 #define LED_COUNT 60
 
 // Define some basic colors
-#define RED strip.Color(255,   0,   0)
-#define GRN strip.Color(  0, 255,   0)
-#define BLU strip.Color(  0,   0, 255)
+#define RED 0xFF0000
+#define GRN 0x00FF00
+#define BLU 0x0000FF
+#define BLK 0x000000
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ400);
+
+// define the different modes that the rgb system can be in
+
+enum class modes{blank, setall, rainbow};
+modes mode = modes::blank;
+
+// If in setall mode, this is the to set everything to
+uint32_t setall_color = BLK;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set up ROS stuff
 ////////////////////////////////////////////////////////////////////////////////
 ros::NodeHandle nh;
 
-ros::Subscriber<std_msgs::String> sub("rgb_control", &rgb_control_callback );
+ros::Subscriber<std_msgs::String> rgb_mode_sub("rgb_mode", &rgb_mode_callback);
+ros::Subscriber<std_msgs::String> setall_color_sub("setall_color", &setall_color_callback);
 
 void setup() {
+	delay(500);
 	strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
 	strip.show();            // Turn OFF all pixels ASAP
 	strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+
+	nh.initNode();
+	nh.subscribe(rgb_mode_sub);
+	nh.subscribe(setall_color_sub);
 }
 
 void loop() {
-	// Fill along the length of the strip in various colors...
-	colorWipe(RED, 50); // Red
-	colorWipe(GRN, 50); // Green
-	colorWipe(BLU, 50); // Blue
-
-	// Do a theater marquee effect in various colors...
-	theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
-	theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
-	theaterChase(strip.Color(  0,   0, 127), 50); // Blue, half brightness
-
-	rainbow(10);             // Flowing rainbow cycle along the whole strip
-	theaterChaseRainbow(50); // Rainbow-enhanced theaterChase variant
+	nh.spinOnce();
 }
 
-void rgb_control_callback( const std_msgs::String& control_msg){
-	
+void rgb_mode_callback( const std_msgs::String& control_msg){
+	// Convert the recieved bytes into a String object
+	String s(control_msg.data);
+
+	if (s.equals(String("blank"))) {
+		mode = modes::blank;
+		nh.logdebug("Set mode to blank");
+	} else if (s.equals(String("setall")) {
+		mode = modes::setall;
+		nh.logdebug("Set mode to setall");
+	} else {
+		s.equals(String("blank");
+		nh.logerror("Recieved an invalid mode string, blanking!");
+	}
+}
+
+void setall_color_callback( const std_msgs::ColorRGBA& rgb){
+	// Convert from floats to uint32_t
+	uint32_t r = ColorRGBA.r * 0xFF;
+	uint32_t g = ColorRGBA.g * 0xFF;
+	uint32_t b = ColorRGBA.b * 0xFF;
+	// create the color we will set
+	setall_color = (r << 16) | (g <<  8) | b;
 }
 
 // Fill strip pixels one after another with a color. Strip is NOT cleared
