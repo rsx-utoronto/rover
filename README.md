@@ -18,9 +18,11 @@ To run this package:
 2) Run each nodes by typing in this command:
   rosrun rover "name of the node"
   
----To start SSH into the Nvidia Jetson---
-command: ssh nvidia@192.168.0.100 (Jetson ip address)
-password: nvidia
+---To SSH into the Nvidia Jetson---
+1. Connect to the router wi-fi: (possibly rsx_rover_router, password: rsx123rsx123)
+2. Use the following command:
+   command: ssh nvidia@192.168.1.150 (Jetson ip address)
+   password: rsx123
 
 ---
 ---IP Settings to look into if there is a comm issue---
