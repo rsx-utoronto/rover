@@ -40,10 +40,14 @@
     </style>
 </head>
 <body>
-
-<button type="button" onclick="alert('Hello')"> Button 1 </button>
- <button type="button">Button 2 </button>
-  <button type="button">Button 3 </button>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css"
+type="text/css"
+/>
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
 <div id='map'></div>
 
 <script>
@@ -53,9 +57,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZWxsZW54d2NoZW4iLCJhIjoiY2szbHZlc2RiMDJiejNmc
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/light-v10', // style: 'mapbox://styles/mapbox/satellite-v9'for satellite
-  center: [-96, 37.8],
+  center:[-79.4512, 43.6568],
   zoom: 3
 });
+
 
 var geojson = {
   type: 'FeatureCollection',
@@ -83,6 +88,12 @@ var geojson = {
   }]
 };
 
+map.on('click', function(e){
+    let marker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(map);
+    marker.on('click', function(){
+    });
+});
+
 // add markers to map
 geojson.features.forEach(function(marker) {
 
@@ -98,7 +109,17 @@ geojson.features.forEach(function(marker) {
     .addTo(map);
 });
 
-map.addControl(new mapboxgl.NavigationControl());
+
+map.addControl(
+	new MapboxGeocoder({
+	accessToken: mapboxgl.accessToken,
+	mapboxgl: mapboxgl
+	})
+	);
+	
+map.addControl(
+	new mapboxgl.NavigationControl()
+	);
 
 </script>
 
