@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title></title>
+    <title>Rover Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
@@ -90,6 +90,7 @@ var geojson = {
 
 map.on('click', function(e){
     let marker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(map);
+    console.log(e.lngLat);
     marker.on('click', function(){
     });
 });
@@ -120,6 +121,15 @@ map.addControl(
 map.addControl(
 	new mapboxgl.NavigationControl()
 	);
+	
+map.addControl(
+	new mapboxgl.GeolocateControl({
+	positionOptions: {
+	enableHighAccuracy: true
+	},
+	trackUserLocation: true
+	})
+);
 
 </script>
 
