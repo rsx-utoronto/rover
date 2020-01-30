@@ -2,25 +2,25 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>Rover Map</title>
+    <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <style>
-      body {
+    body {
         margin: 0;
         padding: 0;
       }
 
-      #map {
+    #map {
         position: absolute;
         top: 0;
         bottom: 0;
         width: 100%;
       }
       
-      .marker {
+    .marker {
 	  background-image: url('mapbox-icon.png');
 	  background-size: cover;
 	  width: 50px;
@@ -37,19 +37,45 @@
 	  text-align: center;
 	  font-family: 'Open Sans', sans-serif;
 	}
+	
+	#overlay {
+	  font-family: 'Open Sans', sans-serif;
+	  position: absolute;
+	  margin: 10px;
+	  border-radius: 4px;
+	  padding: 10px;
+	  width: 200px;
+	  top: 0;
+	  left: 0;
+	  background-color: white;
+	  box-shadow: 0 0 10px 2px rgba(0,0,0,.1);
+	}
+	
+	#overlay p {
+		padding: 0;
+		margin: 0;
+	}
+	
+	#toggle {
+		margin: 5px 0;
+		border-radius: 4px;
+		color: white;
+		background-color: dodgerblue;
+		border: 0;
+		padding: 5px;
+	}
     </style>
 </head>
 <body>
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
-<link
-rel="stylesheet"
-href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css"
-type="text/css"
-/>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css" type="text/css" />
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
-<div id='map'></div>
-
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+  <div id='map'></div>
+  <div id='overlay'>
+	<p>Overlay</p>
+	<input type=button value="Add Markers" onclick="toggle()" id="toggle"/>
+  </div>
 <script>
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiZWxsZW54d2NoZW4iLCJhIjoiY2szbHZlc2RiMDJiejNmcWVteGx3aHNjcSJ9.KTf1PHkOPk_pXswRLLu8YA';
@@ -61,6 +87,7 @@ var map = new mapboxgl.Map({
   zoom: 3
 });
 
+var place = false;
 
 var geojson = {
   type: 'FeatureCollection',
@@ -88,11 +115,44 @@ var geojson = {
   }]
 };
 
+//Toggles place variable
+function toggle() {
+  if (place) {
+	place = false;
+	document.getElementById("toggle").value = "Add Markers";
+  } else {
+	place = true;
+	document.getElementById("toggle").value = "Stop Adding Markers";
+  }
+}
+
 map.on('click', function(e){
-    let marker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(map);
-    console.log(e.lngLat);
-    marker.on('click', function(){
-    });
+	//checks if place is true
+	if (place) {
+		//Insert new marker into geojson.features array
+		var number = geojson.features.push({
+			type: 'Feature',
+			geometry: {
+			type: 'Point',
+			coordinates: [e.lngLat.lng, e.lngLat.lat]
+			},
+			properties: {
+			title: 'New Marker',
+			description: e.lngLat.lng + ', ' + e.lngLat.lat
+			}
+		})
+		
+		var marker = geojson.features[number-1];
+		var el = document.createElement('div');
+		el.className = 'marker';
+
+		// make a marker for new marker and add to the map
+		new mapboxgl.Marker(el)
+			.setLngLat(marker.geometry.coordinates)
+			.setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+			.setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+			.addTo(map);
+	}
 });
 
 // add markers to map
@@ -105,7 +165,7 @@ geojson.features.forEach(function(marker) {
   // make a marker for each feature and add to the map
   new mapboxgl.Marker(el)
     .setLngLat(marker.geometry.coordinates)
-     .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+    .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
     .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
     .addTo(map);
 });
@@ -116,19 +176,10 @@ map.addControl(
 	accessToken: mapboxgl.accessToken,
 	mapboxgl: mapboxgl
 	})
-	);
+);
 	
 map.addControl(
 	new mapboxgl.NavigationControl()
-	);
-	
-map.addControl(
-	new mapboxgl.GeolocateControl({
-	positionOptions: {
-	enableHighAccuracy: true
-	},
-	trackUserLocation: true
-	})
 );
 
 </script>
