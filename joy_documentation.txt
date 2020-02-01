@@ -7,4 +7,4 @@ After the command "rosrun joy joy_node", if you get the error:
 
 just ignore it. It doesn't matter and does not cause any issues.
 
-[To be edited...]
+[To be edited....]
