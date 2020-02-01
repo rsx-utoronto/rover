@@ -1,0 +1,10 @@
+/* For joystick */
+
+After the command "rosrun joy joy_node", if you get the error:
+
+"[ERROR] [1580579912.157133017]: Couldn't open joystick force feedback!
+[ INFO] [1580579912.158771272]: Opened joystick: /dev/input/js0. deadzone_: 0.050000. "
+
+just ignore it. It doesn't matter and does not cause any issues.
+
+[To be edited...]
