@@ -21,9 +21,14 @@ To run this package:
 ---To SSH into the Nvidia Jetson---
 1. Connect to the router wi-fi: (possibly rsx_rover_router, password: rsx123rsx123)
 2. Use the following command:
-   command: ssh nvidia@192.168.1.150 (Jetson ip address)
+   command: ssh rsx@192.168.1.50 (Jetson ip address)
    password: rsx123
-
+---If you're not able to SSH into the Jetson (emergency procedure)----
+1. Connect to rsx_rover_router.
+2. Go to this link: http://whatsmyrouterip.com/
+3. Type in wi-fi IP address into search bar.
+4. Get Jetson's IP address from device list.
+5. change ssh command to reflect the new IP address.
 ---
 ---IP Settings to look into if there is a comm issue---
 Go into Bashrc: ~/.bashrc
