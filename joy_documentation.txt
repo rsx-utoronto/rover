@@ -1,3 +1,4 @@
+Note: Virtual Machines don't work with this...
 /* For joystick */
 
 After the command "rosrun joy joy_node", if you get the error:
@@ -8,3 +9,5 @@ After the command "rosrun joy joy_node", if you get the error:
 just ignore it. It doesn't matter and does not cause any issues.
 
 [To be edited....]
+
+http://wiki.ros.org/joy/Tutorials/ConfiguringALinuxJoystick           (Link for initial setup of a linux compatible joystick)
