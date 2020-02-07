@@ -115,6 +115,9 @@ var geojson = {
   }]
 };
 
+//Count number of predefined markers
+const staticMarkers = geojson.features.length;
+
 //Toggles place variable
 function toggle() {
   if (place) {
@@ -133,27 +136,59 @@ map.on('click', function(e){
 		var number = geojson.features.push({
 			type: 'Feature',
 			geometry: {
-			type: 'Point',
-			coordinates: [e.lngLat.lng, e.lngLat.lat]
+				type: 'Point',
+				coordinates: [e.lngLat.lng, e.lngLat.lat]
 			},
 			properties: {
-			title: 'New Marker',
-			description: e.lngLat.lng + ', ' + e.lngLat.lat
+				title: 'New Marker',
+				description: e.lngLat.lng + ', ' + e.lngLat.lat
 			}
 		})
 		
 		var marker = geojson.features[number-1];
 		var el = document.createElement('div');
 		el.className = 'marker';
+		//set id of marker to concatenation of coords
+		el.id = e.lngLat.lng + '|' + e.lngLat.lat;
 
 		// make a marker for new marker and add to the map
 		new mapboxgl.Marker(el)
 			.setLngLat(marker.geometry.coordinates)
 			.setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
-			.setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+			.setHTML('<h3>' + marker.properties.title + 
+					'</h3><p>' + marker.properties.description + '</p>' +
+					'<input type="button" value="Delete" onclick="remove(' + '\'' + e.lngLat.lng + '|' + e.lngLat.lat + '\')"/>'))
 			.addTo(map);
+		
+		//Check for size of array
+		if (number > staticMarkers + 5) {
+			//Remove 3rd element (first 2 are static)
+			var coords = geojson.features[staticMarkers].geometry.coordinates;
+			remove(coords[0] + '|' + coords[1]);
+		}
 	}
 });
+
+function remove(id) {
+	//grab coords from id
+	var coords = id.split('|');
+
+	//convert coords from strings to floats
+	coords[0] = parseFloat(coords[0]);
+	coords[1] = parseFloat(coords[1]);
+
+	//loop through geojson.features array and remove matching marker
+	for (var i=0; i < geojson.features.length; i++) {
+		if (geojson.features[i].geometry.coordinates[0] == coords[0]) {
+			geojson.features.splice(i, 1);
+			break
+		}
+	}
+
+	console.log(geojson.features);
+	//remove marker element from page
+	document.getElementById(id).remove();
+}
 
 // add markers to map
 geojson.features.forEach(function(marker) {
