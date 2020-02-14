@@ -1,5 +1,5 @@
 # Rover Software
-ROS Package: Kinetic
+ROS Package: Melodic
 
 Package name: rover
 
