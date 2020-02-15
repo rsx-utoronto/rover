@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="NoActuatorArm.SLDASM">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="9.020307973451E-19 -0.00127 7.77625034677209E-20"
+        rpy="0 0 0" />
+      <mass
+        value="0.0321759249226911" />
+      <inertia
+        ixx="3.24526421671496E-05"
+        ixy="-7.57634435785802E-39"
+        ixz="4.63901971968963E-55"
+        iyy="6.48706866347606E-05"
+        iyz="-1.98496716167664E-21"
+        izz="3.24526421671496E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="shoulder">
+    <inertial>
+      <origin
+        xyz="0.000781189459124646 -0.00178775778492078 0.0742100176870791"
+        rpy="0 0 0" />
+      <mass
+        value="1.21428293086761" />
+      <inertia
+        ixx="0.00265515731800666"
+        ixy="0.000415266502989419"
+        ixz="-2.02722069172952E-05"
+        iyy="0.00277012426763836"
+        iyz="4.63930936478976E-05"
+        izz="0.00320688952214508" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/shoulder.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/shoulder.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_shoulder"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5707963267949 -0.00708905725365007 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="shoulder" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="humerus">
+    <inertial>
+      <origin
+        xyz="0.0737931848896958 -0.0336144916819774 -0.114766986587721"
+        rpy="0 0 0" />
+      <mass
+        value="1.08134963942505" />
+      <inertia
+        ixx="0.0070696998344954"
+        ixy="0.00114748677962122"
+        ixz="-0.00208043167359467"
+        iyy="0.00642520574081207"
+        iyz="0.00258643254437875"
+        izz="0.00390169605736594" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/humerus.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/humerus.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="shoulder_to_humerus"
+    type="continuous">
+    <origin
+      xyz="-0.014446186337702 -0.0253999999999998 0.345909915448798"
+      rpy="-0.195580902426249 0 1.5707963267949" />
+    <parent
+      link="shoulder" />
+    <child
+      link="humerus" />
+    <axis
+      xyz="0.644862598348269 0.749727127370618 0.148531019440791" />
+  </joint>
+  <link
+    name="forearm">
+    <inertial>
+      <origin
+        xyz="0.26494164825564 -0.214144920360418 -0.0418605235637473"
+        rpy="0 0 0" />
+      <mass
+        value="2.13019814818598" />
+      <inertia
+        ixx="0.0215213128230697"
+        ixy="0.0217042659129813"
+        ixz="0.007645819849643"
+        iyy="0.0320225068054651"
+        iyz="-0.00609449904920948"
+        izz="0.0473525491090959" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/forearm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NoActuatorArm.SLDASM/meshes/forearm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="humerus_to_forearm"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="humerus" />
+    <child
+      link="forearm" />
+    <axis
+      xyz="0.644862598348269 0.749727127370618 0.148531019440791" />
+  </joint>
+</robot>
