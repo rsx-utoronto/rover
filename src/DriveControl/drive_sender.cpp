@@ -41,10 +41,41 @@ TeleopRover::TeleopRover():
 void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
 	geometry_msgs::Twist twist;
-	twist.angular.z = a_scale_*joy->axes[angular_];
-	twist.linear.x = l_scale_*joy->axes[linear_];
-	ROS_INFO("%f", joy->axes[linear_]);
-	ROS_INFO("%f", joy->axes[angular_]);
+
+	//indexs for controller values
+	int R2 = 5;
+	int L2 = 2;
+	int LS = 0;
+
+	//Values from Controller
+	double posThrottle = joy->axes[R2];
+	double negThrottle = joy->axes[L2];
+	double turnFactor = joy->axes[LS];
+
+	double dispVal = 0;
+
+	//Encoding Values for Throttle
+	if (posThrottle < 1 && negThrottle < 1){
+		dispVal = 0;
+		twist.linear.x = 0;
+	} else if (posThrottle < 1){
+		ROS_INFO("in Pos throttle");
+		dispVal = 255 - (posThrottle+1)*127.5;
+		twist.linear.x = 255 - (posThrottle+1)*127.5;
+	} else if (negThrottle < 1){
+		ROS_INFO("in neg throttle");
+		dispVal = -1*(255 - (negThrottle+1)*127.5);
+		twist.linear.x = -1*(255 - (negThrottle+1)*127.5);
+	} else {
+		dispVal = 0;
+		twist.linear.x = 0;
+	}
+
+	//send raw turnfactor to be used in drive microcontroller
+	twist.angular.z = turnFactor;
+
+	ROS_INFO("Turn Factor %f", turnFactor);
+	ROS_INFO("Motor Value %f", dispVal);
 	vel_pub_.publish(twist);
 }
 
