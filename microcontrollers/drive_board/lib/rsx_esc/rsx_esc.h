@@ -1,5 +1,5 @@
-#ifndef PID_v1_h
-#define PID_v1_h
+#ifndef rsx_esc_h
+#define rsx_esc_h
 
 class ESC {
 	public:
@@ -21,6 +21,6 @@ class ESC {
 		int direction_pin;
 		int current_limit_pin;
 		uint8_t I2C_addr;
-}
+};
 
 #endif
