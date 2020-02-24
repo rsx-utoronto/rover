@@ -9,17 +9,24 @@
 
 ros::NodeHandle  nh;
 
-int speedPins[] = {6, 9, 11, 5, 3, 10 };
-int directionPins[] = { 4, 2 };
+int speedPins[] = {3, 5, 6, 9, 10, 11 };
+int directionPins[] = {23, 25, 2, 4, 7, 8};
+int rel1 = 12;
+int rel2 = 13;
+int rel3 = A5;
 
 int speedl;
 int speedr;
 boolean driveMode;
-int speedF = 50;
-int speedB = -50;
-int speedPrevF= 50; 
-int speedPrevB= -50; 
-/*int speedP = 50;*/
+
+int speedF = 100;
+int speedB = -100;
+
+int speedPrevF= 100; 
+int speedPrevB= -100; 
+
+int hack = 2;
+
 int num = 1.00;
 int count = 0;
 int count_reached = 500;
@@ -30,14 +37,21 @@ char result[100];// Charcter array for final loginfo display message
 char fspd[50], bspd[50], pspd[50];
 const char *message; 
 
+void accel(int, int);
+void stop();
+void doPivot(int);
+
 void messageCb( const geometry_msgs::Twist& msg){
   startCounting = true;
   count = 0;
   //nh.loginfo("msg received");
   char resultAngular[8]; // Buffer big enough for 7-character float
   char resultLinear[8];
-  dtostrf(msg.angular.z, 6, 2, resultAngular); // Leave room for too large numbers!
-  dtostrf(msg.linear.x, 6, 2, resultLinear); // Leave room for too large numbers!
+  //dtostrf(msg.angular.z, 6, 2, resultAngular); // Leave room for too large numbers!
+  //dtostrf(msg.linear.x, 6, 2, resultLinear); // Leave room for too large numbers!
+
+  //nh.loginfo(resultAngular);
+  //nh.loginfo(resultLinear);
   
   //nh.loginfo(resultAngular);
   //nh.loginfo(resultLinear);
@@ -83,7 +97,7 @@ void messageCb( const geometry_msgs::Twist& msg){
       message = "125";
     } else if (msg.linear.x == 1.5)
     {
-      if (speedF <= 115){
+      if (speedF <= 175){
         speedF += 10;
         speedB +=-10; 
         /*speedP +=10;*/
@@ -115,10 +129,10 @@ void messageCb( const geometry_msgs::Twist& msg){
       /*setLeftSpd(speedF);
       setRightSpd(speedF);*/
       accel(speedF, speedPrevF);
-      message = "forward @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,fspd);
-      nh.loginfo(result);
+      //message = "forward @ ";
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,fspd);
+      nh.loginfo(fspd);
     }
     else if (msg.linear.x == -1.00)
     {
@@ -126,9 +140,9 @@ void messageCb( const geometry_msgs::Twist& msg){
       setRightSpd(-speedF);*/
       accel(speedB, speedPrevB); 
       message = "backward @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,bspd);
-      nh.loginfo(result);
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,bspd);
+      nh.loginfo(bspd);
     }
     else
     {
@@ -140,35 +154,35 @@ void messageCb( const geometry_msgs::Twist& msg){
     if (msg.angular.z == 1.00)
     {
       doPivot(speedF);
-      message = "left @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,fspd);
-      nh.loginfo(result);
+      //message = "left @ ";
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,fspd);
+      nh.loginfo(fspd);
     }
     else if (msg.angular.z == -1.00)
     {
       doPivot(-speedF);
-      message = "right @ ";
-      strcpy(result,message);// Combines the output message with the appropriate speed 
-      strcat(result,fspd);
-      nh.loginfo(result);
+      //message = "right @ ";
+      //strcpy(result,message);// Combines the output message with the appropriate speed 
+      //strcat(result,fspd);
+      nh.loginfo(bspd);
     }
   }
-  digitalWrite(13, HIGH-digitalRead(13));   // blink the led
+//  digitalWrite(13, HIGH-digitalRead(13));   // blink the led
 }
 
 ros::Subscriber<geometry_msgs::Twist> sub("drive", &messageCb );
 
 void setLeftSpd(int spd) {
       if(spd < 0) {
-          digitalWrite(directionPins[0], LOW);
           for(int i=0; i<3; i++) {
+              digitalWrite(directionPins[i], HIGH);
               analogWrite(speedPins[i], -spd);
           }
       }
       else {
-          digitalWrite(directionPins[0], HIGH);
           for(int i=0; i<3; i++) {
+              digitalWrite(directionPins[i], LOW);
               analogWrite(speedPins[i], spd);
           }
       }
@@ -176,15 +190,18 @@ void setLeftSpd(int spd) {
 
 void setRightSpd(int spd) {
     if(spd < 0) {
-        digitalWrite(directionPins[1], LOW);
-        for(int i=3; i<6; i++) {
-            analogWrite(speedPins[i], -spd);
-        }
+        digitalWrite(directionPins[3], LOW);
+        analogWrite(speedPins[3], -spd);
+        for(int i=4; i<6; i++) {
+              digitalWrite(directionPins[i], HIGH);
+              analogWrite(speedPins[i], -spd);
+          }
     }
     else {
-        digitalWrite(directionPins[1], HIGH);
-
-        for(int i=3; i<6; i++) {
+        digitalWrite(directionPins[3], HIGH);
+        analogWrite(speedPins[3], spd);
+        for(int i=4; i<6; i++) {
+            digitalWrite(directionPins[i], LOW);
             analogWrite(speedPins[i], spd);
         }
     }
@@ -209,8 +226,8 @@ void accel(int spd, int speedPrev) {
 
 // Pivot either direction
 void doPivot(int pivot){
-    setLeftSpd(pivot);
-    setRightSpd(-pivot);
+    setLeftSpd(-pivot);
+    setRightSpd(+pivot);
 }
 
 // Drive forward or backward
@@ -235,13 +252,20 @@ void setup()
     pinMode(speedPins[i], OUTPUT);
     pinMode(directionPins[i], OUTPUT);
   }
-  pinMode(13, OUTPUT);
+//  pinMode(13, OUTPUT);
   nh.initNode();
   nh.subscribe(sub);
+  
+  pinMode(rel1, OUTPUT);
+  pinMode(rel2, OUTPUT);
+  pinMode(rel3, OUTPUT);
 }
 
 void loop()
 {  
+  digitalWrite(rel1, HIGH);
+  digitalWrite(rel2, HIGH);
+  digitalWrite(rel3, HIGH);
   nh.spinOnce();
 
   delay(1);
@@ -257,5 +281,8 @@ void loop()
     stop();  
     startCounting = false;
   }
+  
+//  forward(200, 200);
+  
 }
 

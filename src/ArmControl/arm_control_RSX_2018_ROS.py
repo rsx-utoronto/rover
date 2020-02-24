@@ -12,7 +12,7 @@ import threading
 import rospy
 from std_msgs.msg import String
 
-
+gripper_encoder_missing = 1
 
 def put_msg(message):
     #global conn
@@ -499,7 +499,18 @@ def sendAngleValues(qVect, start = 0):
         q4String = str( int(qVect[3] * q4Steps/(2*math.pi) ) )
         q5String = str( int(qVect[4] * q5Steps/(2*math.pi) ) )
         q6String = str( int(qVect[5] * q6Steps/(2*math.pi) ) )
-        q7String = str( int(qVect[6] * q7Steps ) ) # gripper
+
+        if gripper_encoder_missing:
+            buttons = getJoystickButtons()
+            if buttons[22] == 1:
+                gripperSpeed = -255
+            elif buttons[25] == 1:
+                gripperSpeed = 255
+            else:
+                gripperSpeed = 0
+            q7String = str (gripperSpeed)
+        else:
+            q7String = str( int(qVect[6] * q7Steps ) ) # gripper
 
         if limitFlag == True:
             command = 'p'
@@ -569,7 +580,7 @@ def getJoystickDirection():
             # if storedInd == 3 and modeOfOperation == 3:
             #     if savedJointAngles[5] > 0:
             #         directionVector[storedInd] = storedVal
-            #     else:
+            #     else:on
             #         directionVector[storedInd] = -storedVal
             # else:
             directionVector[storedInd] = storedVal
@@ -922,8 +933,8 @@ def directControl():
                 modElem = -1.0
         joystickDirection[i] = modElem
         i += 1
-    print("Current joystick direction:")
-    print(joystickDirection)
+    # print("Current joystick direction:")
+    # print(joystickDirection)
     # get the current joint angles of the arm
     global savedJointAngles
     jointAngles = copy.deepcopy(savedJointAngles)

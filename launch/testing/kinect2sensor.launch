@@ -1,0 +1,52 @@
+<!-- 
+  Turtlebot is a bit low on horsepower...
+
+  We use openni_camera here, turn everything on by default
+  (allows the user to conveniently see everything when
+  launching this on its own - use with 
+  turtebot_rviz_launchers/view_robot.launch to visualise)
+  and provide args to disable them so you can optimise the
+  horsepower for your application.
+  
+  For an example of disabling processing modules, check
+  any of the turtlebot_rapps (e.g. android_make_a_map.launch
+  only enables scan_processing for depthimage_to_laserscan and
+  rgb_processing for the android tele-view).
+-->
+<launch>
+  <!-- "camera" should uniquely identify the device. All topics are pushed down
+       into the "camera" namespace, and it is prepended to tf frame ids. -->
+  <arg name="camera"      		default="kinect2"/>
+  <arg name="publish_tf"  		default="true"/>
+ <!-- <arg name="jpeg_quality"  default="50"/>-->
+  <arg name="depth_method"  		default="opengl"/>
+  <arg name="scan_processing"  		default="true"/>
+  <arg name="depth_registration"        default="true"/>
+  <arg     if="$(arg depth_registration)" name="depth" value="depth_registered" />
+  <arg unless="$(arg depth_registration)" name="depth" value="depth" />
+
+  <!-- Laserscan topic -->
+  <arg name="scan_topic" default="scan"/>
+
+  <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
+    <arg name="base_name"			value="$(arg camera)"/>                         
+    <arg name="publish_tf"                      value="$(arg publish_tf)"/>
+    <!-- <arg name="jpeg_quality"                      value="$(arg jpeg_quality)"/>-->
+    <arg name="depth_method"			value="$(arg depth_method)"/>
+  </include>
+
+  <remap from="qhd/image_depth_rect" to="depthimage_to_laserscan"/>
+
+  <group if="$(arg scan_processing)">
+    <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="standalone depthimage_to_laserscan/DepthImageToLaserScanNodelet">
+      <!-- Pixel rows to use to generate the laserscan. For each column, the scan will
+           return the minimum value for those pixels centered vertically in the image. -->
+      <param name="scan_height" value="10"/>
+      <param name="output_frame_id" value="base_link"/>
+      <param name="range_min" value="0.45"/>
+      <remap from="image" to="/kinect2/qhd/image_depth_rect"/>
+      <remap from="scan" to="/scan"/>
+
+    </node>
+  </group>
+</launch>

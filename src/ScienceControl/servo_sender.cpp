@@ -3,15 +3,23 @@
 #include <signal.h>
 #include <termios.h>
 #include <stdio.h>
+#include <string.h>
 
 #define KEYCODE_0 0x30 
 #define KEYCODE_1 0x31
 #define KEYCODE_2 0x32
 #define KEYCODE_3 0x33
 #define KEYCODE_4 0x34
+#define KEYCODE_5 0x35
+#define KEYCODE_6 0x36
+#define KEYCODE_7 0x37
 #define KEYCODE_s 0x73
-#define KEYCODE_c 0x63
+#define KEYCODE_c 0x63		
 #define KEYCODE_o 0x6f
+
+// GLOBALS.
+int servo = 0; 
+//PUBLISH FORMAT 'NUMBER(1-6)LETTER(O/C)'
 
 class TeleopRover{
     public:
@@ -79,7 +87,8 @@ void TeleopRover::keyLoop()
 	std_msgs::String msg;
 	puts("Reading from keyboard");
 	puts("---------------------------");
-	puts("Use arrow keys to move the servo.");
+	puts("Select servo 1-6 or 7(all)");
+	puts("o -> open; c -> close");
 
 	for(;;)
 	{
@@ -93,50 +102,134 @@ void TeleopRover::keyLoop()
 
 	    linear_=angular_=0;
 	    ROS_DEBUG("value: 0x%02X\n", c);
-	  
-	    switch(c)
-	    {
-	      	case KEYCODE_0:
-	        	ROS_INFO("OPEN SERVO0");
-		        msg.data = "0";
-		        dirty = true;
-		        break;
-			case KEYCODE_1:
-			       	ROS_INFO("OPEN SERVO1");
-			        msg.data = "1";
-			        dirty = true;
-			        break;
-			case KEYCODE_2:
-			        ROS_INFO("OPEN SERVO2");
-			        msg.data = "2";
-			        dirty = true;
-			        break;
-			case KEYCODE_3:
-			        ROS_INFO("OPEN SERVO3");
-			        msg.data = "3";
-			        dirty = true;
-			        break;
-			case KEYCODE_c:
-			        ROS_INFO("CLOSE ALL");
-			        msg.data = "c";
-			        dirty = true;
-			        break;
-			case KEYCODE_o:
-			        ROS_INFO("OPEN ALL");
-			        msg.data = "o";
-			        dirty = true;
-			        break;
-			default:
-				continue;
-	    }
 
-	     if(dirty ==true)
+		// Update servo choice.
+		if(c==KEYCODE_7 || c==KEYCODE_1 || c==KEYCODE_2 || c==KEYCODE_3 || c==KEYCODE_4 || c==KEYCODE_5 || c==KEYCODE_6) {
+			switch(c)
+			{
+				case KEYCODE_7:
+					servo = 7;
+					ROS_INFO("SELECTED ALL SERVOS");
+					break;
+				case KEYCODE_1:
+					servo = 1;
+					ROS_INFO("SELECTED SERVO 1");
+					break;
+				case KEYCODE_2:
+					servo = 2;
+					ROS_INFO("SELECTED SERVO 2");
+					break;
+				case KEYCODE_3:
+					servo = 3;
+					ROS_INFO("SELECTED SERVO 3");
+					break;
+				case KEYCODE_4:
+					servo = 4;
+					ROS_INFO("SELECTED SERVO 4");
+					break;
+				case KEYCODE_5:
+					servo = 5;
+					ROS_INFO("SELECTED SERVO 5");
+					break;
+				case KEYCODE_6:
+					servo = 6;
+					ROS_INFO("SELECTED SERVO 6");
+					break;																									
+			}
+		}
+		// Move servo.
+		else if(c==KEYCODE_c || c==KEYCODE_o) {
+			switch(c)
+			{
+				case KEYCODE_o:
+					switch(servo)
+					{
+						case 7:
+							ROS_INFO("OPEN ALL SERVOS");
+							msg.data = "7o";
+							dirty = true;
+							break;
+						case 1:
+							ROS_INFO("OPEN SERVO1");
+							msg.data = "1o";
+							dirty = true;
+							break;
+						case 2:
+							ROS_INFO("OPEN SERVO2");
+							msg.data = "2o";
+							dirty = true;
+							break;
+						case 3:
+							ROS_INFO("OPEN SERVO3");
+							msg.data = "3o";
+							dirty = true;
+							break;
+						case 4:
+							ROS_INFO("OPEN SERVO4");
+							msg.data = "4o";
+							dirty = true;
+							break;
+						case 5:
+							ROS_INFO("OPEN SERVO5");
+							msg.data = "5o";
+							dirty = true;
+							break;
+						case 6:
+							ROS_INFO("OPEN SERVO6");
+							msg.data = "6o";
+							dirty = true;
+							break;
+					}
+					break;
+				case KEYCODE_c:
+					switch(servo)
+					{
+						case 7:
+							ROS_INFO("CLOSE ALL SERVOS");
+							msg.data = "7c";
+							dirty = true;
+							break;						
+						case 1:
+							ROS_INFO("CLOSE SERVO1");
+							msg.data = "1c";
+							dirty = true;
+							break;
+						case 2:
+							ROS_INFO("CLOSE SERVO2");
+							msg.data = "2c";
+							dirty = true;
+							break;
+						case 3:
+							ROS_INFO("CLOSE SERVO3");
+							msg.data = "3c";
+							dirty = true;
+							break;
+						case 4:
+							ROS_INFO("CLOSE SERVO4");
+							msg.data = "4c";
+							dirty = true;
+							break;
+						case 5:
+							ROS_INFO("CLOSE SERVO5");
+							msg.data = "5c";
+							dirty = true;
+							break;
+						case 6:
+							ROS_INFO("CLOSE SERVO6");
+							msg.data = "6c";
+							dirty = true;
+							break;
+					}
+					break;	
+			}
+		}
+
+	    if(dirty ==true)
 	    {
 	      message_pub.publish(msg);    
 	      dirty=false;
 	    }
-	  }
+	}
 
-
-	  return;
+	return;
 }

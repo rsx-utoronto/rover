@@ -58,7 +58,7 @@ def directControl():
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-                sendSpeeds[0] += 30
+                sendSpeeds[0] += 60
             if event.key == pygame.K_w:
                 sendSpeeds[1] += 255
             if event.key == pygame.K_e:
@@ -70,9 +70,9 @@ def directControl():
             if event.key == pygame.K_y:
                 sendSpeeds[5] += 35
             if event.key == pygame.K_u:
-                sendSpeeds[6] += 255
+                sendSpeeds[6] += 35
             if event.key == pygame.K_a:
-                sendSpeeds[0] -= 30
+                sendSpeeds[0] -= 60
             if event.key == pygame.K_s:
                 sendSpeeds[1] -= 255
             if event.key == pygame.K_d:
@@ -84,13 +84,13 @@ def directControl():
             if event.key == pygame.K_h:
                 sendSpeeds[5] -= 35
             if event.key == pygame.K_j:
-                sendSpeeds[6] -= 255
+                sendSpeeds[6] -= 35
             if event.key == pygame.K_SPACE:
                 for e in sendSpeeds:
                     e = 0
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_q:
-                sendSpeeds[0] -= 30
+                sendSpeeds[0] -= 60
             if event.key == pygame.K_w:
                 sendSpeeds[1] -= 255
             if event.key == pygame.K_e:
@@ -102,9 +102,9 @@ def directControl():
             if event.key == pygame.K_y:
                 sendSpeeds[5] -= 35
             if event.key == pygame.K_u:
-                sendSpeeds[6] -= 255
+                sendSpeeds[6] -= 35
             if event.key == pygame.K_a:
-                sendSpeeds[0] += 30
+                sendSpeeds[0] += 60
             if event.key == pygame.K_s:
                 sendSpeeds[1] += 255
             if event.key == pygame.K_d:
@@ -116,7 +116,7 @@ def directControl():
             if event.key == pygame.K_h:
                 sendSpeeds[5] += 35
             if event.key == pygame.K_j:
-                sendSpeeds[6] += 255
+                sendSpeeds[6] += 35
     sendAngleValues(sendSpeeds)
 
 
