@@ -5,5 +5,5 @@
 
 import webview
 
-webview.create_window('RSX Map Software', 'http://localhost:8080/index.html')
-webview.start()
+webview.create_window ('RSX Map Software', 'http://localhost:8080/index.html')
+webview.start(gui='qt')
