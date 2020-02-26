@@ -888,7 +888,7 @@ var map = new mapboxgl.Map({
   maxZoom: 14.8
 });
 
-var place = false;
+var place = true;
 
 var geojson = {
   type: 'FeatureCollection',
@@ -916,6 +916,15 @@ var geojson = {
   }]
 };
 
+//mapboxgl.accessToken = 'pk.eyJ1IjoiZWxsZW54d2NoZW4iLCJhIjoiY2szbHZlc2RiMDJiejNmcWVteGx3aHNjcSJ9.KTf1PHkOPk_pXswRLLu8YA';
+
+//var map = new mapboxgl.Map({
+//  container: 'map',
+//  style: 'mapbox://styles/mapbox/light-v10', // style: 'mapbox://styles/mapbox/satellite-v9'for satellite
+//  center:[-79.396564,43.660648],
+//  zoom: 20
+//});
+
 //Count number of predefined markers
 const staticMarkers = geojson.features.length;
 
@@ -930,19 +939,34 @@ function toggle() {
   }
 }
 
-map.on('click', function(e){
-	//checks if place is true
+var coordinates = [-79.396564,43.660648,
+		-79.396565,43.660650,
+		-79.396566,43.660653,
+		-79.396563,43.660651,
+		-79.396568,43.660654,
+		-79.396571,43.660655,
+		-79.396573,43.660657,
+		-79.396573,43.660661,
+		-79.396574,43.660662,
+		-79.396575,43.660662,
+		-79.396577,43.660664,
+		];
+var delay = 0, howManyTimes = 20;
+
+//newFunction (0);
+function newFunction(delay){
 	if (place) {
+		//for (var start = 0; start < 20; start = start + 2){
 		//Insert new marker into geojson.features array
 		var number = geojson.features.push({
 			type: 'Feature',
 			geometry: {
 				type: 'Point',
-				coordinates: [e.lngLat.lng, e.lngLat.lat]
+				coordinates: [coordinates[delay], coordinates [delay + 1]]
 			},
 			properties: {
 				title: 'New Marker',
-				description: e.lngLat.lng + ', ' + e.lngLat.lat
+				description:  coordinates [delay] + ', ' +  coordinates [delay + 1]
 			}
 		})
 		
@@ -950,7 +974,7 @@ map.on('click', function(e){
 		var el = document.createElement('div');
 		el.className = 'marker';
 		//set id of marker to concatenation of coords
-		el.id = e.lngLat.lng + '|' + e.lngLat.lat;
+		el.id =  coordinates [delay] + '|' +  coordinates [delay + 1];
 
 		// make a marker for new marker and add to the map
 		new mapboxgl.Marker(el)
@@ -958,7 +982,7 @@ map.on('click', function(e){
 			.setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
 			.setHTML('<h3>' + marker.properties.title + 
 					'</h3><p>' + marker.properties.description + '</p>' +
-					'<input type="button" value="Delete" onclick="remove(' + '\'' + e.lngLat.lng + '|' + e.lngLat.lat + '\')"/>'))
+					'<input type="button" value="Delete" onclick="remove(' + '\'' +  coordinates [delay] + '|' +  coordinates [delay+1] + '\')"/>'))
 			.addTo(map);
 		
 		//Check for size of array
@@ -967,8 +991,26 @@ map.on('click', function(e){
 			var coords = geojson.features[staticMarkers].geometry.coordinates;
 			remove(coords[0] + '|' + coords[1]);
 		}
+	 //}
 	}
-});
+}
+
+//map.on('click', function(e){
+function delayFunc(){
+	//checks if place is true
+	setTimeout (function(){
+		newFunction(delay);
+		delay = delay + 2;
+		if (delay < 20){
+		console.log (delay);
+		delayFunc();
+		}
+		
+	},1500)
+}
+//});
+
+delayFunc();
 
 function remove(id) {
 	//grab coords from id
