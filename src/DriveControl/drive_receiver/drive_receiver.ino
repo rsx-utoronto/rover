@@ -41,7 +41,8 @@ void accel(int, int);
 void stop();
 void doPivot(int);
 
-void messageCb( const geometry_msgs::Twist& msg){
+void messageCb(const geometry_msgs::Twist& msg)
+{
   startCounting = true;
   count = 0;
   //nh.loginfo("msg received");

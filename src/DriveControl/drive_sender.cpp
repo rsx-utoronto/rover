@@ -83,6 +83,7 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "drive_sender");
 	TeleopRover drive_sender;
-	
+	ROS_INFO("Opened");
+
 	ros::spin();
 }
