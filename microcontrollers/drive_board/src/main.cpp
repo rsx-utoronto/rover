@@ -7,7 +7,7 @@
 #include <Wire.h>
 #include <rsx_esc.h>
 #include <main.h>
-
+//:)
 // Allocate 128 bytes to hold ros loggin messages
 char log_buffer[128];
 
