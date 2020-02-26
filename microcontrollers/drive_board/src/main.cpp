@@ -7,12 +7,16 @@
 
 #include <rsx_esc.h>
 #include <main.h>
+<<<<<<< HEAD
 
 //   ___ _     _          _    
 //  / __| |___| |__  __ _| |___
 // | (_ | / _ \ '_ \/ _` | (_-<
 //  \___|_\___/_.__/\__,_|_/__/
 
+=======
+//:)
+>>>>>>> 6ebb068f1a75b8dbf1d25e3143d71a0f72908a31
 // Allocate 128 bytes to hold ros loggin messages
 char log_buffer[128];
 
