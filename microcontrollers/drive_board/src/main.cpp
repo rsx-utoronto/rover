@@ -2,6 +2,8 @@
 #include <ros.h>
 #include <Wire.h>
 #include <rsx_esc.h>
+#include <main.h>
+
 
 void setup() {
 	Wire.begin();
@@ -33,7 +35,7 @@ void loop() {
 		first_run = false;
 	}
 
-	float a = 100.0;
+	float a = -200.0;
 	ESC1.set_vel(a);
 	ESC2.set_vel(a);
 	ESC3.set_vel(a);
