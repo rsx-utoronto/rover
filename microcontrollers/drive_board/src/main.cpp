@@ -4,6 +4,8 @@
 #include <rsx_esc.h>
 #include <main.h>
 
+// Allocate 128 bytes to hold ros loggin messages
+char log_buffer[128];
 
 void setup() {
 	Wire.begin();
@@ -29,7 +31,7 @@ void loop() {
 	}
 }
 
-void reset_driver_faults(ESC Drivers[6]){
+void reset_driver_faults(ESC Drivers[6]) {
 	// Call this if the motors fault
 	for(int i = 0; i < 6; i++) {
 		Drivers[i].set_enable(false);
@@ -44,5 +46,14 @@ void reset_driver_faults(ESC Drivers[6]){
 void set_all_vel(float vel, ESC Drivers[6]) {
 	for(int i = 0; i < 6; i++) {
 		Drivers[i].set_vel(vel);
+	}
+}
+
+void check_motor_status(ESC Drivers[6]) {
+	for(int i = 0; i < 6; i++) {
+		if(!Drivers[i].get_ok_status()) {
+			sprintf(log_buffer,"Fault on motor i=%d (%d)", i, i+1);
+			nh.logerror(log_buffer);
+		}
 	}
 }
