@@ -1,6 +1,8 @@
 HOW TO RUN DRIVE
 
-Open 4 terminal windows and run 1 in each in the given order.
+Pull latest version of the drive board branch of rover
+
+Open 4 terminal windows and run the following commands in each in the given order.
 
 1. roscore
 
