@@ -38,11 +38,11 @@ double Kd[7] = {0.06, 0.05, 0.05, 0.05, 0.04, 0.04,   0};
 const char dirPin[7] = {22, 23, 4, 6, 8, 10, 12};
 const char pwmPin[7] = {2, 3, 5, 7, 9, 11, 13};
 
-const char spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
+const int spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
 
 // Flags
 bool running = true;          // Used for emergency stopping
-bool manual_override = false; // Used for the 'm' command
+bool manual_override = true; // Used for the 'm' command
 
 // PID objects operate on the values of vel[] directly
 // Change to REVERSE if PID control is backwards
@@ -63,8 +63,8 @@ void setup() {
     Serial.println("Serial initialized.");
     drivers_initilize();
     //setup_interrupts();
-    starting_position();
-    setup_PID();
+    //starting_position();
+    //setup_PID();
     Serial.println("drivers and encoders initialized.");
 }
 
@@ -72,7 +72,7 @@ unsigned long last_print = millis();
 unsigned long last_override = 0;
 
 void loop() {
-    get_encoder_values();
+    //get_encoder_values();
     if (Serial.available()) {
         switch (Serial.read()) {
             case 'p': // Move to absolute position within limits
@@ -104,6 +104,7 @@ void loop() {
             case 'm':                      // direct manual control of joint velocities
                 last_override = millis();
                 manual_override = true;
+                Serial.println("manual command received");
                 direct_velocity_control(); // paser
                 break;
             case 's': // starting position (fully upright and center)
@@ -122,7 +123,7 @@ void loop() {
         updatePID();
     } else {
         // we are in manual mode, so we already set the velocities we want.
-        if (millis() - last_override > 100) {
+        if (millis() - last_override > 1000) {
             // if we have not recieved an update for a while, set all velocities to zero
             // to prevent damage
             for (int i = 0; i < 7; i++) {
@@ -263,8 +264,8 @@ void direct_velocity_control(){
     vel[2] = raw_vel[2];
     vel[3] = -raw_vel[3];
     // Translate IK spherical model to differential wrist
-    vel[4] = -raw_vel[4] - raw_vel[5];  // tilt + rot
-    vel[5] = -raw_vel[4] + raw_vel[5]; // tilt + rot
+    vel[4] = -raw_vel[4]// - raw_vel[5];  // tilt + rot
+    vel[5] = -raw_vel[5]// + raw_vel[4]; // tilt + rot
     //Serial.println(vel[5]);
     // Take into account spherical wrist rotation for the gripper output
     vel[6] = raw_vel[6];
