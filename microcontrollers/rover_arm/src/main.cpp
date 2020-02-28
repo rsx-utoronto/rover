@@ -57,10 +57,6 @@ PID PID_6(&actual_pos_float[6], &vel[6], &goal_pos[6], Kp[6], Ki[6], Kd[6], REVE
 void setup() {
     Wire.begin(Controller_address); // put your setup code here, to run once:
     Wire.onReceive(receiveEvent);
-    Serial.begin(115200);
-    while (!Serial);
-    Serial.setTimeout(2); // Set the timeout to 2ms, otherwise parsing can hang for up to a second
-    Serial.println("Serial initialized.");
     drivers_initilize();
     //setup_interrupts();
     //starting_position();
