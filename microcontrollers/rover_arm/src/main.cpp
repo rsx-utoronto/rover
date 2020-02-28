@@ -123,7 +123,7 @@ void loop() {
         updatePID();
     } else {
         // we are in manual mode, so we already set the velocities we want.
-        if (millis() - last_override > 1000) {
+        if (millis() - last_override > 100) {
             // if we have not recieved an update for a while, set all velocities to zero
             // to prevent damage
             for (int i = 0; i < 7; i++) {
@@ -264,8 +264,8 @@ void direct_velocity_control(){
     vel[2] = raw_vel[2];
     vel[3] = -raw_vel[3];
     // Translate IK spherical model to differential wrist
-    vel[4] = -raw_vel[4]// - raw_vel[5];  // tilt + rot
-    vel[5] = -raw_vel[5]// + raw_vel[4]; // tilt + rot
+    vel[4] = -raw_vel[4];// - raw_vel[5];  // tilt + rot
+    vel[5] = -raw_vel[5];// + raw_vel[4]; // tilt + rot
     //Serial.println(vel[5]);
     // Take into account spherical wrist rotation for the gripper output
     vel[6] = raw_vel[6];
