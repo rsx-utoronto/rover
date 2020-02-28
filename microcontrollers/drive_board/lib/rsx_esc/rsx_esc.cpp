@@ -18,6 +18,9 @@ ESC::ESC(float _full_speed_rpm, int _enable_pin, int _direction_pin, int _curren
 
 void ESC::set_vel(float vel) {
 	int spd = abs(vel * 60.0 / (2.0*pi) / full_speed_rpm * 4096.0);
+	if(spd >= 4095)  {
+		spd =  4095;
+	}
 	digitalWrite(direction_pin, (vel > 0.0));
 	Wire.beginTransmission(I2C_addr);
 	Wire.write(spd & 0xFF);
