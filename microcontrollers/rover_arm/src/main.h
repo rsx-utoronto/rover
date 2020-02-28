@@ -1,7 +1,6 @@
 #ifndef main_h
 #define main_h
 
-void updatePID();
 void drivers_initilize();
 void update_velocity();
 void update_encoders();
@@ -12,10 +11,14 @@ void starting_position();
 void receiveEvent(int number_of_bytes);
 void get_encoder_values();
 
-void TEST_find_encoder_pins();
-void TEST_print_encoder_pins();
-void PRINT_encoder_positions();
-void TEST_PID();
-void TEST_motor_pins();
-void PRINT_oscilloscope(int motor);
+void arm_direct_pwm_update();
+
+//   ___  ___  ___    ___      _ _ _             _       
+//  | _ \/ _ \/ __|  / __|__ _| | | |__  __ _ __| |__ ___
+//  |   / (_) \__ \ | (__/ _` | | | '_ \/ _` / _| / /(_-<
+//  |_|_\\___/|___/  \___\__,_|_|_|_.__/\__,_\__|_\_\/__/
+
+void arm_direct_pwm_cb(const std_msgs::Int16MultiArray&);
+
+
 #endif
