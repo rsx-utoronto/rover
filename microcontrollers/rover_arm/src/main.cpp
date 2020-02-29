@@ -47,7 +47,7 @@ ros::Subscriber<std_msgs::Int16MultiArray> arm_direct_pwm_sub("rover/arm_direct_
 void setup() {
     drivers_initilize();
     //setup_PID();
-
+    nh.getHardware()->setBaud(115200);
     nh.initNode();
 	nh.subscribe(arm_direct_pwm_sub);
     nh.loginfo("arm drivers and encoders initialized.");

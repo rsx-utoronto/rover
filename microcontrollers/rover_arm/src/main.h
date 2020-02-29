@@ -20,5 +20,4 @@ void arm_direct_pwm_update();
 
 void arm_direct_pwm_cb(const std_msgs::Int16MultiArray&);
 
-
 #endif
