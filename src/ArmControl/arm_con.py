@@ -27,13 +27,13 @@ def joystick_buttons():
 
 def axes_to_pwm(buttons, axes):
 	out = [0,0,0,0,0,0,0]
-	out[0] = axes[0] * 255
-	out[1] = axes[1] * 255
-	out[2] = axes[2] * 255
-	out[3] = axes[3] * 255
-	out[4] = axes[4] * 255
-	out[5] = axes[5] * 255
-	out[6] = buttons[22] * 255 - buttons[25] * 255
+	out[0] = buttons[22] * 255 - buttons[25] * 255
+	out[1] = axes[0] * 255
+	out[2] = axes[1] * 255
+	out[3] = axes[2] * 255
+	out[4] = axes[3] * 255
+	out[5] = axes[4] * 255
+	out[6] = axes[5] * 255
 	return out
 
 if __name__ == "__main__":

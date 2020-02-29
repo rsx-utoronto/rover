@@ -106,6 +106,7 @@ void drivers_initilize() {
         pinMode(dirPin[i], OUTPUT);
         pinMode(pwmPin[i], OUTPUT);
     }
+    update_velocity();
 }
 
 //   ___  ___  ___    ___      _ _ _             _       
