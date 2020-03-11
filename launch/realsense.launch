@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="width"                           default="424" />
+	<arg name="height"                          default="240" />
+	<arg name="frame_rate"                      default="15" />
+
+	<!-- RealSense D435i -->
+	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+		<arg name="align_depth"                 value="true" />
+		<arg name="unite_imu_method"            value="linear_interpolation" /> <!-- Options are: [none, copy, linear_interpolation] -->
+
+		<arg name="depth_fps"                   value="$(arg frame_rate)"/>
+		<arg name="infra_fps"                   value="$(arg frame_rate)"/>
+		<arg name="color_fps"                   value="$(arg frame_rate)"/>
+
+		<arg name="depth_width"                  value="$(arg width)"/>
+		<arg name="infra_width"                  value="$(arg width)"/>
+		<arg name="color_width"                  value="$(arg width)"/>
+
+		<arg name="depth_height"                 value="$(arg height)"/>
+		<arg name="infra_height"                 value="$(arg height)"/>
+		<arg name="color_height"                 value="$(arg height)"/>
+	</include>
+
+	<!-- RealSense IMU -->
+	<!-- <node pkg="imu_filter_madgwick" type="imu_filter_node" name="rs2_imu" respawn="true">  -->
+		<!-- <param name="_use_mag" value="false" /> -->
+		<!-- <param name="_publish_tf" value="false" /> -->
+		<!-- <param name="_world_frame" value="enu" /> -->
+		<!-- <remap from="/imu/data_raw" to="/camera/imu"/> -->
+		<!-- <remap from="/imu/data" to="/rtabmap/imu"/> -->
+	<!-- </node> -->
+</launch>

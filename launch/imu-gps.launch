@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="ns" default="/imu" />
+
+	<!-- Inertial-Sense-ROS https://github.com/inertialsense/inertial_sense_ros -->
+	<group ns="$(arg ns)">
+		<node pkg="inertial_sense" type="inertial_sense_node" name="inertial_sense_node" respawn="true"> 
+			<param name="stream_INS"           value="false" />
+			<param name="stream_IMU"           value="true" />
+			<param name="stream_baro"          value="true" />
+			<param name="stream_mag"           value="true" />
+			<param name="stream_preint_IMU"    value="true" />
+			<param name="stream_GPS"           value="false" />
+			<param name="publishTf"            value="true" />
+			<!-- <remap from="$(arg ns)/imu"        to="/rtabmap/imu"/> -->
+		</node>
+	</group>
+</launch>
