@@ -1,13 +1,17 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="width"                           default="424" />
-	<arg name="height"                          default="240" />
-	<arg name="frame_rate"                      default="15" />
+	<arg name="width"                           default="640" />
+	<arg name="height"                          default="480" />
+	<arg name="frame_rate"                      default="30" />
 
 	<!-- RealSense D435i -->
 	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
 		<arg name="align_depth"                 value="true" />
-		<arg name="unite_imu_method"            value="linear_interpolation" /> <!-- Options are: [none, copy, linear_interpolation] -->
+		<arg name="unite_imu_method"            value="none" /> <!-- Options are: [none, copy, linear_interpolation] -->
+		<arg name="enable_gyro"                 value="false)"/>
+		<arg name="enable_accel"                value="false)"/>
+
+		<arg name="filters"                  value="decimation,temporal"/>
 
 		<arg name="depth_fps"                   value="$(arg frame_rate)"/>
 		<arg name="infra_fps"                   value="$(arg frame_rate)"/>
