@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <launch>
+	<include file="$(find rover)/launch/realsense.launch" respawn="true">
+	</include>
+
+	<include file="$(find rover)/launch/imu-gps.launch" respawn="true">
+	</include>
+
 	<!-- RTAB-map Node-->
 	<include file="$(find rtabmap_ros)/launch/rtabmap.launch" respawn="true">
 			<arg name="rtabmap_args"                value="--delete_db_on_start" />

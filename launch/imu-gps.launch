@@ -11,8 +11,19 @@
 			<param name="stream_mag"           value="true" />
 			<param name="stream_preint_IMU"    value="true" />
 			<param name="stream_GPS"           value="false" />
-			<param name="publishTf"            value="true" />
+			<param name="publishTf"            value="false" />
 			<!-- <remap from="$(arg ns)/imu"        to="/rtabmap/imu"/> -->
 		</node>
 	</group>
+
+	<!-- IMU Filter http://wiki.ros.org/imu_complementary_filter -->
+	<node pkg="imu_complementary_filter" type="complementary_filter_node" name="complementary_filter_node" respawn="true"> 
+		<param name="use_mag"                  value="false" />
+		<param name="publish_tf"               value="false" />
+		<remap from="$imu/data_raw"        to="/camera/imu"/>
+		<remap from="$(arg ns)/imu"        to="/rtabmap/imu"/>
+	</node>
+
+
+
 </launch>
