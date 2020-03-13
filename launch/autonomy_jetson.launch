@@ -1,20 +1,21 @@
 <?xml version="1.0"?>
 <launch>
-	<include file="$(find rover)/launch/realsense.launch" respawn="true">
+	<include file="$(find rover)/launch/realsense.launch">
 	</include>
 
-	<include file="$(find rover)/launch/imu-gps.launch" respawn="true">
+	<include file="$(find rover)/launch/imu-gps.launch">
 	</include>
 
 	<!-- RTAB-map Node-->
-	<include file="$(find rtabmap_ros)/launch/rtabmap.launch" respawn="true">
-			<arg name="rtabmap_args"                value="--delete_db_on_start" />
-			<arg name="rgb_topic"                   value="/camera/color/image_raw" />
+	<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+			<arg name="rtabmap_args"                value="--delete_db_on_start --Optimizer/GravitySigma 0.3" />
 			<arg name="depth_topic"                 value="/camera/aligned_depth_to_color/image_raw" />
-			<arg name="camera_info_topic"           value="/rgb/camera_info" />
-			<arg name="depth_camera_info_topic"     value="/camera/color/camera_info" />
+			<arg name="rgb_topic"                   value="/camera/color/image_raw" />
+			<arg name="camera_info_topic"           value="/camera/color/camera_info" />
 			<arg name="approx_sync"                 value="false" />
 			<arg name="rtabmapviz"                  value="false"/>
 			<arg name="rviz"                        value="false"/>
+			<arg name="wait_imu_to_init"            value="true"/>
+			<arg name="imu_topic"                   value="/rtabmap/imu"/>
 	</include>
 </launch>

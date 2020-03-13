@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="ns" default="/imu" />
+	<arg name="ns" default="/inertialsense" />
 
 	<!-- Inertial-Sense-ROS https://github.com/inertialsense/inertial_sense_ros -->
 	<group ns="$(arg ns)">
@@ -12,6 +12,8 @@
 			<param name="stream_preint_IMU"    value="true" />
 			<param name="stream_GPS"           value="false" />
 			<param name="publishTf"            value="false" />
+			<param name="frame_id"             value="camera_link" />
+			frame_id
 			<!-- <remap from="$(arg ns)/imu"        to="/rtabmap/imu"/> -->
 		</node>
 	</group>
@@ -20,10 +22,7 @@
 	<node pkg="imu_complementary_filter" type="complementary_filter_node" name="complementary_filter_node" respawn="true"> 
 		<param name="use_mag"                  value="false" />
 		<param name="publish_tf"               value="false" />
-		<remap from="$imu/data_raw"        to="/camera/imu"/>
-		<remap from="$(arg ns)/imu"        to="/rtabmap/imu"/>
+		<remap from="/imu/data_raw"        to="$(arg ns)/imu"/>
+		<remap from="/imu/data"        to="/rtabmap/imu"/>
 	</node>
-
-
-
 </launch>
