@@ -1,40 +1,21 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="verbose"                         default="true" />
-	<arg name="width"                           default="640" />
-	<arg name="height"                          default="480" />
-	<arg name="frame_rate"                      default="15" />
+	<include file="$(find rover)/launch/realsense.launch">
+	</include>
 
-	<!-- RealSense D435i -->
-	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
-		<arg name="align_depth"                 value="true" />
-		<arg name="unite_imu_method"            value="linear_interpolation" />
-
-		<arg name="fisheye_fps"                 value="$(arg frame_rate)"/>
-		<arg name="depth_fps"                   value="$(arg frame_rate)"/>
-		<arg name="infra_fps"                   value="$(arg frame_rate)"/>
-		<arg name="color_fps"                   value="$(arg frame_rate)"/>
-
-		<arg name="fisheye_width"                value="$(arg width)"/>
-		<arg name="depth_width"                  value="$(arg width)"/>
-		<arg name="infra_width"                  value="$(arg width)"/>
-		<arg name="color_width"                  value="$(arg width)"/>
-
-		<arg name="fisheye_height"               value="$(arg height)"/>
-		<arg name="depth_height"                 value="$(arg height)"/>
-		<arg name="infra_height"                 value="$(arg height)"/>
-		<arg name="color_height"                 value="$(arg height)"/>
+	<include file="$(find rover)/launch/imu-gps.launch">
 	</include>
 
 	<!-- RTAB-map Node-->
 	<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
-			<arg name="rtabmap_args"                value="--delete_db_on_start" />
-			<arg name="rgb_topic"                   value="/camera/color/image_raw" />
+			<arg name="rtabmap_args"                value="--delete_db_on_start --Optimizer/GravitySigma 0.3" />
 			<arg name="depth_topic"                 value="/camera/aligned_depth_to_color/image_raw" />
-			<arg name="camera_info_topic"           value="/rgb/camera_info" />
-			<arg name="depth_camera_info_topic"     value="/camera/color/camera_info" />
+			<arg name="rgb_topic"                   value="/camera/color/image_raw" />
+			<arg name="camera_info_topic"           value="/camera/color/camera_info" />
 			<arg name="approx_sync"                 value="false" />
 			<arg name="rtabmapviz"                  value="false"/>
 			<arg name="rviz"                        value="false"/>
+			<arg name="wait_imu_to_init"            value="true"/>
+			<arg name="imu_topic"                   value="/rtabmap/imu"/>
 	</include>
 </launch>
