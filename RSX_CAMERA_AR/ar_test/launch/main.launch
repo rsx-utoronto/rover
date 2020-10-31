@@ -1,0 +1,7 @@
+<launch>
+ <include file="$(find ar_test)/launch/Camera.launch" />
+ <include file="$(find ar_test)/launch/Track.launch" />
+
+</launch>
+
+

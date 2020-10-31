@@ -1,0 +1,6 @@
+<launch>
+ <include file="$(find AutoRover)/launch/Camera.launch" />
+ <include file="$(find AutoRover)/launch/Track.launch" />
+
+</launch>
+
