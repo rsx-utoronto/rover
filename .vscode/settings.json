@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "C:\\Users\\Shichao\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.banditEnabled": false,
+    "python.linting.pylamaEnabled": false,
+    "python.linting.flake8Enabled": false,
+    "python.linting.mypyEnabled": false
+}
