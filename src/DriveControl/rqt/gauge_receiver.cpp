@@ -27,6 +27,8 @@ int main(int argc, char**argv){
                 std_msgs::Float64 velocity;
                 std_msgs::Float64 angle;
                 velocity.data=vals[0];
+                velocity.data=velocity.data/2.55;
+                //normalize velocity to +/- 100 so it fits nicer on the gauge
                 angle.data=vals[1];
 
                 vel_pub.publish(velocity);
