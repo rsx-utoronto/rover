@@ -14,7 +14,8 @@ void gaugesCallback(const geometry_msgs::Twist& msg){ // Callback function for p
 int main(int argc, char**argv){
         ros::init(argc, argv, "gauges");
         ros::NodeHandle n;
-        ros::Subscriber sub = n.subscribe("drive_sender", 1000, &gaugesCallback);
+        ros::Subscriber sub = n.subscribe("drive", 1000, &gaugesCallback);
+        
         // subscribe to drive_sender node in drive_sender.cpp
         ros::Publisher  vel_pub = n.advertise<std_msgs::Float64>("gauge_velocity_sender", 1000);
         ros::Publisher  ang_pub = n.advertise<std_msgs::Float64>("gauge_angle_sender", 1000);
