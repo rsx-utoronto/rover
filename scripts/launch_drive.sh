@@ -54,7 +54,7 @@ rosrun rover drive_sender &
 echo "Starting joy_node..."
 rosrun joy joy_node &
 
-if [$quiet==0]; then
+if [ $quiet == 0 ]; then
         echo "Initializing rqt plugin: gauges..."
         #gauges
         # from wiki.ros.org/gauges:
