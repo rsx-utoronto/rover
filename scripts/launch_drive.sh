@@ -121,8 +121,8 @@ if [[ " ${plugin_list[@]} " =~ "gauges" ]]; then
 
 	rosparam set /rqt_gauges/topic2 /gauge_angle_sender
 	rosparam set /rqt_gauges/gauge_name2 Angle
-	rosparam set /rqt_gauges/minimum2 -1
-	rosparam set /rqt_gauges/maximum2 1
+	rosparam set /rqt_gauges/minimum2 -90
+	rosparam set /rqt_gauges/maximum2 90
 	
 	rosrun rover gauge_receiver &
 fi

@@ -31,6 +31,8 @@ int main(int argc, char**argv){
                 velocity.data=velocity.data/2.55;
                 //normalize velocity to +/- 100 so it fits nicer on the gauge
                 angle.data=vals[1];
+                angle.data=angle.data*90;
+		//normalize angle to +/- 90
 
                 vel_pub.publish(velocity);
                 ros::spinOnce();
