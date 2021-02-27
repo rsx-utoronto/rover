@@ -1,5 +1,7 @@
 # Map GUI
 
+Wiki for Map can be found here: https://github.com/rsx-utoronto/rover/wiki/Map
+
 ## Getting Started
 This GUI requires at least python 3.6 to be installed
 
