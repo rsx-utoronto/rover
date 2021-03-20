@@ -21,8 +21,8 @@ do
 		-h|--help)
 			echo -e "launch_drive bash script V.1.1 (2021 Jan 16, Eddie Tian)\n"
 			echo -e "Usage: launch_drive [arguments]\n"
-			echo "Known Issue: Only way to stop nodes is with `top` then `kill {PID}`. A workaround is to close the terminal window, then run `launch_drive` again."
-			echo "Arguments"
+			echo -e "Known Issue: Only way to stop nodes is with 'top' then 'kill {PID}'. A workaround is to close the terminal window, then run 'launch_drive' again."
+			echo -e "Arguments"
 			echo -e "\t-h|--help               Show this help screen"
 			echo -e "\t-s|--set-port {a} {c}   Temporarily change port for arduino to \"a\""
 			echo -e "\t                        Temporariily change port for controller to \"c\""
