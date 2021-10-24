@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  cv_bridge
+  image_transport
 )
 
 ## System dependencies are found with CMake's conventions
@@ -204,3 +206,27 @@ add_executable(servo_sender src/ScienceControl/servo_sender.cpp)
 target_link_libraries(drive_sender ${catkin_LIBRARIES})
 target_link_libraries(listener ${catkin_LIBRARIES})
 target_link_libraries(servo_sender ${catkin_LIBRARIES})
+
+find_library(LIBAVUTIL_LIBRARY avutil HINTS /opt/ffmpeg/lib)
+find_library(LIBAVCODEC_LIBRARY avcodec HINTS /opt/ffmpeg/lib)
+find_library(LIBSWSCALE_LIBRARY swscale HINTS /opt/ffmpeg/lib)
+
+set(FFMPEG_INCLUDE_PATH "/opt/ffmpeg/include" CACHE PATH "path to libavcodec/avcodec.h")
+include_directories(${FFMPEG_INCLUDE_PATH})
+
+if(NOT LIBAVCODEC_LIBRARY OR NOT FFMPEG_INCLUDE_PATH)
+  message(WARNING "Could not find ffmpeg libraries, not building receivers...")
+endif()
+
+
+if(LIBAVCODEC_LIBRARY AND EXISTS ${FFMPEG_INCLUDE_PATH})
+  add_executable(receive_stream
+    src/DriveControl/image_encoder/decoder_node.cpp
+  )
+  target_link_libraries(receive_stream
+    ${catkin_LIBRARIES}
+    ${LIBAVUTIL_LIBRARY}
+    ${LIBAVCODEC_LIBRARY}
+    ${LIBSWSCALE_LIBRARY}
+  )
+endif()

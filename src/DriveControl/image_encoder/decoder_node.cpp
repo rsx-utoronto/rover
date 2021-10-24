@@ -78,7 +78,7 @@ void callback(const sensor_msgs::CompressedImageConstPtr& img){
 
 int main(int argc, char** argv){
 
-	ros::init(argc, argv, "receive stream");
+	ros::init(argc, argv, "receive_stream");
 
 	ros::NodeHandle nh("~");
 
