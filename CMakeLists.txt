@@ -200,13 +200,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(drive_sender src/DriveControl/drive_sender.cpp)
-add_executable(listener src/DriveControl/listener.cpp)
-add_executable(servo_sender src/ScienceControl/servo_sender.cpp)
-target_link_libraries(drive_sender ${catkin_LIBRARIES})
-target_link_libraries(listener ${catkin_LIBRARIES})
-target_link_libraries(servo_sender ${catkin_LIBRARIES})
-
 find_library(LIBAVUTIL_LIBRARY avutil HINTS /opt/ffmpeg/lib)
 find_library(LIBAVCODEC_LIBRARY avcodec HINTS /opt/ffmpeg/lib)
 find_library(LIBSWSCALE_LIBRARY swscale HINTS /opt/ffmpeg/lib)
@@ -230,3 +223,10 @@ if(LIBAVCODEC_LIBRARY AND EXISTS ${FFMPEG_INCLUDE_PATH})
     ${LIBSWSCALE_LIBRARY}
   )
 endif()
+
+add_executable(drive_sender src/DriveControl/drive_sender/drive_sender.cpp)
+add_executable(listener src/DriveControl/drive_receiver_joystick/listener.cpp)
+add_executable(servo_sender src/ScienceControl/servo_sender.cpp)
+target_link_libraries(drive_sender ${catkin_LIBRARIES})
+target_link_libraries(listener ${catkin_LIBRARIES})
+target_link_libraries(servo_sender ${catkin_LIBRARIES})
