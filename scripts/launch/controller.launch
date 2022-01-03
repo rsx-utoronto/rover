@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<launch>
+	<node pkg="gpsd_client" type="gpsd_client" name="gps_publish" args="localhost 4000" output="screen"/>
+	<node pkg="rover" type="GPScontroller.py" name="gps_controller"/>
+</launch>

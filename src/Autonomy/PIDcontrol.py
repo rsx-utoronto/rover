@@ -68,7 +68,7 @@ class AutonomousRover:
         print("callback")
 
     def callbackMAG(self, data):
-        print data  #for testing
+        print(data)  #for testing
         self.xMag = data.magnetic_field.x
         self.yMag = data.magnetic_field.y
         self.head = math.atan2(self.xMag, self.yMag)
@@ -76,6 +76,7 @@ class AutonomousRover:
     def listener(self):
         rospy.init_node('gps_listener', anonymous=True)
         rospy.Subscriber('/fix', NavSatFix, self.callbackGPS)
+        print("Getting fix topic")
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
 
     def initializeController(self):
@@ -112,14 +113,14 @@ class AutonomousRover:
         self.yDiff = targetY - roverY
 
         #for testing
-        print ("xDiff X")
-        print (self.xDiff)
-        print ("yDiff Y")
-        print (self.yDiff)
+        print("xDiff X")
+        print(self.xDiff)
+        print("yDiff Y")
+        print(self.yDiff)
 
         # Checks to see if rover reached target
         if (abs(self.xDiff) < self.xError) and (abs(self.yDiff) < self.yError):
-            print ("Destination Reached!")
+            print("Destination Reached!")
             self.arrived = True
             return True
 
