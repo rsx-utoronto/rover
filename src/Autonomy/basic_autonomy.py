@@ -3,11 +3,12 @@ import rospy
 from nav_msgs.msg import Odometry
 from inertial_sense.msg import GPS
 from sensor_msgs.msg import MagneticField
+from std_msgs.msg import Float64
 import threading
 import math
 import time
 
-class AutonomousRover:
+class BasicAutonomousRover:
 # '''
          North
 #         |
@@ -19,7 +20,7 @@ class AutonomousRover:
 # - >   : long, x (+)
 #
 # '''
-    def __init__(self, tick, errorx, errory, server):
+    def __init__(self, tick, errorx, errory):
         # Time at start.
         self.tick = tick
         # Time when operation is stopped.
@@ -30,16 +31,25 @@ class AutonomousRover:
         # Initial speed. Arbitrary value. Adjusted by testing.
         self.lin_vel = 0.3
         self.ref_ang_vel = 1
+        self.init_heading = 0
       
         self.timeOut = False
         self.arrived = False
 
+        self.latitude = 0
+        self.longitude = 0 
+
+        self.targetX = self.latitude
+        self.targetY = self.longitude
+
         # Thread keeps subscriber running while rest of the code executes
         # Thread runs for infinite time
-        t = threading.Thread(target = listener, name = 'listener_thread')
+        t = threading.Thread(target = self.listener, name = 'listener_thread')
         t.start()
 
-    def callbackGPS(data):
+        self.pub_target_angle = rospy.Publisher("target_angle", Float64 , queue_size=10))
+
+    def callbackGPS(self, data):
         print(data)  #for testing
         # If print doesn't work use loginfo
         # rospy.loginfo(rospy.get_name()+ "Coordinates are x=%f y=%f z=%f", data.pose.pose.position.x,
@@ -48,19 +58,29 @@ class AutonomousRover:
         self.latitude = data.latitude
         self.longitude = data.longitude
 
-    def callbackMAG(data):
+        # apply convert2UTM() if wanted 
+
+    def callbackMAG(self, data):
         print data  #for testing
         self.xMag = data.magnetic_field.x
         self.yMag = data.magnetic_field.y
         self.head = math.atan2(self.xMag, self.yMag)
+    
+    def callbackTarget(self, target):
+        self.targetX = target[0]
+        self.targetY = target[1]
 
-    def listener():
+        # apply convert to UTM if wanted 
+
+
+    def listener(self):
         rospy.init_node('gps_listener', anonymous=True)
-        rospy.Subscriber('/gps', GPS, callbackGPS)
-        rospy.Subscriber('/mag', MagneticField, callbackMAG)
+        rospy.Subscriber('/fix', GPS, callbackGPS)
+        rospy.Subscriber('/target_gps', GPS, callbackTarget)
+        #rospy.Subscriber('/mag', MagneticField, callbackMAG)
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
         
-    def move_towards_gps_location(self, coordinate):
+    def move_towards_gps_location(self, coordinate): # gets actual heading between target and current GPS location
     
         # Get target gps coordinates
         targetX = coordinate[0]
@@ -117,28 +137,19 @@ class AutonomousRover:
         print("refined head: " + str(refinedHead))
         print("angle from rover: " + str(angle_from_rover))
 
-        self.motor_controller(angle_from_rover)
+        self.pub_target_angle(angle_from_rover)
+
         return False
 
-    # Motor Controller
-    def motor_controller(self, angle_from_rover):
-        if angle_from_rover >= 0:
-            #Turn right
-            if angle_from_rover < 85:
-                angular_velocity = self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
-                self.lin_vel = 0.3
-            #For large values just turn
-            else:
-                angular_velocity = self.reg_ang_vel
-                self.lin_vel = 0 #stop and turn
-        else:
-            #Turn left
-            if abs(angle_from_rover) < 85:
-                self.lin_vel = 0.3
-                angular_velocity = -self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
-            #For large angles just turn
-            else:
-                angular_velocity = -self.reg_ang_vel
-                self.lin_vel = 0 #stop and turn
+if __name__ == '__main__':
+    rospy.init_node('basic_autonomy')
+    tick = rospy.now()
+    errorx = 0.01
+    errory = 0.01 
+    basic_auto = BasicAutonomousRover(tick, errorx, errory)
 
-        print("Left speed: " + str(left_speed) + " Right speed: " + str(right_speed))
+    while not rospy.is_shutdown():
+
+        basic_auto.move_towards_gps_location()   
+
+    rover_control.cleanup() 

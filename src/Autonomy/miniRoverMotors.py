@@ -3,43 +3,8 @@ import RPi.GPIO as GPIO
 from time import sleep
 import rospy
 from std_msgs.msg import Int32
-import getch    
-
-class Encoder:
-    def __init__(self, vcc, gnd, out):
-        self.vcc = vcc # 1
-        self.gnd = gnd # 6
-        self.out = out # 8
-        self.cnt = 0
-        self.rot = 0
-    
-    def setup(self):
-        GPIO.setup(self.out, GPIO.IN)
-    
-    def readOut(self):
-        print(GPIO.input(self.out))
-    
-    def count(self):
-        self.cnt += 1
-        if self.cnt % 20 == 0:
-            self.rot += 1
-    def test(self):
-        stateLast = 0
-        stateCount = 0
-        stateCountTotal = 0
-        try:
-            while 1:
-                stateCurrent = GPIO.input(self.out)
-                if stateCurrent != stateLast:
-                    print("current is not last")
-                    print(stateCurrent)
-                    stateLast = stateCurrent
-                    stateCount += 1
-                    stateCountTotal += 1
-                print(stateCount)
-        except KeyboardInterrupt:
-            GPIO.cleanup()
-            exit()
+from geometry_msgs.msg import Twist
+import getch   
 
 class setMotor:
     def __init__(self, in1, in2, name):
@@ -70,14 +35,24 @@ class moveMotor:
         GPIO.setmode(GPIO.BCM)
         self.rear_right = setMotor(25, 8, "rear_right")
         self.rear_right.setup()
-        self.rear_left = setMotor(9, 16, "rear_left")
+        self.rear_left = setMotor(9, 11, "rear_left")
         self.rear_left.setup()
         self.front_left = setMotor(19, 26, "front_left")
         self.front_left.setup()
         self.front_right = setMotor(16, 20, "front_right")
         self.front_right.setup()
         self.state = 0
-        self.pub = rospy.Publisher("motor_state", Int32, queue_size=10)
+        self.pub_state = rospy.Publisher("motor_state", Int32, queue_size=10)
+        self.pub_twist = rospy.Publisher("robot_twist", Twist, queue_size=10)
+
+        # For larger rover implementation
+        self.lin_vel = 0.3
+        self.ref_ang_vel = 1
+
+        self.arrived = False
+
+        t = threading.Thread(target = motorListener, name = 'listener_thread')
+        t.start()
     
     def cleanup(self):
         GPIO.cleanup()
@@ -131,11 +106,58 @@ class moveMotor:
         rospy.sleep(0.25)
         self.moveStop()
     
+    def motorListener(self):
+        rospy.init_node('motor_heading_listener')
+        rospy.Subscriber('/target_angle', , autoControlCallback)
+        rospy.spin()   # see if I can change frequency to slower than inertial sense provision
+
+    def testMotors(self):
+        print("Testing motors...")
+
+        print("Testing front left motor")
+        print('FORWARD')
+        self.front_left.forward()
+        rospy.sleep(1)
+        print('BACKWARD')
+        self.front_left.backward()
+        rospy.sleep(1)
+        self.front_left.stop()
+
+        print("Testing front right motor")
+        print('FORWARD')
+        self.front_right.forward()
+        rospy.sleep(1)
+        print('BACKWARD')
+        self.front_right.backward()
+        rospy.sleep(1)
+        self.front_right.stop()
+
+        print("Testing back left motor")
+        print('FORWARD')
+        self.rear_left.forward()
+        rospy.sleep(1)
+        print('BACKWARD')
+        self.rear_left.backward()
+        rospy.sleep(1)
+        self.rear_left.stop()
+
+        print("Testing back right motor")
+        print('FORWARD')
+        self.rear_right.forward()
+        rospy.sleep(1)
+        print('BACKWARD')
+        self.rear_right.backward()
+        rospy.sleep(1) 
+        self.rear_right.stop() 
+
+        self.cleanup()      
+
     def manualControl(self):
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(5)
         while not rospy.is_shutdown():
             print("Key press?")
             press = 'q'
+            press = input()
             if press == "w":
                 self.moveForward()
                 press == "s"
@@ -153,35 +175,35 @@ class moveMotor:
             rate.sleep()
         self.cleanup()
 
-    # def autoControl(self, target_angle):
-    #     # target angle must always be given relative to the 0 degrees for the robot 
+    def autoControlCallback(self, angle_from_rover):
+        # target angle must always be given relative to the 0 degrees for the robot 
+        if angle_from_rover >= 0:
+            #Turn right
+            if angle_from_rover < 85:
+                angular_velocity = self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
+                self.lin_vel = 0.3
+            #For large values just turn
+            else:
+                angular_velocity = self.reg_ang_vel
+                self.lin_vel = 0 #stop and turn
+        else:
+            #Turn left
+            if abs(angle_from_rover) < 85:
+                self.lin_vel = 0.3
+                angular_velocity = -self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
+            #For large angles just turn
+            else:
+                angular_velocity = -self.reg_ang_vel
+                self.lin_vel = 0 #stop and turn
 
-    #     if target_angle < 0:
+        print("Left speed: " + str(left_speed) + " Right speed: " + str(right_speed))
             
 
 
-    
+# set up for testing not as an encoder and motor node right now    
 if __name__ == '__main__':
-    rospy.init_node('motor_state_publisher')
+    rospy.init_node('motor_state')
     rover_control = moveMotor()
-    encoder = Encoder(0,0,14)
-    encoder.setup()
     while not rospy.is_shutdown():
-        rover_control.pub.publish(rover_control.state) 
-        #encoder.test()
-        rover_control.manualControl()
-    rover_control.cleanup() 
-
-
- 
-
-
-
-    
-
-
-
-
-
-
         
+    rover_control.cleanup() 
