@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 import rospy
 from nav_msgs.msg import Odometry
 from inertial_sense.msg import GPS
@@ -8,9 +8,11 @@ import threading
 import math
 import time
 
+### This is the only script that can be used with the mini rovers 
+
 class BasicAutonomousRover:
 # '''
-         North
+#         North
 #         |
 #        ---
 #         |
@@ -44,10 +46,10 @@ class BasicAutonomousRover:
 
         # Thread keeps subscriber running while rest of the code executes
         # Thread runs for infinite time
-        t = threading.Thread(target = self.listener, name = 'listener_thread')
-        t.start()
+        # t = threading.Thread(target = self.listener, name = 'listener_thread')
+        # t.start()
 
-        self.pub_target_angle = rospy.Publisher("target_angle", Float64 , queue_size=10))
+        self.pub_target_angle = rospy.Publisher("target_angle", Float64 , queue_size=10)
 
     def callbackGPS(self, data):
         print(data)  #for testing
@@ -61,16 +63,9 @@ class BasicAutonomousRover:
         # apply convert2UTM() if wanted 
 
     def callbackMAG(self, data):
-        print data  #for testing
         self.xMag = data.magnetic_field.x
         self.yMag = data.magnetic_field.y
         self.head = math.atan2(self.xMag, self.yMag)
-    
-    def callbackTarget(self, target):
-        self.targetX = target[0]
-        self.targetY = target[1]
-
-        # apply convert to UTM if wanted 
 
 
     def listener(self):
@@ -80,11 +75,11 @@ class BasicAutonomousRover:
         #rospy.Subscriber('/mag', MagneticField, callbackMAG)
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
         
-    def move_towards_gps_location(self, coordinate): # gets actual heading between target and current GPS location
+    def callbackTarget(self, coordinate): # gets actual heading between target and current GPS location
     
         # Get target gps coordinates
-        targetX = coordinate[0]
-        targetY = coordinate[1]
+        self.targetX = coordinate[0]
+        self.targetY = coordinate[1]
 
         # Calculate difference to target
         xDiff = targetX - self.latitude
@@ -97,7 +92,7 @@ class BasicAutonomousRover:
         print (self.yDiff)
 
         # Checks to see if rover reached target
-        if (abs(xDiff)) < self.xError and abs(yDiff) < self.yError):
+        if abs(xDiff) < self.xError and abs(yDiff) < self.yError:
             print ("Destination Reached!")
             self.arrived = True
             return True
@@ -149,7 +144,6 @@ if __name__ == '__main__':
     basic_auto = BasicAutonomousRover(tick, errorx, errory)
 
     while not rospy.is_shutdown():
-
-        basic_auto.move_towards_gps_location()   
+        basic_auto.listener()  
 
     rover_control.cleanup() 

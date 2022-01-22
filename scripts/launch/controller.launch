@@ -2,5 +2,8 @@
 
 <launch>
 	<node pkg="gpsd_client" type="gpsd_client" name="gps_publish" args="localhost 4000" output="screen"/>
-	<node pkg="rover" type="GPScontroller.py" name="gps_controller"/>
+	<node pkg="rover" type="basic_autonomy.py" name="basic_controller"/>
+	<node pkg="rover" type="miniRoverMotors.py" name="mini_rover_motors"/>
+	<node pkg="rover" type="roverControl.py" name="rover_control"/>
+	<node pkg="rover" type="UTMconverter.py" name="utm_converter"/>
 </launch>
