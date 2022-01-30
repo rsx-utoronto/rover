@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import rospy
 from nav_msgs.msg import Odometry
-from inertial_sense.msg import GPS
+from sensor_msgs.msg import NavSatFix
 from sensor_msgs.msg import MagneticField
 from std_msgs.msg import Float64
 import threading
@@ -69,9 +69,9 @@ class BasicAutonomousRover:
 
 
     def listener(self):
-        rospy.init_node('gps_listener', anonymous=True)
-        rospy.Subscriber('/fix', GPS, callbackGPS)
-        rospy.Subscriber('/target_gps', GPS, callbackTarget)
+
+        rospy.Subscriber('/fix', NavSatFix, self.callbackGPS)
+        rospy.Subscriber('/target_gps', GPS, self.callbackTarget)
         #rospy.Subscriber('/mag', MagneticField, callbackMAG)
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
         
@@ -137,8 +137,8 @@ class BasicAutonomousRover:
         return False
 
 if __name__ == '__main__':
-    rospy.init_node('basic_autonomy')
-    tick = rospy.now()
+    rospy.init_node('basic_autonomy', anonymous=True)
+    tick = rospy.Time.now()
     errorx = 0.01
     errory = 0.01 
     basic_auto = BasicAutonomousRover(tick, errorx, errory)
@@ -146,4 +146,3 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         basic_auto.listener()  
 
-    rover_control.cleanup() 

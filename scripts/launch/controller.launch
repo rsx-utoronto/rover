@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 
 <launch>
+	<arg name="bag" default="/home/pi/bags/ins.bag" />
 	<node pkg="gpsd_client" type="gpsd_client" name="gps_publish" args="localhost 4000" output="screen"/>
 	<node pkg="rover" type="basic_autonomy.py" name="basic_controller"/>
 	<node pkg="rover" type="miniRoverMotors.py" name="mini_rover_motors"/>
 	<node pkg="rover" type="roverControl.py" name="rover_control"/>
+	<node pkg="rover" type="miniRoverEncoder.py" name="mini_rover_encoder"/>
 	<node pkg="rover" type="UTMconverter.py" name="utm_converter"/>
+	<node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag)"/>
 </launch>

@@ -17,6 +17,7 @@ class Encoder:
         self.radius = 0.0325 
     
     def setup(self):
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.out, GPIO.IN)
     
     def readOut(self):
@@ -26,11 +27,8 @@ class Encoder:
         self.cnt += 1
         if self.cnt % 20 == 0:
             self.rot += 1
-    
-    def encoderCallback(self):
 
-        
-    def test(self):
+    def encoderPublisher(self):
         stateLast = 0
         stateCount = 0
         stateCountTotal = 0
@@ -52,6 +50,13 @@ class Encoder:
         except KeyboardInterrupt:
             GPIO.cleanup()
             exit()
+
+if __name__ == '__main__':
+    rospy.init_node("mini_rover_encoder")
+    rover_encoder = Encoder(1,6,14)
+    rover_encoder.setup()
+    while not rospy.is_shutdown():
+        rover_encoder.encoderPublisher() 
 
 
  

@@ -7,6 +7,7 @@ import threading
 import math
 import time
 import geodesy
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 class AutonomousRover:
 # '''
@@ -37,17 +38,22 @@ class AutonomousRover:
 
         self.init_x = 0 
         self.init_y = 0
+        self.init_utm = False 
         
         self.x = 0
         self.y = 0 
-        self.zone = 'unknown'
+        self.zone_current = 'unknown'
+        self.zone_prev = 'unknown'
         self.z = 0
         self.band = 'unknown'
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0 
 
         # Thread keeps subscriber running while rest of the code executes
         # Thread runs for infinite time
-        t = threading.Thread(target = listener, name = 'listener_thread')
-        t.start()
+        # t = threading.Thread(target = listener, name = 'listener_thread')
+        # t.start()
 
     def callbackGPS(data):
         # If print doesn't work use loginfo
@@ -61,8 +67,14 @@ class AutonomousRover:
         self.easting = data.easting
         self.northing = data.northing
         self.altitude = data.altitude
-        self.zone = data.zone
+        self.zone_current = data.zone
         self.band = data.band
+        if self.init_utm == False:
+            self.init_x = self.northing
+            self.init_y = self.easting
+            self.init_utm = True 
+        if self.zone_current != self.zone_prev:
+            
 
     def callbackMAG(data):
         self.xMag = data.magnetic_field.x
@@ -78,6 +90,10 @@ class AutonomousRover:
         self.pose = data.pose
         self.twist = data.twist 
 
+        orientation_q = self.pose.orientation
+        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+        (self.roll, self.pitch, self.yaw) = euler_from_quaternion (orientation_list)
+
     def listener():
         rospy.init_node('gps_listener', anonymous=True)
         rospy.Subscriber('/gps', GPS, callbackGPS)
@@ -86,7 +102,7 @@ class AutonomousRover:
         rospy.Subscriber('/imu', Imu, callbackIMU)
         rospy.Subscriber('/ins', Odometry, callbackOdom)
         rospy.Subscriber('/target', GPS, callbackTarget)
-        rospy.spin()   #see if I can change frequency to slower than inertial sense provision
+        rospy.spin() 
         
     def callbackTarget(self, coordinate):
         # Get target gps coordinates
