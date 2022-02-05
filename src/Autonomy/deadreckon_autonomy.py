@@ -9,7 +9,7 @@ import time
 import geodesy
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
-class AutonomousRover:
+class DeadReckonAutonomousRover:
 # '''
          North
 #         |"'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''  "
@@ -55,6 +55,8 @@ class AutonomousRover:
         # t = threading.Thread(target = listener, name = 'listener_thread')
         # t.start()
 
+        self.pub_target_angle = rospy.Publisher("target_angle", Float64 , queue_size=10)
+
     def callbackGPS(data):
         # If print doesn't work use loginfo
         # rospy.loginfo(rospy.get_name()+ "Coordinates are x=%f y=%f z=%f", data.pose.pose.position.x,
@@ -92,26 +94,29 @@ class AutonomousRover:
 
         orientation_q = self.pose.orientation
         orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
-        (self.roll, self.pitch, self.yaw) = euler_from_quaternion (orientation_list)
+        (self.roll, self.pitch, self.yaw) = euler_from_quaternion(orientation_list)
+
+        
 
     def listener():
         rospy.init_node('gps_listener', anonymous=True)
-        rospy.Subscriber('/gps', GPS, callbackGPS)
-        rospy.Subscriber('/utm', UTMPoint, callbackUTM)
+        # rospy.Subscriber('/gps', GPS, callbackGPS)
+        rospy.Subscriber('/gps_utm', UTMPoint, callbackUTM)
         rospy.Subscriber('/mag', MagneticField, callbackMAG)
         rospy.Subscriber('/imu', Imu, callbackIMU)
         rospy.Subscriber('/ins', Odometry, callbackOdom)
-        rospy.Subscriber('/target', GPS, callbackTarget)
+        # rospy.Subscriber('/target', GPS, callbackTarget)
+        rospy.Subscriber('/target_utm', UTMPoint, callbackTarget)
         rospy.spin() 
         
     def callbackTarget(self, coordinate):
         # Get target gps coordinates
-        targetX = coordinate[0]
-        targetY = coordinate[1]
+        targetX = coordinate.easting
+        targetY = coordinate.northing
 
         # Calculate difference to target
-        xDiff = targetX - self.latitude
-        yDiff = targetY - self.longitude
+        xDiff = targetX - self.easting
+        yDiff = targetY - self.northing
 
         #for testing
         print ("xDiff X")
@@ -140,17 +145,16 @@ class AutonomousRover:
 
         # Heading starts from north. Clockwise is positive and CounterClockwise is negative.
         # Change it to unit circle degree measurement
-        if (self.head >= 0):
-            if(self.head <= 90):
-                refinedHead = 90 - self.head
+        if (self.yaw >= 0):
+            if(self.yaw <= 90):
+                refinedHead = 90 - self.yaw
             else:
-                refinedHead = 360 - (self.head - 90)
+                refinedHead = 360 - (self.yaw - 90)
         else:
-            refinedHead = 90 + abs(self.head)
+            refinedHead = 90 + abs(self.yaw)
 
         angle_from_rover = refinedHead - target_angle
 
-        # For angles to destination higher than 180, turn the other way, because it's faster.
         if (angle_from_rover >= 180):
             angle_from_rover = -1 * (360 - angle_from_rover)
         elif (angle_from_rover <= -180):
@@ -160,28 +164,16 @@ class AutonomousRover:
         print("refined head: " + str(refinedHead))
         print("angle from rover: " + str(angle_from_rover))
 
-        self.motor_controller(angle_from_rover)
+        self.pub_target_angle(angle_from_rover)
+
         return False
 
-    # Motor Controller
-    def motor_controller(self, angle_from_rover):
-        if angle_from_rover >= 0:
-            #Turn right
-            if angle_from_rover < 85:
-                angular_velocity = self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
-                self.lin_vel = 0.3
-            #For large values just turn
-            else:
-                angular_velocity = self.reg_ang_vel
-                self.lin_vel = 0 #stop and turn
-        else:
-            #Turn left
-            if abs(angle_from_rover) < 85:
-                self.lin_vel = 0.3
-                angular_velocity = -self.ref_ang_vel * abs(math.cos(math.radians(abs(angle_from_rover))))
-            #For large angles just turn
-            else:
-                angular_velocity = -self.reg_ang_vel
-                self.lin_vel = 0 #stop and turn
+if __name__ == '__main__':
+    rospy.init_node('dead_reckon_autonomy', anonymous=True)
+    tick = rospy.Time.now()
+    errorx = 0.01
+    errory = 0.01 
+    deadreckon_auto = DeadReckonAutonomousRover(tick, errorx, errory)
 
-        print("Left speed: " + str(left_speed) + " Right speed: " + str(right_speed))
+    while not rospy.is_shutdown():
+        deadreckon_auto.listener()  

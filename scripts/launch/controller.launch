@@ -1,12 +1,82 @@
 <?xml version="1.0"?>
 
 <launch>
+	<arg name="basic" default="false" />
+	<arg name="dead_reckon" default="false" />
+	<arg name="ekf" default="false" />
 	<arg name="bag" default="/home/pi/bags/ins.bag" />
 	<node pkg="gpsd_client" type="gpsd_client" name="gps_publish" args="localhost 4000" output="screen"/>
-	<node pkg="rover" type="basic_autonomy.py" name="basic_controller"/>
 	<node pkg="rover" type="miniRoverMotors.py" name="mini_rover_motors"/>
 	<node pkg="rover" type="roverControl.py" name="rover_control"/>
 	<node pkg="rover" type="miniRoverEncoder.py" name="mini_rover_encoder"/>
 	<node pkg="rover" type="UTMconverter.py" name="utm_converter"/>
 	<node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag)"/>
+
+	<group if="$(arg basic)">
+		<node pkg="rover" type="basic_autonomy.py" name="basic_controller"/>
+	</group>
+	
+	<group if="$(arg dead_reckon)">
+		<node pkg="rover" type="deadreckon_autonomy.py" name="basic_controller"/>
+		<node pkg="robot_localization" type="navsat_transform_node" output="screen"> 
+			<param param="frequency" value= />
+			<param param="delay" value= />
+			<param param="magnetic_declination_radians" value= />
+			<param param="yaw_offset" value= />
+			<param param="zero_altitude" value= />
+			<param param="publish_filtered_gps" value="true" />
+			<param param="broadcast_utm_transform" value="true" />
+			<param param="use_odometry_yaw" value="true" />
+			<param param="wait_for_datum" value="true" />
+			<param param="broadcast_utm_transform_as_parent_frame" value="false" />
+			<param param="wait_for_datum" value="true" />
+			<param param="transform_timeout" value= />
+		</node>
+	</group>
+		<group if="$(arg ekf)">
+		<node pkg="rover" type="deadreckon_autonomy.py" name="basic_controller"/>
+		<node pkg="robot_localization" type="navsat_transform_node" output="screen"> 
+			<param param="frequency" value= />
+			<param param="delay" value= />
+			<param param="magnetic_declination_radians" value= />
+			<param param="yaw_offset" value= />
+			<param param="zero_altitude" value= />
+			<param param="publish_filtered_gps" value="true" />
+			<param param="broadcast_utm_transform" value="true" />
+			<param param="use_odometry_yaw" value="true" />
+			<param param="wait_for_datum" value="true" />
+			<param param="broadcast_utm_transform_as_parent_frame" value="false" />
+			<param param="wait_for_datum" value="true" />
+			<param param="transform_timeout" value= />
+		</node>
+		<node pkg="robot_localization" type="ekf_localization_node" output="screen">
+			<param param="frequency" value= />
+			<param param="sensor_timeout" value= />
+			<param param="two_d_mode" value= />
+			<param param="map_frame" value= />
+			<param param="odom_frame" value= />
+			<param param="base_link_frame" value= />
+			<param param="base_link_frame" value= />
+			<param param="transform_time_offset" value= />
+			<param param="transform_timeout" value= />
+			<param name="imu0" value="imu"/>
+			<param name="odom0" value="ins"/>
+			<rosparam param="odom0_config">[true,  true,  false,
+                                false, false, true,
+                                true,  false, false,
+                                false, false, true,
+                                false, false, false]</rosparam>
+			<param name="odom0_queue_size" value= />
+			<param name="odom0_differential" value= />
+			<param name="odom0_relative" value= />
+			<param name="imu0_remove_gravitational_acceleration" value="true" />
+			<rosparam param="initial_state">[5.0,  4.0,  3.0,
+                                 0.0,  0.0,  1.57,
+                                 0.1,  0.2,  0.3,
+                                 0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0]</rosparam>
+			<param name="publish_tf" value="true"/>
+			<param name="print_diagnostics" value="true"/>
+		</node>
+	</group>
 </launch>

@@ -18,13 +18,11 @@ class UTMConverter:
         self.altitude = 0
         self.band = 'unknown'
 
-        self.pub_UTM = rospy.Publisher("utm", UTMPoint, queue_size=10)
+        self.pub_gps_utm = rospy.Publisher("gps_utm", UTMPoint, queue_size=10)
+        self.pub_target_utm = rospy.Publisher("target_utm", UTMPoint, queue_size=10)
 
-    def callbackGPS(data):
-        # If print doesn't work use loginfo
-        # rospy.loginfo(rospy.get_name()+ "Coordinates are x=%f y=%f z=%f", data.pose.pose.position.x,
-        #                                                                  data.pose.pose.position.y,
-        #                                                                  data.pose.pose.position.z)
+    def callbackGPS(data, target):
+    
         geo_pt = GeoPoint()
         geo_pt.latitude = data.latitude
         geo_pt.longitude = data.longitude
@@ -36,11 +34,15 @@ class UTMConverter:
         self.zone = utm_pt.zone
         self.band = utm_pt.band
 
-        self.pub.pub_UTM(utm_pt)
+        if target:
+            self.pub.pub_target_utm(utm_pt)
+        else:
+            self.pub.pub_gps_utm(utm_pt)
 
     def listener():
         rospy.init_node('gps_listener', anonymous=True)
-        rospy.Subscriber('/gps', GPS, callbackGPS)
+        rospy.Subscriber('/gps', GPS, callbackGPS, (False))
+        rospy.Subscriber('/target', GPS, callbackGPS, (True))
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
 
 if __name__ == '__main__':
