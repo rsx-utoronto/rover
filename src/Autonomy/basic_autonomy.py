@@ -2,7 +2,10 @@
 import rospy
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import NavSatFix
+from inertial_sense_ros.msg import GPS
 from sensor_msgs.msg import MagneticField
+from geodesy.utm import UTMPoint, fromLatLong
+from geographic_msgs.msg import GeoPoint
 from std_msgs.msg import Float64
 import threading
 import math
@@ -40,25 +43,25 @@ class BasicAutonomousRover:
 
         self.latitude = 0
         self.longitude = 0 
+        self.altitude = 0
+        self.head = 0
 
         self.targetX = self.latitude
         self.targetY = self.longitude
+        self.utm = UTMPoint()
 
-        # Thread keeps subscriber running while rest of the code executes
-        # Thread runs for infinite time
-        # t = threading.Thread(target = self.listener, name = 'listener_thread')
-        # t.start()
-
-        self.pub_target_angle = rospy.Publisher("target_angle", Float64 , queue_size=10)
+        self.pub_target_angle = rospy.Publisher("/target_angle", Float64 , queue_size=10)
 
     def callbackGPS(self, data):
-        print(data)  #for testing
         # If print doesn't work use loginfo
         # rospy.loginfo(rospy.get_name()+ "Coordinates are x=%f y=%f z=%f", data.pose.pose.position.x,
         #                                                                  data.pose.pose.position.y,
-        #                                                                  data.pose.pose.position.z)
+        #                                                                 data.pose.pose.position.z)
         self.latitude = data.latitude
         self.longitude = data.longitude
+        self.altitude = data.altitude
+
+        self.utm = fromLatLong(self.latitude, self.longitude, self.altitude)
 
         # apply convert2UTM() if wanted 
 
@@ -71,28 +74,29 @@ class BasicAutonomousRover:
     def listener(self):
 
         rospy.Subscriber('/fix', NavSatFix, self.callbackGPS)
-        rospy.Subscriber('/target_gps', GPS, self.callbackTarget)
-        #rospy.Subscriber('/mag', MagneticField, callbackMAG)
+        rospy.Subscriber('/target_gps', NavSatFix, self.callbackTarget)
+        rospy.Subscriber('mag', MagneticField, self.callbackMAG)
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
         
-    def callbackTarget(self, coordinate): # gets actual heading between target and current GPS location
+    def callbackTarget(self, data): # gets actual heading between target and current GPS location
     
         # Get target gps coordinates
-        self.targetX = coordinate[0]
-        self.targetY = coordinate[1]
+        self.targetX = data.latitude
+        self.targetY = data.longitude
+        self.targetZ = data.altitude
 
         # Calculate difference to target
-        xDiff = targetX - self.latitude
-        yDiff = targetY - self.longitude
+        self.xDiff = self.targetX - self.latitude
+        self.yDiff = self.targetY - self.longitude
 
         #for testing
-        print ("xDiff X")
-        print (self.xDiff)
-        print ("yDiff Y")
-        print (self.yDiff)
+        # print ("xDiff X")
+        # print (self.xDiff)
+        # print ("yDiff Y")
+        # print (self.yDiff)
 
         # Checks to see if rover reached target
-        if abs(xDiff) < self.xError and abs(yDiff) < self.yError:
+        if abs(self.xDiff) < self.xError and abs(self.yDiff) < self.yError:
             print ("Destination Reached!")
             self.arrived = True
             return True
@@ -100,7 +104,7 @@ class BasicAutonomousRover:
         # The Math.atan2() function returns the angle in the 
         # plane (in radians) between the positive x-axis and the ray from (0,0)
         # to the point (x,y), for Math.atan2(y,x). Converted to degrees
-        target_angle = math.degrees(math.atan2(yDiff, xDiff))
+        target_angle = math.degrees(math.atan2(self.yDiff, self.xDiff))
         if (target_angle < 0):
             target_angle = 360 + target_angle
 
@@ -127,22 +131,26 @@ class BasicAutonomousRover:
             angle_from_rover = -1 * (360 - angle_from_rover)
         elif (angle_from_rover <= -180):
             angle_from_rover = (360 - abs(angle_from_rover))
-
+        time.sleep(1)
+        print("-------------- CONTROL INFO ----------------")
         print("target angle: " + str(target_angle))
         print("refined head: " + str(refinedHead))
         print("angle from rover: " + str(angle_from_rover))
+        print("--------------------------------------------")
 
-        self.pub_target_angle(angle_from_rover)
+        self.pub_target_angle.publish(angle_from_rover)
 
         return False
 
 if __name__ == '__main__':
     rospy.init_node('basic_autonomy', anonymous=True)
     tick = rospy.Time.now()
-    errorx = 0.01
-    errory = 0.01 
+    errorx = 0.00001
+    errory = 0.00001 
     basic_auto = BasicAutonomousRover(tick, errorx, errory)
-
+    r = rospy.Rate(2)
     while not rospy.is_shutdown():
-        basic_auto.listener()  
+        basic_auto.listener() 
+        r.sleep()
+
 

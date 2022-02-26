@@ -41,9 +41,6 @@ class moveMotor:
         self.front_left.setup()
         self.front_right = setMotor(16, 20, "front_right")
         self.front_right.setup()
-
-        # t = threading.Thread(target = motorListener, name = 'listener_thread')
-        # t.start()
     
     def cleanup(self):
         GPIO.cleanup()
@@ -99,8 +96,7 @@ class moveMotor:
     
     def motorListener(self):
         rospy.init_node('mini_rover_motors')
-        while not rospy.is_shutdown():
-            rospy.Subscriber('/rover_twist', Twist, self.motorCallback)
+        rospy.Subscriber('/rover_twist_fake', Twist, self.motorCallback)
         rospy.spin()   # see if I can change frequency to slower than inertial sense provision
 
     def testMotors(self):
@@ -148,16 +144,23 @@ class moveMotor:
     def motorCallback(self, twist):
         # target angle must always be given relative to the 0 degrees for the robot 
 
-        if twist.linear.y == 1:
+        if twist.linear.y == 1 and twist.angular.z == 0:
+            print("Move Forward")
             self.moveForward()
-        if twist.linear.y == -1:
+        if twist.linear.y == -1 and twist.angular.z == 0:
+            print("Move Backward")
             self.moveBackward()
-        if twist.angular.z == 1:
+        if twist.angular.z == 1 and twist.linear.y == 0:
+            print("Turn Right")
             self.turnRight()
-        if twist.angular.z == -1:
+        if twist.angular.z == -1 and twist.linear.y == 0:
+            print("Turn Left")
             self.turnLeft()
-        else:
+        if twist.angular.z == 0 and twist.linear.y == 0:
+            print("Stopping")
             self.moveStop()
+        else:
+            self.moveForward()
             
 # set up for testing not as an encoder and motor node right now    
 if __name__ == '__main__':

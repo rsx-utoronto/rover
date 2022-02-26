@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 import rospy
 from nav_msgs.msg import Odometry
 from inertial_sense.msg import GPS
@@ -6,8 +6,10 @@ from sensor_msgs.msg import MagneticField
 import threading
 import math
 import time
+import geodesy
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
-class AutonomousRover:
+class FullAutonomousRover:
 # '''
          North
 #         |
@@ -34,10 +36,29 @@ class AutonomousRover:
         self.timeOut = False
         self.arrived = False
 
-        # Thread keeps subscriber running while rest of the code executes
-        # Thread runs for infinite time
-        t = threading.Thread(target = listener, name = 'listener_thread')
-        t.start()
+        self.init_x = 0 
+        self.init_y = 0
+        self.init_utm = False 
+        
+        self.x = 0
+        self.y = 0 
+        self.zone_current = 'unknown'
+        self.zone_prev = 'unknown'
+        self.z = 0
+        self.band = 'unknown'
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0 
+
+        self.latitude = 0
+        self.longitude = 0 
+        self.altitude = 0
+
+        self.targetX = self.latitude
+        self.targetY = self.longitude
+        self.utm = UTMPoint()
+
+        self.pub_target_angle = rospy.Publisher("target_angle", Float64 , queue_size=10)
 
     def callbackGPS(data):
         print(data)  #for testing
@@ -47,16 +68,21 @@ class AutonomousRover:
         #                                                                  data.pose.pose.position.z)
         self.latitude = data.latitude
         self.longitude = data.longitude
+        self.altitude = data.altitude
+
+        self.utm = fromLatLong(self.latitude, self.longitude, self.altitude)
 
     def callbackMAG(data):
-        print data  #for testing
         self.xMag = data.magnetic_field.x
         self.yMag = data.magnetic_field.y
         self.head = math.atan2(self.xMag, self.yMag)
 
     def listener():
-        rospy.init_node('gps_listener', anonymous=True)
-        rospy.Subscriber('/gps', GPS, callbackGPS)
+        rospy.Subscriber('/fix', NavSatFix, self.callbackGPS)
+        rospy.Subscriber('/target_gps', GPS, self.callbackTarget)
+        rospy.Subscriber('/odom', self.callback)
+        rospy.Subscriber('/ekf_imu', Imu, self.callbackIMu)
+        rospy.Subscriber('/ekf_ins', Odometry, self.callbackOdometry)
         rospy.Subscriber('/mag', MagneticField, callbackMAG)
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
         
