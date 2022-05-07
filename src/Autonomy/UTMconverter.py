@@ -3,7 +3,8 @@ import rospy
 from nav_msgs.msg import Odometry
 from inertial_sense_ros.msg import GPS
 from sensor_msgs.msg import MagneticField
-import geodesy
+from geometry_msgs.msg import Point
+from geodesy.utm import UTMPoint
 from geographic_msgs.msg import GeoPoint
 import threading
 import math
@@ -18,8 +19,8 @@ class UTMConverter:
         self.altitude = 0
         self.band = 'unknown'
 
-        self.pub_gps_utm = rospy.Publisher("gps_utm", UTMPoint, queue_size=10)
-        self.pub_target_utm = rospy.Publisher("target_utm", UTMPoint, queue_size=10)
+        self.pub_gps_utm = rospy.Publisher("gps_utm", Point, queue_size=10)
+        self.pub_target_utm = rospy.Publisher("target_utm", , queue_size=10)
 
     def callbackGPS(data, target):
     
@@ -27,7 +28,7 @@ class UTMConverter:
         geo_pt.latitude = data.latitude
         geo_pt.longitude = data.longitude
         geo_pt.altitude = data.altitude
-        utm_pt = geodesy.utm.UTMPoint(geo_pt)
+        utm_pt = UTMPoint(geo_pt)
         self.easting = utm_pt.easting
         self.northing = utm_pt.northing
         self.altitude = utm_pt.altitude

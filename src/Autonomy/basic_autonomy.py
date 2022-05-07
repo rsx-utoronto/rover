@@ -48,7 +48,6 @@ class BasicAutonomousRover:
 
         self.targetX = self.latitude
         self.targetY = self.longitude
-        self.utm = UTMPoint()
 
         self.pub_target_angle = rospy.Publisher("/target_angle", Float64 , queue_size=10)
 
