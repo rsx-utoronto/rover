@@ -1,6 +1,6 @@
 <launch>
-    <node pkg="tf" type="static_transform_publisher" name="imu_broadcaster" args="0 0 0 0 0 0 1 base_link imu 100" />
-    <node pkg="tf" type="static_transform_publisher" name="ouster_broadcaster" args="0 0 0 0 0 0 1 base_link lidar 100" />
+    <node pkg="tf" type="static_transform_publisher" name="imu_broadcaster" args="0 0 0 0 0 0 1 body imu 100" />
+    <node pkg="tf" type="static_transform_publisher" name="ouster_broadcaster" args="0 0 0 0 0 0 1 body lidar 100" />
     <node pkg="rover" type="odom_transform_publisher.py" name="odom_broadcaster" output="screen">
         <param name="topic" type="string" value="ins" />
     </node>

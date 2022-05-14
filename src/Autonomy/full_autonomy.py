@@ -1,17 +1,21 @@
 #!/usr/bin/python3
 import rospy
 from nav_msgs.msg import Odometry
-from inertial_sense.msg import GPS
+from inertial_sense_ros.msg import GPS
+from sensor_msgs.msg import NavSatFix
 from sensor_msgs.msg import MagneticField
 import threading
 import math
 import time
 import geodesy
+from geodesy.utm import UTMPoint, fromLatLong
+from geographic_msgs.msg import GeoPoint
+from std_msgs.msg import Float64
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 class FullAutonomousRover:
 # '''
-         North
+#         North
 #         |
 #        ---
 #         |
@@ -21,7 +25,7 @@ class FullAutonomousRover:
 # - >   : long, x (+)
 #
 # '''
-    def __init__(self, tick, errorx, errory, server):
+    def __init__(self, tick, errorx, errory):
         # Time at start.
         self.tick = tick
         # Time when operation is stopped.
@@ -61,20 +65,19 @@ class FullAutonomousRover:
         self.longitude = data.longitude
         self.altitude = data.altitude
 
-    def callbackMAG(data):
+    def callbackMAG(self, data):
         self.xMag = data.magnetic_field.x
         self.yMag = data.magnetic_field.y
         self.head = math.atan2(self.xMag, self.yMag)
 
-    def listener():
-        rospy.Subscriber('/fix', NavSatFix, self.callbackGPS)
-        rospy.Subscriber('/target_gps', GPS, self.callbackTarget)
-        rospy.Subscriber('/odom', self.callback)
-        rospy.Subscriber('/gps/filtered', Odometry, self.callbackOdometry)
-        rospy.Subscriber('/mag', MagneticField, callbackMAG)
+    def listener(self):
+        # rospy.Subscriber('/fix', NavSatFix, self.callbackGPS)
+        rospy.Subscriber('/target_gps', NavSatFix, self.callbackTarget)
+        rospy.Subscriber('/gps/filtered', NavSatFix, self.callbackGPS)
+        rospy.Subscriber('/mag', MagneticField, self.callbackMAG)
         rospy.spin()   #see if I can change frequency to slower than inertial sense provision
         
-    def move_towards_gps_location(self, coordinate):
+    def callbackTarget(self, data): # gets actual heading between target and current GPS location
     
         # Get target gps coordinates
         self.targetX = data.latitude
@@ -86,10 +89,10 @@ class FullAutonomousRover:
         self.yDiff = self.targetY - self.longitude
 
         #for testing
-        print ("xDiff X")
-        print (self.xDiff)
-        print ("yDiff Y")
-        print (self.yDiff)
+        # print ("xDiff X")
+        # print (self.xDiff)
+        # print ("yDiff Y")
+        # print (self.yDiff)
 
         # Checks to see if rover reached target
         if abs(self.xDiff) < self.xError and abs(self.yDiff) < self.yError:
@@ -143,8 +146,8 @@ if __name__ == '__main__':
     tick = rospy.Time.now()
     errorx = 0.00001
     errory = 0.00001 
-    basic_auto = BasicAutonomousRover(tick, errorx, errory)
+    full_auto = FullAutonomousRover(tick, errorx, errory)
     r = rospy.Rate(2)
     while not rospy.is_shutdown():
-        basic_auto.listener() 
+        full_auto.listener() 
         r.sleep()

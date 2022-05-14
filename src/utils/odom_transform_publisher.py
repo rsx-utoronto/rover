@@ -17,7 +17,7 @@ def odom_handler(msg, topic):
     tf_found = False
     while not tf_found:
         try:
-            t_msg = tfBuffer.lookup_transform("base_link", "imu", rospy.Time())
+            t_msg = tfBuffer.lookup_transform("body", "imu", rospy.Time())
             tf_found = True
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rate.sleep()
@@ -27,7 +27,7 @@ def odom_handler(msg, topic):
 
     t.header.stamp = rospy.Time.now()
     t.header.frame_id = "odom"
-    t.child_frame_id = "base_link"
+    t.child_frame_id = "body"
     t.transform.translation.x = msg_t.pose.position.x
     t.transform.translation.y = msg_t.pose.position.y
     t.transform.translation.z = msg_t.pose.position.z

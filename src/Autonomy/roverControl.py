@@ -39,7 +39,7 @@ class roverControl:
 
             #For large values just turn
             else:
-                self.ang_vel = self.reg_ang_vel
+                self.ang_vel = self.ref_ang_vel
                 self.lin_vel = 0 #stop and turn
                 #self.turnRight() # mini rover
 
