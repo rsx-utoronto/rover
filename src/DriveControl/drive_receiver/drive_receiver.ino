@@ -8,9 +8,12 @@
 #include <geometry_msgs/Twist.h>
 
 ros::NodeHandle  nh;
-
-int speedPins[] = {3, 5, 6, 9, 10, 11 };
-int directionPins[] = {23, 25, 2, 4, 7, 8};
+// E1 - 24, E2 - 26, E3 - 33, E4 - 35, E5 - 39, E6 - 45
+//int speedPins[] = {3, 5, 6, 9, 10, 11 };
+int speedPins[] = {24, 26, 33, 35, 39, 45};
+// E1 - 25, E2 - 27, E3 - 32, E4 - 34, E5 - 38, E6 - 44
+//int directionPins[] = {23, 25, 2, 4, 7, 8};
+int directionPins[] = {25, 27, 32, 34, 38, 44};
 int rel1 = 12;
 int rel2 = 13;
 int rel3 = A5;

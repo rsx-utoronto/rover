@@ -86,7 +86,7 @@ rosparam set joy_node/dev "/dev/input/js$CONTROLLER_DEFAULT"
 
 # Start rosserial_python
 echo "Starting rosserial_python..."
-rosrun rosserial_python serial_node.py _port:=/dev/ttyACM$ARDUINO_DEFAULT _baud:=57600 &
+rosrun rosserial_python serial_node.py _port:=/dev/ttyACM$ARDUINO_DEFAULT _baud:=9600 &
 
 # Start drive_sender
 echo "Starting drive_sender..."
@@ -138,6 +138,6 @@ fi
 #fi
 
 
-echo "Finished initializing all rqt plugins"
-echo "Starting rqt..."
-rqt &
+# echo "Finished initializing all rqt plugins"
+# echo "Starting rqt..."
+# rqt &

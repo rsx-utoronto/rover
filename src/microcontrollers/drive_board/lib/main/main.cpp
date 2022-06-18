@@ -21,7 +21,7 @@ int count_reached = 500;
 bool startCounting = false;
 
 // Set up driving variables
-float velocity = 100;
+float velocity = 0;
 float turndir = 0;
 float turnfactor = 0;
 
@@ -178,14 +178,14 @@ void teleop_cb(const geometry_msgs::Twist& msg) {
 
 	char resultAngular[8]; // Buffer big enough for 7-character float
 	char resultLinear[8];
-	// velocity = (float)msg.linear.x;
-	turndir = (float)msg.angular.z;
+	velocity = float(msg.linear.x);
+	turndir = float(msg.angular.z);
 	turnfactor = 1 - abs(msg.angular.z); 
 
 	dtostrf(velocity, 6, 2, resultAngular); // Leave room for too large numbers!
 	dtostrf(turnfactor, 6, 2, resultLinear); // Leave room for too large numbers!
-	Serial.print(velocity);
-	Serial.print(turnfactor);
+	//Serial.print(speed);
+	//Serial.print(turnfactor);
 
 	nh.loginfo(resultAngular);
 	nh.loginfo(resultLinear);
