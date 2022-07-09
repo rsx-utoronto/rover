@@ -1,0 +1,14 @@
+drive1(){
+        #rosrun rosserial_python serial_node.py _port:=/dev/ttyACM"$1" _baud:=57600
+        #use the above to make it accept a different port. type 'drive1 0' for ACM0
+        # 'drive1 1' for ACM1
+        rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
+}
+
+drive2(){
+        rosrun rover drive_sender
+}
+
+drive3(){
+        rosrun joy joy_node
+}
