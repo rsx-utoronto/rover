@@ -5,6 +5,7 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Byte.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float32.h>
 
 #include <rsx_esc.h>
 #include <main.h>
@@ -35,12 +36,18 @@ float turnfactor = 0;
 ros::NodeHandle nh;
 
 // Set up subscribers
-geometry_msgs::Twist teleop_twist;
-ros::Subscriber<geometry_msgs::Twist> teleop_sub("drive", &teleop_cb);
+// geometry_msgs::Twist teleop_twist;
+// ros::Subscriber<geometry_msgs::Twist> teleop_sub("drive", &teleop_cb);
+
+std_msgs::Float32 lin_vel_msg;
+ros::Subscriber<std_msgs::Float32> lin_vel_sub("drive/lin_vel", &lin_vel_cb);
+std_msgs::Float32 turn_msg;
+ros::Subscriber<std_msgs::Float32> turn_sub("drive/turn", &turn_cb);
 std_msgs::Byte motor_faults_msg;
+std_msgs::
 ros::Publisher motor_faults_pub("rover/motor_faults", &motor_faults_msg);
 std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
+ros::Publisher chatter_pub("chatter", &str_msg);
 
 //   ___      _             
 //  / __| ___| |_ _  _ _ __ 
@@ -54,9 +61,10 @@ void setup() {
 	Wire.begin();
 	Serial3.begin(9600); //This is for Bluetooth Debug!
 	nh.initNode();
-	// nh.advertise(motor_faults_pub);
-	nh.advertise(chatter);
-	nh.subscribe(teleop_sub);
+	nh.advertise(motor_faults_pub);
+	nh.advertise(chatter_pub);
+	nh.subscribe(lin_vel_sub);
+	nh.subscribe(turn_sub);
 	nh.spinOnce();
   	delay(100);
 }
@@ -111,7 +119,7 @@ void loop() {
 	std_msgs::String str_msg;
 	str_msg.data = "Node is running!";
 
-	chatter.publish(&str_msg);
+	chatter_pub.publish(&str_msg);
 	delay(500);
 }
 
@@ -189,24 +197,43 @@ void stop(ESC Drivers[6]) {
 //  |   / (_) \__ \ | (__/ _` | | | '_ \/ _` / _| / /(_-<
 //  |_|_\\___/|___/  \___\__,_|_|_|_.__/\__,_\__|_\_\/__/
                                                       
-void teleop_cb(const geometry_msgs::Twist& msg) {
-	startCounting = true;
-	count = 0;
+// void teleop_cb(const geometry_msgs::Twist& msg) {
+// 	startCounting = true;
+// 	count = 0;
 
-	char resultAngular[8]; // Buffer big enough for 7-character float
+// 	char resultAngular[8]; // Buffer big enough for 7-character float
+// 	char resultLinear[8];
+// 	velocity = float(lin_vel_msg.data);
+
+// 	turndir = float(turn_msg.data);
+// 	turnfactor = 1 - abs(turn_msg.data); 
+
+// 	dtostrf(velocity, 6, 2, resultAngular); // Leave room for too large numbers!
+// 	dtostrf(turnfactor, 6, 2, resultLinear); // Leave room for too large numbers!
+
+// 	nh.loginfo(resultAngular);
+// 	nh.loginfo(resultLinear);
+// }
+
+void lin_vel_cb(const std_msgs::Float32& lin_vel_msg) {
+
 	char resultLinear[8];
-	velocity = float(msg.linear.x);
-	// size_t max_msg_size = 100;
-	// char log_str[100];
-	// snprintf(log_str, max_msg_size, "velocity:%d", velocity);
-    // nh.loginfo(log_str);
+	velocity = float(lin_vel_msg.data);
 
-	turndir = float(msg.angular.z);
-	turnfactor = 1 - abs(msg.angular.z); 
+	dtostrf(velocity, 6, 2, resultLinear); // Leave room for too large numbers!
 
-	dtostrf(velocity, 6, 2, resultAngular); // Leave room for too large numbers!
-	dtostrf(turnfactor, 6, 2, resultLinear); // Leave room for too large numbers!
-
-	nh.loginfo(resultAngular);
 	nh.loginfo(resultLinear);
+}
+
+void turn_cb(const std_msgs::Float32& turn_msg) {
+
+	char resultAngular[8];
+
+	turndir = float(turn_msg.data);
+	turnfactor = 1 - abs(turn_msg.data);
+
+	dtostrf(turnfactor, 6, 2, resultAngular); // Leave room for too large numbers!
+
+	nh.loginfo(resultAngular)
+
 }
