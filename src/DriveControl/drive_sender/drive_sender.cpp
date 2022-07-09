@@ -11,9 +11,11 @@ float angular = 0.0;
 int linear_ = 1;
 int angular_ = 2;
 
+
 class TeleopRover {
 	public:
 		TeleopRover();
+		// void publishDrive();
 	private:
 		void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
 
@@ -41,7 +43,6 @@ TeleopRover::TeleopRover():
 void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
 	geometry_msgs::Twist twist;
-
 	//indexs for controller values
 	int R2 = 5;
 	int L2 = 2;
@@ -61,12 +62,12 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	} else if (posThrottle < 1){
 		ROS_INFO("in Pos throttle");
 		dispVal = 255 - (posThrottle+1)*127.5;
-		// twist.linear.x = 255 - (posThrottle+1)*127.5;
+		twist.linear.x = 255 - (posThrottle+1)*127.5;
 		twist.linear.x = 120;
 	} else if (negThrottle < 1){
 		ROS_INFO("in neg throttle");
 		dispVal = -1*(255 - (negThrottle+1)*127.5);
-		// twist.linear.x = -1*(255 - (negThrottle+1)*127.5);
+		twist.linear.x = -1*(255 - (negThrottle+1)*127.5);
 		twist.linear.x = -120;
 	} else {
 		dispVal = 0;
@@ -80,6 +81,11 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	ROS_INFO("Motor Value %f", dispVal);
 	vel_pub_.publish(twist);
 }
+
+// void TeleopRover::publishDrive()
+// {
+// 	vel_pub_.publish(twist);
+// }
 
 int main(int argc, char** argv)
 {

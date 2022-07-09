@@ -86,7 +86,7 @@ rosparam set joy_node/dev "/dev/input/js$CONTROLLER_DEFAULT"
 
 # Start rosserial_python
 echo "Starting rosserial_python..."
-rosrun rosserial_python serial_node.py _port:=/dev/ttyACM$ARDUINO_DEFAULT _baud:=9600 &
+rosrun rosserial_python serial_node.py _port:=/dev/ttyACM$ARDUINO_DEFAULT _baud:=57600 &
 
 # Start drive_sender
 echo "Starting drive_sender..."
@@ -97,35 +97,35 @@ echo "Starting joy_node..."
 rosrun joy joy_node &
 
 # Don't run rqt if --no-rqt option set
-if [ $rqt == 0 ]
-then
-	exit 0
-fi
+# if [ $rqt == 0 ]
+# then
+# 	exit 0
+# fi
 
 
 #Gauges plugin
-if [[ " ${plugin_list[@]} " =~ "gauges" ]]; then
-	echo "Initializing rqt plugin: gauges..."
-	# from wiki.ros.org/gauges:
-	#  "gauge_nameX" -- The name displayed below gauge X.
-	#  "minimumX" -- The minimum value shown on gauge X.
-	#  "maximumX" -- The maximum value shown on gauge X.
-	#  "danger_thresholdX" -- Show a color band, with red beginning at this value.
-	#  "topicX" -- The name of the topic that controls needle X.
-	#  "pixel_sizeX" -- The width and height of gaugeX.
+# if [[ " ${plugin_list[@]} " =~ "gauges" ]]; then
+# 	echo "Initializing rqt plugin: gauges..."
+# 	# from wiki.ros.org/gauges:
+# 	#  "gauge_nameX" -- The name displayed below gauge X.
+# 	#  "minimumX" -- The minimum value shown on gauge X.
+# 	#  "maximumX" -- The maximum value shown on gauge X.
+# 	#  "danger_thresholdX" -- Show a color band, with red beginning at this value.
+# 	#  "topicX" -- The name of the topic that controls needle X.
+# 	#  "pixel_sizeX" -- The width and height of gaugeX.
 
-	rosparam set /rqt_gauges/topic1 /gauge_velocity_sender
-	rosparam set /rqt_gauges/gauge_name1 Velocity
-	rosparam set /rqt_gauges/minimum1 -100
-	rosparam set /rqt_gauges/maximum1 100
+# 	rosparam set /rqt_gauges/topic1 /gauge_velocity_sender
+# 	rosparam set /rqt_gauges/gauge_name1 Velocity
+# 	rosparam set /rqt_gauges/minimum1 -100
+# 	rosparam set /rqt_gauges/maximum1 100
 
-	rosparam set /rqt_gauges/topic2 /gauge_angle_sender
-	rosparam set /rqt_gauges/gauge_name2 Angle
-	rosparam set /rqt_gauges/minimum2 -90
-	rosparam set /rqt_gauges/maximum2 90
+# 	rosparam set /rqt_gauges/topic2 /gauge_angle_sender
+# 	rosparam set /rqt_gauges/gauge_name2 Angle
+# 	rosparam set /rqt_gauges/minimum2 -90
+# 	rosparam set /rqt_gauges/maximum2 90
 	
-	rosrun rover gauge_receiver &
-fi
+# 	rosrun rover gauge_receiver &
+# fi
 
 # Format for adding new plugins:
 # Copy and uncomment lines below, replacing YOUR_PLUGIN_NAME and YOUR_SETUP_CODE

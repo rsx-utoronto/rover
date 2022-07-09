@@ -4,6 +4,7 @@
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Byte.h>
+#include <std_msgs/String.h>
 
 #include <rsx_esc.h>
 #include <main.h>
@@ -21,15 +22,16 @@ int count_reached = 500;
 bool startCounting = false;
 
 // Set up driving variables
-float velocity = 100;
+float velocity = 0;
 float turndir = 0;
 float turnfactor = 0;
 
-//   ___  ___  ___ 
+//   ___  ___  ___
 //  | _ \/ _ \/ __|
 //  |   / (_) \__ \
 //  |_|_\\___/|___/
 
+// ros::NodeHandle nh;
 ros::NodeHandle nh;
 
 // Set up subscribers
@@ -37,6 +39,8 @@ geometry_msgs::Twist teleop_twist;
 ros::Subscriber<geometry_msgs::Twist> teleop_sub("drive", &teleop_cb);
 std_msgs::Byte motor_faults_msg;
 ros::Publisher motor_faults_pub("rover/motor_faults", &motor_faults_msg);
+std_msgs::String str_msg;
+ros::Publisher chatter("chatter", &str_msg);
 
 //   ___      _             
 //  / __| ___| |_ _  _ _ __ 
@@ -45,10 +49,16 @@ ros::Publisher motor_faults_pub("rover/motor_faults", &motor_faults_msg);
 //                    |_|   
 
 void setup() {
+	// Serial.begin(57600);
+	// nh.getHardware()->setBaud(57600);
 	Wire.begin();
+	Serial3.begin(9600); //This is for Bluetooth Debug!
 	nh.initNode();
-	nh.advertise(motor_faults_pub);
+	// nh.advertise(motor_faults_pub);
+	nh.advertise(chatter);
 	nh.subscribe(teleop_sub);
+	nh.spinOnce();
+  	delay(100);
 }
 
 //   __  __      _        _                  
@@ -69,7 +79,8 @@ void loop() {
 		ESC(2340.0, 45, 44, 6, 43, 42, B1001100)
 	};
 	
-	nh.spinOnce();
+	nh.spinOnce();	
+	delay(250);
 	
 	if (startCounting) {
 		count++; 
@@ -96,6 +107,12 @@ void loop() {
 	} else {
 		set_all_vel(velocity, Drivers);
 	}
+
+	std_msgs::String str_msg;
+	str_msg.data = "Node is running!";
+
+	chatter.publish(&str_msg);
+	delay(500);
 }
 
 //   ___             _   _             
@@ -117,6 +134,8 @@ void reset_driver_faults(ESC Drivers[6]) {
 
 void set_all_vel(float vel, ESC Drivers[6]) {
 	nh.loginfo("Moving forward");
+	Serial3.print("Moving forward with vel: ");
+	Serial3.println(vel);
 	for(int i = 0; i < 6; i++) {
 		Drivers[i].set_vel(vel);
 	}
@@ -156,7 +175,7 @@ uint8_t check_motor_status(ESC Drivers[6]) {
 		}
 	}
 	motor_faults_msg.data = faults;
-	motor_faults_pub.publish(&motor_faults_msg);
+	// motor_faults_pub.publish(&motor_faults_msg);
 	return faults;
 }
 
@@ -173,19 +192,20 @@ void stop(ESC Drivers[6]) {
 void teleop_cb(const geometry_msgs::Twist& msg) {
 	startCounting = true;
 	count = 0;
-	
-	//Serial.begin(9600);
 
 	char resultAngular[8]; // Buffer big enough for 7-character float
 	char resultLinear[8];
-	// velocity = (float)msg.linear.x;
-	turndir = (float)msg.angular.z;
+	velocity = float(msg.linear.x);
+	// size_t max_msg_size = 100;
+	// char log_str[100];
+	// snprintf(log_str, max_msg_size, "velocity:%d", velocity);
+    // nh.loginfo(log_str);
+
+	turndir = float(msg.angular.z);
 	turnfactor = 1 - abs(msg.angular.z); 
 
 	dtostrf(velocity, 6, 2, resultAngular); // Leave room for too large numbers!
 	dtostrf(turnfactor, 6, 2, resultLinear); // Leave room for too large numbers!
-	Serial.print(velocity);
-	Serial.print(turnfactor);
 
 	nh.loginfo(resultAngular);
 	nh.loginfo(resultLinear);

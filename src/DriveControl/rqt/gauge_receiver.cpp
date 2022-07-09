@@ -6,7 +6,7 @@
 float vals [2]; //declare the variable for angle and velocity
 
 void gaugesCallback(const geometry_msgs::Twist& msg){ // Callback function for publisher
-        ROS_INFO("Turn: %f, Velocity: %f", msg.linear.x, msg.angular.z); //ros messages
+        ROS_INFO("Velocity: %f, Turn: %f", msg.linear.x, msg.angular.z); //ros messages
         vals[0]=msg.linear.x;
         vals[1]=msg.angular.z;
 }
