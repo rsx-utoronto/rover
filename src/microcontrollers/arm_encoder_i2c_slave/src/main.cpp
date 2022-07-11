@@ -13,7 +13,8 @@ volatile int bStates[3] = { 0 };
 int count_values[3] = {0};
 
 void loop(){
-  }
+
+}
 
 
 void receiveEvent(int numBytes);

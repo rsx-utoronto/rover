@@ -11,8 +11,10 @@
 
 #define total_no_of_slaves 3
 #define total_no_of_sensors 7
-const int slave_address[3]     = {1, 2, 3};
-const int sensors_per_slave[3] = {2, 2, 3};
+// const int slave_address[3]     = {1, 2, 3};
+const int slave_address[1] = {1};
+// const int sensors_per_slave[3] = {2, 2, 3};
+const int sensors_per_slave[1] = {3};
 // IDs for each of the joints and motors
 typedef enum joint {  SHR,   SHP,   ELB,   FAR,   WPI,   WRO,   GRP};
 typedef enum motor {M_SHR, M_SHP, M_ELB, M_FAR, M_WRL, M_WRR, M_GRP};
@@ -38,7 +40,7 @@ double Kd[7] = {0.06, 0.05, 0.05, 0.05, 0.04, 0.04,   0};
 const char dirPin[7] = {22, 23, 4, 6, 8, 10, 12};
 const char pwmPin[7] = {2, 3, 5, 7, 9, 11, 13};
 
-const char spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
+const int spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
 
 // Flags
 bool running = true;          // Used for emergency stopping
@@ -73,10 +75,19 @@ unsigned long last_override = 0;
 
 void loop() {
     get_encoder_values();
+    Serial.println("Goal pos: ");
+    for (int i = 0; i < 7; i++) {
+        Serial.println(goal_pos[i]);
+    }
+    Serial.println("Velocity: ");
+    for (int i = 0; i < 7; i++) {
+        Serial.println(vel[i]);
+    }
     if (Serial.available()) {
         switch (Serial.read()) {
             case 'p': // Move to absolute position within limits
                 Serial.read(); // there should be a space, discard it.
+                Serial.println("getting case p");
                 update_goals(false, true);
                 break;
             case 'f': // Move to position with NO LIMITS
@@ -142,8 +153,10 @@ void get_encoder_values() {
         Wire.requestFrom(slave_addr, 6); // request 6 bytes from slave
         int i = 0;
         byte read_bytes[6];
+        Serial.println("Getting slave bytes!");
         while (Wire.available() && i < 6) {
             read_bytes[i] = Wire.read();
+            Serial.println(read_bytes[i], BIN);
             i++;
         }
         #if ENC_DEBUG
