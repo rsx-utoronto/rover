@@ -3,7 +3,7 @@
 # Edit default values here
 # Not recommended, as if you git push then changes will be reflected across all users
 ARDUINO_DEFAULT=0
-CONTROLLER_DEFAULT=2
+CONTROLLER_DEFAULT=0
 
 # Make sure to update this list when new plugins are added
 # See instructions at bottom
@@ -84,9 +84,9 @@ fi
 echo "Setting up ros parameters for drive control..."
 rosparam set joy_node/dev "/dev/input/js$CONTROLLER_DEFAULT" 
 
-# Start rosserial_python
-echo "Starting rosserial_python..."
-rosrun rosserial_python serial_node.py _port:=/dev/ttyACM$ARDUINO_DEFAULT _baud:=57600 &
+# # Start rosserial_python
+# echo "Starting rosserial_python..."
+# rosrun rosserial_python serial_node.py _port:=/dev/ttyACM$ARDUINO_DEFAULT _baud:=57600 &
 
 # Start drive_sender
 echo "Starting drive_sender..."
@@ -94,7 +94,12 @@ rosrun rover drive_sender &
 
 # Start joy_node
 echo "Starting joy_node..."
-rosrun joy joy_node &
+rosrun joy joy_node & 
+
+echo "Starting drive listener..."
+rosparam set baud_rate "115200"
+rosparam set arduino_port "/dev/ttyACM$ARDUINO_DEFAULT" 
+rosrun rover drive_listener_ROS.py 
 
 # Don't run rqt if --no-rqt option set
 # if [ $rqt == 0 ]

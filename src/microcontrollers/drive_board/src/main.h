@@ -14,14 +14,8 @@ void turn_right(float, float, ESC[6]);
 void set_left_vel(float, ESC[6]);
 void set_right_vel(float, ESC[6]);
 void stop(ESC[6]);
-
-//   ___  ___  ___    ___      _ _ _             _       
-//  | _ \/ _ \/ __|  / __|__ _| | | |__  __ _ __| |__ ___
-//  |   / (_) \__ \ | (__/ _` | | | '_ \/ _` / _| / /(_-<
-//  |_|_\\___/|___/  \___\__,_|_|_|_.__/\__,_\__|_\_\/__/
-
-// void teleop_cb(const geometry_msgs::Twist&);
-void turn_cb(const std_msgs::Float32& turn_msg);
-void lin_vel_cb(const std_msgs::Float32& lin_vel_msg)
+void read_angular();
+void read_linear();
+void parse_drive();
 
 #endif
