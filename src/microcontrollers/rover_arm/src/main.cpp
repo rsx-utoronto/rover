@@ -23,7 +23,7 @@ typedef enum motor {M_SHR, M_SHP, M_ELB, M_FAR, M_WRL, M_WRR, M_GRP};
 const int logical_to_physical_sens_map[7] = {M_SHR, M_SHP, M_FAR, M_ELB, M_WRR, M_WRL, M_GRP};
 
 double goal_pos[14] = {0, 0, 0, 0, 0, 0, 0};         // The goal position for each MOTOR
-volatile int actual_pos[7] = {0, 0, 0, 0, 0, 0, 0}; // The reading of each MOTOR encoder
+int actual_pos[7] = {0, 0, 0, 0, 0, 0, 0}; // The reading of each MOTOR encoder
 double actual_pos_float[7] = {0, 0, 0, 0, 0, 0, 0}; // Floating point copy of above for PID lib
 double vel[7] = {0, 0, 0, 0, 0, 0, 0};              // The PWM voltage to apply to each MOTOR
 
@@ -366,10 +366,8 @@ void TEST_encoder_feedback(){
 
     int ticks = 50;
     int init_vals[7];
-    for (int i=0; i<7;i++)
-    {
-        init_vals[i] = actual_pos[i];
-    }
+    memcpy(actual_pos, init_vals, 7);
+    
     for (int i=0; i<7;i++)
     {
         Serial.println("Motor: ");
@@ -390,9 +388,10 @@ void TEST_encoder_feedback(){
             analogWrite(pwmPin[i], 180);
             Serial.println("encoder updated...");
             PRINT_encoder_positions();
-            delay(10000);
+            
         }
     }
+    delay(10000);
 }
 
 void TEST_PID(){
