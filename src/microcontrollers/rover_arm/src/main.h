@@ -13,6 +13,7 @@ void receiveEvent(int number_of_bytes);
 void get_encoder_values();
 
 void TEST_find_encoder_pins();
+void TEST_encoder_feedback();
 void TEST_print_encoder_pins();
 void PRINT_encoder_positions();
 void TEST_PID();

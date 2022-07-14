@@ -40,7 +40,9 @@ double Kd[7] = {0.06, 0.05, 0.05, 0.05, 0.04, 0.04,   0};
 const char dirPin[7] = {22, 23, 4, 6, 8, 10, 12};
 const char pwmPin[7] = {2, 3, 5, 7, 9, 11, 13};
 
-const int spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
+// const int spdLimit[7] = {255, 255, 255, 255, 255, 255, 255};
+
+const int spdLimit[7] = {120, 120, 120, 120, 120, 120, 120};
 
 // Flags
 bool running = true;          // Used for emergency stopping
@@ -84,7 +86,8 @@ void loop() {
         Serial.println(vel[i]);
     }
     if (Serial.available()) {
-        switch (Serial.read()) {
+        Serial.println("Serial available!");
+        switch ('a') {
             case 'p': // Move to absolute position within limits
                 Serial.read(); // there should be a space, discard it.
                 Serial.println("getting case p");
@@ -122,8 +125,10 @@ void loop() {
                 updatePID();         // update PID twice so D term does not explode
                 break;
             case 'a':                // print encoder positions
-                PRINT_encoder_positions();
-               // TEST_motor_pins();
+                Serial.println("Testing arm!");
+                // PRINT_encoder_positions();
+                // TEST_motor_pins();
+                TEST_encoder_feedback();
                 break;
             default:
                 Serial.println("parse err");
@@ -153,10 +158,10 @@ void get_encoder_values() {
         Wire.requestFrom(slave_addr, 6); // request 6 bytes from slave
         int i = 0;
         byte read_bytes[6];
-        Serial.println("Getting slave bytes!");
+        // Serial.println("Getting slave bytes!");
         while (Wire.available() && i < 6) {
             read_bytes[i] = Wire.read();
-            Serial.println(read_bytes[i], BIN);
+            // Serial.println(read_bytes[i], BIN); DEBUG
             i++;
         }
         #if ENC_DEBUG
@@ -355,6 +360,41 @@ void PRINT_encoder_positions(){
     Serial.println();
 }
 
+void TEST_encoder_feedback(){
+
+    Serial.println("Moving 200 ticks: ");
+
+    int ticks = 50;
+    int init_vals[7];
+    for (int i=0; i<7;i++)
+    {
+        init_vals[i] = actual_pos[i];
+    }
+    for (int i=0; i<7;i++)
+    {
+        Serial.println("Motor: ");
+        Serial.println(i);
+        Serial.println(' ');
+        while (abs(init_vals[i] - actual_pos[i]) < ticks)
+        {
+            Serial.println("Init encoder values: ");
+            for (int i=0; i<7;i++)
+            {
+                Serial.println(init_vals[i]);
+            }
+            int encoder_diff = init_vals[i] - actual_pos[i];
+            Serial.println("Encoder_diff: ");
+            Serial.println(encoder_diff);
+            get_encoder_values();
+            digitalWrite(dirPin[i], 0);
+            analogWrite(pwmPin[i], 180);
+            Serial.println("encoder updated...");
+            PRINT_encoder_positions();
+            delay(10000);
+        }
+    }
+}
+
 void TEST_PID(){
     unsigned long last_goal_change = millis();
     for(int i = 0; i < 7; i++){
@@ -386,24 +426,22 @@ void TEST_PID(){
 }
 
 void TEST_motor_pins(){
-    while(true){
-        for(int i = 0; i < 7; i++) {
-            Serial.println(i);
-            // forwards
-            digitalWrite(dirPin[i], 0);
-            analogWrite(pwmPin[i], spdLimit[i]);
-            delay(200);
-            // stop
-            analogWrite(pwmPin[i], 0);
-            delay(1000);
-            // back
-            digitalWrite(dirPin[i], 1);
-            analogWrite(pwmPin[i], spdLimit[i]);
-            delay(200);
-            // stop
-            analogWrite(pwmPin[i], 0);
-            delay(3000);
-        }
+    for(int i = 0; i < 7; i++) {
+        Serial.println(i);
+        // forwards
+        digitalWrite(dirPin[i], 0);
+        analogWrite(pwmPin[i], spdLimit[i]);
+        delay(500);
+        // stop
+        analogWrite(pwmPin[i], 0);
+        delay(1000);
+        // back
+        digitalWrite(dirPin[i], 1);
+        analogWrite(pwmPin[i], spdLimit[i]);
+        delay(200);
+        // stop
+        analogWrite(pwmPin[i], 0);
+        delay(3000);
     }
 }
 
