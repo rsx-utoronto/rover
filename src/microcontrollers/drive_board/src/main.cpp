@@ -1,11 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-
-// #include <geometry_msgs/Twist.h>
-// #include <std_msgs/Byte.h>
-// #include <std_msgs/String.h>
-// #include <std_msgs/Float32.h>
-
+#include <Stream.h>
 #include <rsx_esc.h>
 #include <main.h>
 
@@ -15,6 +10,9 @@
 //  \___|_\___/_.__/\__,_|_/__/
 
 // Allocate 128 bytes to hold ros loggin messages
+
+#define Controller_address 0
+
 char log_buffer[128];
 
 int count = 0;
@@ -42,7 +40,7 @@ static ESC Drivers[6] = {
 //                    |_|   
 
 void setup() {
-	Wire.begin();
+	Wire.begin(Controller_address);
 	Serial.begin(115200);
 	while (!Serial);
 	Serial.setTimeout(2);
