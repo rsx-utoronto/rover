@@ -162,7 +162,8 @@ void read_angular() {
 
 void read_linear() {
 	float lin_vel;
-	velocity = Serial.parseFloat();
+	lin_vel = Serial.parseFloat();
+	velocity = lin_vel;
 }
 
 void parse_drive() {

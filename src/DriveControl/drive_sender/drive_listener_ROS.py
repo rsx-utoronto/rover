@@ -25,7 +25,7 @@ def listener():
 
 if __name__ == '__main__':
     arduino_port = rospy.get_param('arduino_port') #should return 1
-    baud_rate = int(rospy.get_param('baud_rate'))
-    ser = serial.Serial(arduino_port, baud_rate)
+    baud_rate = 115200
+    ser = serial.Serial("/dev/ttyACM1", baud_rate)
     listener()
     ser.close()
