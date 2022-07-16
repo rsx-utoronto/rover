@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <main.h>
 
 #define slave_address 1
 

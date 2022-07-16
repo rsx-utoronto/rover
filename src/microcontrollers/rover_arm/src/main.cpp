@@ -161,7 +161,7 @@ void get_encoder_values() {
         // Serial.println("Getting slave bytes!");
         while (Wire.available() && i < 6) {
             read_bytes[i] = Wire.read();
-            // Serial.println(read_bytes[i], BIN); DEBUG
+            // Serial.println(read_bytes[i], BIN); //DEBUG
             i++;
         }
         #if ENC_DEBUG
