@@ -10,7 +10,9 @@ ESC::ESC(float _full_speed_rpm, int _enable_pin, int _direction_pin, int _curren
 	current_limit_pin = _current_limit_pin;
 	commutation_freq_pin = _commutation_freq_pin;
 	I2C_addr = _I2C_addr;
+}
 
+void ESC::init() {
 	ESC::initialize();
 	ESC::set_vel(0);
 	ESC::set_enable(true);
@@ -23,8 +25,8 @@ void ESC::set_vel(float vel) {
 	}
 	digitalWrite(direction_pin, (vel > 0.0));
 	Wire.beginTransmission(I2C_addr);
-	Wire.write(spd & 0xFF);
 	Wire.write((spd >> 8) & 0xFF);
+	Wire.write(spd & 0xFF);
 	Wire.endTransmission();
 }
 

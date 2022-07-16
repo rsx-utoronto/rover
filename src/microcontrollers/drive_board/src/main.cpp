@@ -18,6 +18,7 @@ char log_buffer[128];
 int count = 0;
 int count_reached = 500;
 bool startCounting = false;
+bool first_run = true;
 
 // Set up driving variables
 float velocity = 0;
@@ -31,7 +32,7 @@ static ESC Drivers[6] = {
 	ESC(2340.0, 35, 34, 4, 37, 36, B0001100),
 	ESC(2340.0, 39, 38, 5, 41, 40, B0001110),
 	ESC(2340.0, 45, 44, 6, 43, 42, B1001100)
-};
+	};
 
 //   ___      _             
 //  / __| ___| |_ _  _ _ __ 
@@ -40,13 +41,17 @@ static ESC Drivers[6] = {
 //                    |_|   
 
 void setup() {
-	Wire.begin(Controller_address);
+	Wire.begin();
 	Serial.begin(115200);
 	while (!Serial);
 	Serial.setTimeout(2);
 	Serial.println("Serial initialized.");
-	reset_driver_faults(Drivers);
-	Serial.println("Driver faults reset.");
+	for (int i=0; i < 6; i++) {
+		Drivers[i].init();
+		Serial.print("Initializing motor: ");
+		Serial.println(i);
+	}
+	
 }
 
 //   __  __      _        _                  
@@ -57,27 +62,28 @@ void setup() {
 
 void loop() {
 	// Declare these objects here because ROS does not like to have
-	// global objects for some reason
 	Serial.println("In loop");
 	if (Serial.available()) {
 		switch (Serial.read()) {
 			case 'd':
+				Serial.println("Getting drive...");
 				parse_drive();
 				break;
 			default: 
+				stop(Drivers);
 				Serial.println("Not a recognized command");
 		}
 	}
 	
-	if (startCounting) {
-		count++; 
-	}
+	// if (startCounting) {
+	// 	count++; 
+	// }
 	
-	if (count == count_reached) {
-		count = 0;
-		stop(Drivers);
-		startCounting = false;
-	}
+	// if (count == count_reached) {
+	// 	count = 0;
+	// 	stop(Drivers);
+	// 	startCounting = false;
+	// }
 
 	if (turndir<0) {
 		turn_right(velocity, turnfactor, Drivers);
@@ -87,7 +93,6 @@ void loop() {
 	} else {
 		set_all_vel(velocity, Drivers);
 	}
-	delay(500);
 }
 
 //   ___             _   _             
@@ -158,12 +163,16 @@ void read_angular() {
 	turn = Serial.parseFloat();
 	turndir = turn;
 	turnfactor = 1 - abs(turndir);
+	Serial.println("Turn factor: ");
+	Serial.println(turnfactor);
 }
 
 void read_linear() {
 	float lin_vel;
 	lin_vel = Serial.parseFloat();
 	velocity = lin_vel;
+	Serial.println("Velocity: ");
+	Serial.println(velocity);
 }
 
 void parse_drive() {

@@ -64,19 +64,16 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	//Encoding Values for Throttle
 	if (posThrottle < 1 && negThrottle < 1){
 		dispVal = 0;
-		// twist.linear.x = 0;
 		lin_vel =  0;
 
 	} else if (posThrottle < 1){
 		ROS_INFO("in Pos throttle");
 		dispVal = 255 - (posThrottle+1)*127.5;
-		// twist.linear.x = 255 - (posThrottle+1)*127.5;
-		lin_vel = 120;
+		lin_vel = 255 - (posThrottle+1)*127.5;
 	} else if (negThrottle < 1){
 		ROS_INFO("in neg throttle");
 		dispVal = -1*(255 - (negThrottle+1)*127.5);
-		// twist.linear.x = -1*(255 - (negThrottle+1)*127.5);
-		lin_vel = -120;
+		lin_vel = -1*(255 - (negThrottle+1)*127.5);
 	} else {
 		dispVal = 0;
 		lin_vel = 0;

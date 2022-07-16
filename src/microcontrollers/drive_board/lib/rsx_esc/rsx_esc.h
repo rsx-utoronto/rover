@@ -8,11 +8,12 @@ class ESC {
 		void set_current_limit(float);
 		void set_vel_limit(float);
 		void set_enable(bool);
+		void init();
 		bool get_ok_status();
 		float get_vel();
+		void initialize();
 	
 	private:
-		void initialize();
 		float pi = 3.14159265;
 		float full_speed_rpm;
 		int ready_status_pin;
