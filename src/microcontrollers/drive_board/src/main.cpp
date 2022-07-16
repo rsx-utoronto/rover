@@ -44,7 +44,6 @@ ros::Subscriber<std_msgs::Float32> lin_vel_sub("drive/lin_vel", &lin_vel_cb);
 std_msgs::Float32 turn_msg;
 ros::Subscriber<std_msgs::Float32> turn_sub("drive/turn", &turn_cb);
 std_msgs::Byte motor_faults_msg;
-std_msgs::
 ros::Publisher motor_faults_pub("rover/motor_faults", &motor_faults_msg);
 std_msgs::String str_msg;
 ros::Publisher chatter_pub("chatter", &str_msg);
@@ -56,13 +55,14 @@ ros::Publisher chatter_pub("chatter", &str_msg);
 //                    |_|   
 
 void setup() {
-	// Serial.begin(57600);
-	// nh.getHardware()->setBaud(57600);
 	Wire.begin();
-	Serial3.begin(9600); //This is for Bluetooth Debug!
+	Serial.begin(57600);
+	nh.getHardware()->setBaud(57600);
+	while (!Serial);
+    Serial.setTimeout(2); // Set the timeout to 2ms, otherwise parsing can hang for up to a second
+    Serial.println("Serial initialized.");
 	nh.initNode();
 	nh.advertise(motor_faults_pub);
-	nh.advertise(chatter_pub);
 	nh.subscribe(lin_vel_sub);
 	nh.subscribe(turn_sub);
 	nh.spinOnce();
@@ -234,6 +234,6 @@ void turn_cb(const std_msgs::Float32& turn_msg) {
 
 	dtostrf(turnfactor, 6, 2, resultAngular); // Leave room for too large numbers!
 
-	nh.loginfo(resultAngular)
+	nh.loginfo(resultAngular);
 
 }

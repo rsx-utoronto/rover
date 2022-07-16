@@ -22,6 +22,7 @@ void stop(ESC[6]);
 
 // void teleop_cb(const geometry_msgs::Twist&);
 void turn_cb(const std_msgs::Float32& turn_msg);
-void lin_vel_cb(const std_msgs::Float32& lin_vel_msg)
+void lin_vel_cb(const std_msgs::Float32& lin_vel_msg);
 
 #endif
+
