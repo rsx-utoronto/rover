@@ -12,9 +12,9 @@
 #define total_no_of_slaves 3
 #define total_no_of_sensors 7
 // const int slave_address[3]     = {1, 2, 3};
-const int slave_address[1] = {1};
+const int slave_address[2] = {1, 2};
 // const int sensors_per_slave[3] = {2, 2, 3};
-const int sensors_per_slave[1] = {3};
+const int sensors_per_slave[2] = {3, 1};
 // IDs for each of the joints and motors
 typedef enum joint {  SHR,   SHP,   ELB,   FAR,   WPI,   WRO,   GRP};
 typedef enum motor {M_SHR, M_SHP, M_ELB, M_FAR, M_WRL, M_WRR, M_GRP};
@@ -23,7 +23,7 @@ typedef enum motor {M_SHR, M_SHP, M_ELB, M_FAR, M_WRL, M_WRR, M_GRP};
 const int logical_to_physical_sens_map[7] = {M_SHR, M_SHP, M_FAR, M_ELB, M_WRR, M_WRL, M_GRP};
 
 double goal_pos[14] = {0, 0, 0, 0, 0, 0, 0};         // The goal position for each MOTOR
-int actual_pos[7] = {0, 0, 0, 0, 0, 0, 0}; // The reading of each MOTOR encoder
+volatile int actual_pos[7] = {0, 0, 0, 0, 0, 0, 0}; // The reading of each MOTOR encoder
 double actual_pos_float[7] = {0, 0, 0, 0, 0, 0, 0}; // Floating point copy of above for PID lib
 double vel[7] = {0, 0, 0, 0, 0, 0, 0};              // The PWM voltage to apply to each MOTOR
 
@@ -37,6 +37,9 @@ double Ki[7] = {1,     0.8,    0,  1.0,    1,    1,   0};
 double Kd[7] = {0.06, 0.05, 0.05, 0.05, 0.04, 0.04,   0};
 
 // Pins for each motor
+// const char dirPin[7] = {22, 23, 4, 6, 8, 10, 12};
+// const char pwmPin[7] = {2, 3, 5, 7, 9, 11, 13};
+
 const char dirPin[7] = {22, 23, 4, 6, 8, 10, 12};
 const char pwmPin[7] = {2, 3, 5, 7, 9, 11, 13};
 
@@ -77,14 +80,15 @@ unsigned long last_override = 0;
 
 void loop() {
     get_encoder_values();
-    Serial.println("Goal pos: ");
-    for (int i = 0; i < 7; i++) {
-        Serial.println(goal_pos[i]);
-    }
-    Serial.println("Velocity: ");
-    for (int i = 0; i < 7; i++) {
-        Serial.println(vel[i]);
-    }
+    // Serial.println("Goal pos: ");
+    // for (int i = 0; i < 7; i++) {
+    //     Serial.println(goal_pos[i]);
+    // }
+    // Serial.println("Velocity: ");
+    // for (int i = 0; i < 7; i++) {
+    //     Serial.println(vel[i]);
+    // }
+
     if (Serial.available()) {
         Serial.println("Serial available!");
         switch ('a') {
@@ -368,8 +372,9 @@ void TEST_encoder_feedback(){
     int init_vals[7];
     memcpy(actual_pos, init_vals, 7);
     
-    for (int i=0; i<7;i++)
-    {
+    // for (int i=0; i<7;i++)
+    // {
+        int i = 3;
         Serial.println("Motor: ");
         Serial.println(i);
         Serial.println(' ');
@@ -384,14 +389,17 @@ void TEST_encoder_feedback(){
             Serial.println("Encoder_diff: ");
             Serial.println(encoder_diff);
             get_encoder_values();
-            digitalWrite(dirPin[i], 0);
+            digitalWrite(dirPin[i], 1);
             analogWrite(pwmPin[i], 180);
+            delay(200);
+            analogWrite(pwmPin[i], 0);
             Serial.println("encoder updated...");
             PRINT_encoder_positions();
-            
+            delay(500);
         }
-    }
-    delay(10000);
+
+    // }
+    // delay(10000);
 }
 
 void TEST_PID(){
