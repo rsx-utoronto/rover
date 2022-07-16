@@ -20,6 +20,6 @@ void stop(ESC[6]);
 //  |   / (_) \__ \ | (__/ _` | | | '_ \/ _` / _| / /(_-<
 //  |_|_\\___/|___/  \___\__,_|_|_|_.__/\__,_\__|_\_\/__/
 
-void teleop_cb(const geometry_msgs::Twist&);
+// void teleop_cb(const geometry_msgs::Twist& msg);
 
 #endif
