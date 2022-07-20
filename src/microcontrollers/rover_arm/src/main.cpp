@@ -390,7 +390,7 @@ void TEST_encoder_feedback(){
             Serial.println(encoder_diff);
             get_encoder_values();
             digitalWrite(dirPin[i], 1);
-            analogWrite(pwmPin[i], 180);
+            analogWrite(pwmPin[i], 255);
             delay(200);
             analogWrite(pwmPin[i], 0);
             Serial.println("encoder updated...");
