@@ -75,23 +75,24 @@ void loop() {
 		}
 	}
 	
-	// if (startCounting) {
-	// 	count++; 
-	// }
+	// maybe modify tmrw 
+	if (startCounting) {
+		count++; 
+	}
 	
-	// if (count == count_reached) {
-	// 	count = 0;
-	// 	stop(Drivers);
-	// 	startCounting = false;
-	// }
+	if (count == count_reached) {
+		count = 0;
+		stop(Drivers);
+		startCounting = false;
+	}
 
-	if (turndir<0) {
+	if (turndir<0) { // fix turning to be in place
 		turn_right(velocity, turnfactor, Drivers);
 	}
 	else if (turndir>0) {
 		turn_left(velocity, turnfactor, Drivers);
 	} else {
-		set_all_vel(velocity, Drivers);
+		set_all_vel(velocity, Drivers);// check logic for moving backwards 
 	}
 }
 
@@ -133,12 +134,12 @@ void set_right_vel(float vel, ESC Drivers[6]) {
 }
 
 void turn_left(float vel, float turn, ESC Drivers[6]) {
-	set_left_vel(vel*turn, Drivers);
+	set_left_vel(-vel, Drivers);
 	set_right_vel(vel, Drivers);
 }
 
 void turn_right(float vel, float turn, ESC Drivers[6]) {
-	set_right_vel(vel*turn, Drivers);
+	set_right_vel(-vel, Drivers);
 	set_left_vel(vel, Drivers);
 }
 
