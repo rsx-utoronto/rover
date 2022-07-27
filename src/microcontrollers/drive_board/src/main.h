@@ -1,25 +1,30 @@
-#ifndef main_h
-#define main_h
+#ifndef rsx_esc_h
+#define rsx_esc_h
 
-//   ___             _   _             
-//  | __|  _ _ _  __| |_(_)___ _ _  ___
-//  | _| || | ' \/ _|  _| / _ \ ' \(_-<
-//  |_| \_,_|_||_\__|\__|_\___/_||_/__/
-
-void reset_driver_faults(ESC[6]);
-void set_all_vel(float, ESC[6]);
-uint8_t check_motor_status(ESC[6]);
-void turn_left(float, float, ESC[6]);
-void turn_right(float, float, ESC[6]);
-void set_left_vel(float, ESC[6]);
-void set_right_vel(float, ESC[6]);
-void stop(ESC[6]);
-
-//   ___  ___  ___    ___      _ _ _             _       
-//  | _ \/ _ \/ __|  / __|__ _| | | |__  __ _ __| |__ ___
-//  |   / (_) \__ \ | (__/ _` | | | '_ \/ _` / _| / /(_-<
-//  |_|_\\___/|___/  \___\__,_|_|_|_.__/\__,_\__|_\_\/__/
-
-void teleop_cb(const geometry_msgs::Twist&);
+class ESC {
+	public:
+		ESC(float, int, int, int, int, int, uint8_t, int, int);     // constructor
+		void set_vel(float);                              //
+		void set_current_limit(float);
+		void set_vel_limit(float);
+		void set_enable(bool);
+		bool get_ok_status();
+		int get_vel_4095();
+		int get_vel_255(int);
+		float get_cur();
+	
+	private:
+		void initialize();
+		float pi = 3.14159265;
+		float full_speed_rpm;
+		int ready_status_pin;
+		int commutation_freq_pin;
+		int enable_pin;
+		int direction_pin;
+		int current_limit_pin;
+		uint8_t I2C_addr;
+		int current_feedback_pin;
+		int speed_feedback_pin;
+};
 
 #endif

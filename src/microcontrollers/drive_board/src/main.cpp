@@ -60,13 +60,15 @@ void setup() {
 void loop() {
 	// Declare these objects here because ROS does not like to have
 	// global objects for some reason
+	
+	//Assuming ESC1 is first and the 6th is last - recheck schematic for analog input pins
 	static ESC Drivers[6] = {
-		ESC(2340.0, 24, 25, 8, 22, 23, B0001001),
-		ESC(2340.0, 26, 27, 9, 28, 29, B0001101),
-		ESC(2340.0, 33, 32, 7, 31, 30, B0001000),
-		ESC(2340.0, 35, 34, 4, 37, 36, B0001100),
-		ESC(2340.0, 39, 38, 5, 41, 40, B0001110),
-		ESC(2340.0, 45, 44, 6, 43, 42, B1001100)
+		ESC(2340.0, 24, 25, 8, 22, 23, B0001001, 66, 67),
+		ESC(2340.0, 26, 27, 9, 28, 29, B0001101, 68, 69),
+		ESC(2340.0, 33, 32, 7, 31, 30, B0001000, 70, 71),
+		ESC(2340.0, 35, 34, 4, 37, 36, B0001100, 65, 64),
+		ESC(2340.0, 39, 38, 5, 41, 40, B0001110, 63, 62),
+		ESC(2340.0, 45, 44, 6, 43, 42, B1001100, 61, 60)
 	};
 	
 	nh.spinOnce();

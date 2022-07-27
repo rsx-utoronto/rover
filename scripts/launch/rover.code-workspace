@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "drive_board",
+			"path": "../../src/microcontrollers/drive_board"
+		}
+	],
+	"settings": {}
+}
