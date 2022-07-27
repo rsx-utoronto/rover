@@ -32,7 +32,7 @@ static ESC Drivers[6] = {
 	ESC(2340.0, 35, 34, 4, 37, 36, B0001100),
 	ESC(2340.0, 39, 38, 5, 41, 40, B0001110),
 	ESC(2340.0, 45, 44, 6, 43, 42, B1001100)
-	};
+};
 
 //   ___      _             
 //  / __| ___| |_ _  _ _ __ 
@@ -41,7 +41,7 @@ static ESC Drivers[6] = {
 //                    |_|   
 
 void setup() {
-	Wire.begin();
+	// Wire.begin();
 	Serial.begin(115200);
 	while (!Serial);
 	Serial.setTimeout(2);

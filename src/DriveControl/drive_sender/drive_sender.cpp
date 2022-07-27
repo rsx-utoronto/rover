@@ -13,6 +13,8 @@ float angular = 0.0;
 int linear_ = 1;
 int angular_ = 2;
 
+#define DEBUG 1
+
 
 class TeleopRover {
 	public:
@@ -38,13 +40,13 @@ TeleopRover::TeleopRover():
 	nh_.param("scale_angular", a_scale_, a_scale_);
 	nh_.param("scale_linear", l_scale_, l_scale_);
 
-	// vel_pub_ = nh_.advertise<geometry_msgs::Twist>("drive", 1);
 	drive_pub_ = nh_.advertise<std_msgs::String>("drive", 1);
 	joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &TeleopRover::joyCallback, this);
 }
 
 void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
+	ros::Rate r(2);
 	// geometry_msgs::Twist twist;
 	std_msgs::String drive_msg;
 	drive_msg.data = "d";
@@ -87,7 +89,12 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 	ROS_INFO("Turn Factor %f", turnFactor);
 	ROS_INFO("Motor Value %f", lin_vel);
-	drive_pub_.publish(drive_msg);
+	#if DEBUG
+		drive_pub_.publish(drive_msg);
+		r.sleep();
+	#else
+		drive_pub_.publish(drive_msg);
+	#endif
 }
 
 

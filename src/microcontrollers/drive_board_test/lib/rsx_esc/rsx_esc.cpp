@@ -13,7 +13,6 @@ ESC::ESC(float _full_speed_rpm, int _enable_pin, int _direction_pin, int _curren
 }
 
 void ESC::init() {
-	ESC::initialize();
 	ESC::set_vel(0);
 	ESC::set_enable(true);
 }
@@ -23,14 +22,16 @@ void ESC::set_vel(float vel) {
 	if(spd >= 4095)  {
 		spd =  4095;
 	}
-	Serial.println("Speed: ");
-	Serial.println(spd);
+	if (spd < 0) {
+		Serial.println("Speed: ");
+		Serial.println(spd);
+	}
 	digitalWrite(direction_pin, (vel > 0.0));
 	delayMicroseconds(100);
-	Wire.beginTransmission(I2C_addr);
-	Wire.write((spd >> 8) & 0xFF);
-	Wire.write(spd & 0xFF);
-	Wire.endTransmission();
+	// Wire.beginTransmission(I2C_addr);
+	// Wire.write((spd >> 8) & 0xFF);
+	// Wire.write(spd & 0xFF);
+	// Wire.endTransmission();
 }
 
 void ESC::set_enable(bool state){
@@ -52,5 +53,5 @@ float get_vel(){
 }
 
 bool ESC::get_ok_status(){
-	return digitalRead(ready_status_pin);
+	// return digitalRead(ready_status_pin);
 }

@@ -1,0 +1,10 @@
+BasedOnStyle: Chromium
+AllowShortLoopsOnASingleLine: 'true'
+IndentWidth: '4'
+Language: Cpp
+ReflowComments: 'true'
+SpacesBeforeTrailingComments: '1'
+SpacesInAngles: 'false'
+SpacesInParentheses: 'false'
+Standard: Cpp11
+TabWidth: '4'
