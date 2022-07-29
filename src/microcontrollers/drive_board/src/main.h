@@ -11,6 +11,7 @@ void set_all_vel(float, ESC[6]);
 uint8_t check_motor_status(ESC[6]);
 void turn_left(float, float, ESC[6]);
 void turn_right(float, float, ESC[6]);
+void set_single_motor_vel(float, int, ESC[6]);
 void set_left_vel(float, ESC[6]);
 void set_right_vel(float, ESC[6]);
 void stop(ESC[6]);

@@ -133,6 +133,11 @@ void set_right_vel(float vel, ESC Drivers[6]) {
 	}
 }
 
+// set single motor vel for single motor control
+void set_single_motor_vel(float vel, int i, ESC Drivers[6]){
+	Drivers[i].set_vel(vel);
+}
+
 void turn_left(float vel, float turn, ESC Drivers[6]) {
 	set_left_vel(-vel, Drivers);
 	set_right_vel(vel, Drivers);

@@ -50,9 +50,20 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	drive_msg.data = "d";
 	float lin_vel;
 	//indexs for controller values
+	// https://github.com/rsx-utoronto/rover/wiki/Drive-Control#ps3-joystick-key-bindings:~:text=The%20keybindings%20read%20from%20the%20Joy%20topic
 	int R2 = 5;
 	int L2 = 2;
 	int LS = 0;
+
+	// 6 single motor control, adding 6 buttons to enter control mode for each motor (motor 1-6 in order)
+	// feel free to change the specific buttons, experiment for now
+	int but_x = 0; // enter control motor 1 mode
+	int but_circle = 1; // enter control motor 2 mode 
+	int but_tri = 2; // motor 3
+	int but_sq = 3; // motor 4
+	int but_up = 13; // motor 5
+	int but_down = 14; // motor 6
+	int but_select = 8; // control all motors 
 
 	//Values from Controller
 	double posThrottle = joy->axes[R2];
