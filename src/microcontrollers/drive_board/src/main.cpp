@@ -24,6 +24,7 @@ bool first_run = true;
 float velocity = 0;
 float turndir = 0;
 float turnfactor = 0;
+int mode = 0; // default to all motors
 
 static ESC Drivers[6] = {
 	ESC(2340.0, 24, 25, 8, 22, 23, B0001001),
@@ -86,13 +87,30 @@ void loop() {
 		startCounting = false;
 	}
 
-	if (turndir<0) { // fix turning to be in place
-		turn_right(velocity, turnfactor, Drivers);
-	}
-	else if (turndir>0) {
-		turn_left(velocity, turnfactor, Drivers);
-	} else {
-		set_all_vel(velocity, Drivers);// check logic for moving backwards 
+	swtich (mode) { 
+		case 0:
+			if (turndir<0) { // fix turning to be in place
+				turn_right(velocity, turnfactor, Drivers);
+			}
+			else if (turndir>0) {
+				turn_left(velocity, turnfactor, Drivers);
+			} else {
+				set_all_vel(velocity, Drivers);// check logic for moving backwards 
+			}
+		case 1:
+			set_single_motor_vel(velocity, 1, Drivers);
+		case 2:
+			set_single_motor_vel(velocity, 2, Drivers);
+		case 3:
+			set_single_motor_vel(velocity, 3, Drivers);
+		case 4:
+			set_single_motor_vel(velocity, 4, Drivers);
+		case 5:
+			set_single_motor_vel(velocity, 5, Drivers);
+		case 6:
+			set_single_motor_vel(velocity, 6, Drivers);
+		default: 
+			Serial.println("Not a recognized mode");
 	}
 }
 
@@ -181,10 +199,20 @@ void read_linear() {
 	Serial.println(velocity);
 }
 
+void read_mode() {
+	int m = Serial.parseInt();
+	mode = m;
+	Serial.println("Mode: ");
+	Serial.println(mode);
+}
+
 void parse_drive() {
 
 	if (Serial.available()) {
 		switch(Serial.read()){
+			case 'm':
+				Serial.println("Getting mode");
+				read_mode();
 			case 'a':
 				Serial.println("Getting angular");
 				read_angular();

@@ -68,6 +68,16 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	//Values from Controller
 	double posThrottle = joy->axes[R2];
 	double negThrottle = joy->axes[L2];
+
+	// assume 1 is pressed and 0 is not?
+	int enable_motor1 = joy->buttons[but_x];
+	int enable_motor2 = joy->buttons[but_circle];
+	int enable_motor3 = joy->buttons[but_tri];
+	int enable_motor4 = joy->buttons[but_sq];
+	int enable_motor5 = joy->buttons[but_up];
+	int enable_motor6 = joy->buttons[but_down];
+	int enable_all_motor = joy->buttons[but_select];
+
 	float turnFactor = static_cast<float>(joy->axes[LS]);
 
 	double dispVal = 0;
@@ -88,6 +98,40 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	} else {
 		dispVal = 0;
 		lin_vel = 0;
+	}
+
+	// add mode
+	drive_msg.data += "m";
+	if (enable_motor1 == 1){
+		drive_msg.data += "1";
+		ROS_INFO("Mode 1");
+
+	} else if (enable_motor2 == 1){
+		drive_msg.data += "2";
+		ROS_INFO("Mode 2");
+
+	} else if (enable_motor3 == 1){
+		drive_msg.data += "3";
+		ROS_INFO("Mode 3");
+		
+	} else if (enable_motor4 == 1){
+		drive_msg.data += "4";
+		ROS_INFO("Mode 4");
+		
+	} else if (enable_motor5 == 1){
+		drive_msg.data += "5";
+		ROS_INFO("Mode 5");
+		
+	} else if (enable_motor6 == 1){
+		drive_msg.data += "6";
+		ROS_INFO("Mode 6");
+		
+	} else if (enable_all_motor == 1){
+		drive_msg.data += "0";
+		ROS_INFO("Mode 0");
+		
+	} else {
+		ROS_INFO("Invalid mode")
 	}
 
 	drive_msg.data += "a";

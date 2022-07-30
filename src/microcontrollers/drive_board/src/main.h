@@ -17,6 +17,7 @@ void set_right_vel(float, ESC[6]);
 void stop(ESC[6]);
 void read_angular();
 void read_linear();
+void read_mode();
 void parse_drive();
 
 #endif
