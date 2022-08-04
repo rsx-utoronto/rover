@@ -131,7 +131,7 @@ void TeleopRover::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		ROS_INFO("Mode 0");
 		
 	} else {
-		ROS_INFO("Invalid mode")
+		ROS_INFO("Invalid mode");
 	}
 
 	drive_msg.data += "a";
