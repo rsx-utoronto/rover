@@ -93,7 +93,6 @@ void TeleopRover::publishDrive(){
 	twist.angular.z = 0.0;
 
 	drive_pub_.publish(twist);
-	cnt ++;
 }
 
 
