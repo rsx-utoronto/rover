@@ -1,0 +1,7 @@
+talons:
+  motor:
+    id: 0
+    P: 3.0
+    I: 0.015
+    D: 175.0
+    inverted: False

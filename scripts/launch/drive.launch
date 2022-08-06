@@ -47,7 +47,6 @@
 		  <arg name="rviz"			value="true"/>
 		</include>
 		
-
  	      <!-- Generate a point cloud from the disparity image -->
 	      <node pkg="nodelet" type="nodelet" name="disparity2cloud" args="load rtabmap_ros/point_cloud_xyz stereo_nodelet">
 		 <remap from="disparity/image"       to="disparity"/>

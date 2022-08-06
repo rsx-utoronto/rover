@@ -1,14 +1,8 @@
 #!/bin/bash
 
-# Edit default values here
-# Not recommended, as if you git push then changes will be reflected across all users
-ARDUINO_DEFAULT=0
-CONTROLLER_DEFAULT=0
-
 # Make sure to update this list when new plugins are added
 # See instructions at bottom
 plugin_list=(gauges)
-
 
 rqt=1
 core=0
@@ -19,7 +13,7 @@ do
 	key="$1"
 	case $key in
 		-h|--help)
-			echo -e "launch_drive bash script V.1.1 (2021 Jan 16, Eddie Tian)\n"
+			echo -e "launch_drive bash script V.2.1 (2021 Jan 16, Eddie Tian)\n"
 			echo -e "Usage: launch_drive [arguments]\n"
 			echo -e "Known Issue: Only way to stop nodes is with 'top' then 'kill {PID}'. A workaround is to close the terminal window, then run 'launch_drive' again."
 			echo -e "Arguments"
