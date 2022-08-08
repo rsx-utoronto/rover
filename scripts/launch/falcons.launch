@@ -1,0 +1,5 @@
+<launch>
+    <rosparam command="load" file="$(find rover)/scripts/launch/goose.yaml" />
+    <node pkg="ros_phoenix" type="ros_phoenix_node" name="ros_phoenix" respawn="false" />
+    <node pkg="ros_phoenix" type="falcon_motor_control_node" name="falcon_motor_control" respawn="false" />
+</launch>

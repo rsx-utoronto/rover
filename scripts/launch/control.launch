@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+	<node pkg="rover" type="drive_sender" name="drive_sender"/>
+	<node pkg="joy" type="joy_node" name="joy"/>
+	<node pkg="rover" type="drive_listener_ROS.py" args="" />
+</launch>
