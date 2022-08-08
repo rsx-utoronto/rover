@@ -58,9 +58,15 @@ roslaunch rover falcons.launch &
 echo "Starting drive_sender..."
 rosrun rover drive_sender_falcons &
 
-# # Start sensors
-# echo "Launching sensors..."
-# roslaunch rover sensors.launch &
+# Start sensors
+echo "Launching sensors..."
+roslaunch rover sensors.launch &
+
+# wheel odom node launch 
+
+# state est node launch 
+
+# tf tree launch 
 
 tmux \
   new-session -s "drive" -n "control" \; \
@@ -83,3 +89,13 @@ tmux \
   select-pane -t 4 \; \
   split-window -h \; \
   send-keys "rostopic echo /back_right/status" C-m \; \
+  new-window -n "sensors" \; \
+  send-keys "rostopic echo /fix" C-m \; \
+  split-window -h \; \
+  send-keys "rostopic echo /imu" C-m \;
+  select-pane -t 0 \; \ 
+  split-window -v \; \
+  send-keys "rostopic hz /zed/zed_node/rgb/image_rect_color" C-m \; \ 
+  select-pane -t 2 \; \
+  split-window -v \; \ 
+  send-keys "rostopic hz /os_cloud_node/points" C-m \;

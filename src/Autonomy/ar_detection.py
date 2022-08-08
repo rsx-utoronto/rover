@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 
 import rospy
 import cv2
@@ -24,7 +24,7 @@ def image_callback(ros_image):
 
 def findArucoMarkers(img, markerSize=4, totalMarkers=50, draw=True):
     imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    key =getattr(aruco,f'DICT_{markerSize}X{markerSize}_{totalMarkers}')
+    key =getattr(aruco, 'DICT_' + str(markerSize) + 'X' + str(markerSize) + str(totalMarkers))
     arucoDict = aruco.Dictionary_get(key)
     arucoParam = aruco.DetectorParameters_create()
     bboxs, ids,rejected=aruco.detectMarkers(imgGray,arucoDict,parameters=arucoParam)

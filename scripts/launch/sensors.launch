@@ -1,0 +1,10 @@
+<launch> 
+    <node pkg="gpsd_client" type="gpsd_client" name="gps_node" respawn="false" />
+    <node pkg="inertial_sense_ros" type="inertial_sense_node" name="imu_ins_node" respawn="false" />
+    <include file="$(find zed_wrapper)/launch/zed.launch" />
+    <include file="$(find ouster_ros)/ouster.launch">
+        <arg name="sensor_hostname" value="os-992120000585.local" />
+        <arg name="metadata" value="meta.json" />
+        <arg name="lidar_mode" value="2048x10" />
+    </include>
+</launch>

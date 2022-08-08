@@ -30,7 +30,7 @@ do
 			echo -e "\t-h|--help               Show this help screen"
 			echo -e "\t-p|--port               Specify the port for the joystick of the form 'jsX' where X is specified here"
 			echo -e "\t                        stop jobs started in scripts with \$jobs). Default is run."
-			echo -r "\t-r|--record [topics]    Records a rosbag of the listed topics or all if a is given"
+			echo -e "\t-r|--record [topics]    Records a rosbag of the listed topics or all if a is given"
 			echo -e "Each node is launched and a tmux panel is created for echoing topics and checking status of topics"
 			exit 0
 		;;
@@ -62,7 +62,7 @@ rosrun joy joy_node &
 
 # Start Visualization
 echo "Starting up RVIZ..."
-rosrun rviz rviz -d 
+rosrun rviz rviz -d # config
 
 if [ $record == 1 ]
 then 

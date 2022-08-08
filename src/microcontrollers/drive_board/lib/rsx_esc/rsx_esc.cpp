@@ -23,10 +23,7 @@ void ESC::set_vel(float vel) {
 	if(spd >= 4095)  {
 		spd =  4095;
 	}
-	Serial.println("Speed: ");
-	Serial.println(spd);
 	digitalWrite(direction_pin, (vel > 0.0));
-	delayMicroseconds(100);
 	Wire.beginTransmission(I2C_addr);
 	Wire.write((spd >> 8) & 0xFF);
 	Wire.write(spd & 0xFF);

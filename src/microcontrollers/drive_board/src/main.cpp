@@ -62,9 +62,11 @@ void setup() {
 
 void loop() {
 	// Declare these objects here because ROS does not like to have
+	Serial.println("In loop");
 	if (Serial.available()) {
 		switch (Serial.read()) {
 			case 'd':
+				Serial.println("Getting drive...");
 				parse_drive();
 				break;
 			default: 
@@ -112,6 +114,7 @@ void reset_driver_faults(ESC Drivers[6]) {
 }
 
 void set_all_vel(float vel, ESC Drivers[6]) {
+	Serial.print("Moving forward with vel: ");
 	Serial.println(vel);
 	for(int i = 0; i < 6; i++) {
 		Drivers[i].set_vel(vel);
@@ -131,12 +134,12 @@ void set_right_vel(float vel, ESC Drivers[6]) {
 }
 
 void turn_left(float vel, float turn, ESC Drivers[6]) {
-	set_left_vel(-vel*turn, Drivers);
+	set_left_vel(-vel, Drivers);
 	set_right_vel(vel, Drivers);
 }
 
 void turn_right(float vel, float turn, ESC Drivers[6]) {
-	set_right_vel(-vel*turn, Drivers);
+	set_right_vel(-vel, Drivers);
 	set_left_vel(vel, Drivers);
 }
 
@@ -178,8 +181,10 @@ void parse_drive() {
 	if (Serial.available()) {
 		switch(Serial.read()){
 			case 'a':
+				Serial.println("Getting angular");
 				read_angular();
 			case 'l':
+				Serial.println("Getting linear");
 				read_linear();
 			default: 
 				Serial.println("Not a recognized drive command");
