@@ -13,9 +13,8 @@ import rospy
 from std_msgs.msg import String
 
 gripper_encoder_missing = 1
-'''
-👆👆👆👆
-'''
+
+
 
 def put_msg(message):
     #global conn
@@ -636,7 +635,7 @@ def updateGripperAngle(localSavedGripperAngle): # updates the gripper condition 
     updatedGripperAngle = localSavedGripperAngle
     step = 200
     if buttons[22] == 1:
-        if updatedGripperAngle+step <= openedLimit:890o
+        if updatedGripperAngle+step <= openedLimit:
             updatedGripperAngle += step
         else:
             print("Gripper completely open")
@@ -691,7 +690,7 @@ def makeDHTable(jointAngles): # making a dh table for kinematics, specific for t
                 [0, 0, 18, jointAngles[5]] ]
     return DHTable
 '''
-👆👆👆👆 ed
+    ed
     DHTable = [ [0, math.pi/2, 6.162, jointAngles[0]],
                 [36, 0, 0, jointAngles[1]],
                 [27.94, 0, 0, jointAngles[2]],
