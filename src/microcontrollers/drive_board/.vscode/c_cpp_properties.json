@@ -1,0 +1,58 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/rsx/rover_ws/src/rover/src/microcontrollers/drive_board/include",
+                "/home/rsx/rover_ws/src/rover/src/microcontrollers/drive_board/src",
+                "/home/rsx/rover_ws/src/rover/src/microcontrollers/drive_board/lib/rsx_esc",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/Wire/src",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/cores/arduino",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/variants/mega",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/HID/src",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SPI/src",
+                "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SoftwareSerial/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/rsx/rover_ws/src/rover/src/microcontrollers/drive_board/include",
+                    "/home/rsx/rover_ws/src/rover/src/microcontrollers/drive_board/src",
+                    "/home/rsx/rover_ws/src/rover/src/microcontrollers/drive_board/lib/rsx_esc",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/Wire/src",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/cores/arduino",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/variants/mega",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/HID/src",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SPI/src",
+                    "/home/rsx/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SoftwareSerial/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60100",
+                "ARDUINO_AVR_MEGA2560",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10805",
+                "__AVR_ATmega2560__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "/home/rsx/.platformio/packages/toolchain-atmelavr@1.50400.190710/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega2560",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
