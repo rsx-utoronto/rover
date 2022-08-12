@@ -6,7 +6,6 @@ import openravepy
 import numpy as np
 import pygame
 import math
-import httplib
 import sys
 import threading
 import rospy
@@ -14,6 +13,13 @@ from std_msgs.msg import String
 
 gripper_encoder_missing = 1
 
+q1 = 0
+q2 = 0
+q3 = 0
+q4 = 0
+
+q5 = 0
+q6 = 0
 
 
 def put_msg(message):
@@ -25,12 +31,12 @@ def put_msg(message):
             #rospy.loginfo(message)
             pub.publish(message)
             rate.sleep()
-        # print ("The message to send is: {}".format(message))
+        # pass # ("The message to send is: {}".format(message))
         #conn.request("PUT", "/arm/"+message+"/")
         #conn.close()
     except rospy.ROSInterruptException as e:
-        print "!!! ERROR in put_msg:"
-        print e
+        # pass # "!!! ERROR in put_msg:"
+        # pass # e
         time.sleep(0.1)
 
 
@@ -65,7 +71,7 @@ def forwardKinematics(dhTable): # use the dh table to perform forward kinematics
     A5 = np.matrix( homogenousTransform(dhTable[4]) )
     A6 = np.matrix( homogenousTransform(dhTable[5]) )
     fullHomTransMatrix = A1*A2*A3*A4*A5*A6
-    #print( fullHomTransMatrix.tolist() )
+    #pass #( fullHomTransMatrix.tolist() )
     return fullHomTransMatrix.tolist()
 
 
@@ -80,26 +86,26 @@ def inverseKinematics(dhTable, homTransMatrix): # perform inverse kinematics
         d4 = dhTable[3][2]
         d6 = dhTable[5][2]
 
-        #print("HomTransMatrix: ")
-        #print(homTransMatrix)
+        #pass #("HomTransMatrix: ")
+        #pass #(homTransMatrix)
         
         Rd = np.matrix( [ homTransMatrix[0][:3], homTransMatrix[1][:3], homTransMatrix[2][:3] ] )
-        #print("Rd: ")
-        #print(Rd)
+        #pass #("Rd: ")
+        #pass #(Rd)
         od = np.matrix( [ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ] ).transpose()
-        #print("od: ")
-        #print(od)
+        #pass #("od: ")
+        #pass #(od)
 
         arD6 = np.matrix( [ 0,0,d6] ).transpose()
-        #print("arD6: ")
-        #print(arD6)
-        #print(arD6.transpose())
-        #print(Rd)
+        #pass #("arD6: ")
+        #pass #(arD6)
+        #pass #(arD6.transpose())
+        #pass #(Rd)
         oc = od - Rd * arD6
-        #print(np.dot(Rd,arD6))
-        #print(np.dot(Rd,arD6.transpose()))
-        #print("oc: ")
-        #print(oc)
+        #pass #(np.dot(Rd,arD6))
+        #pass #(np.dot(Rd,arD6.transpose()))
+        #pass #("oc: ")
+        #pass #(oc)
 
         xc = oc.tolist()[0][0]
         yc = oc.tolist()[1][0]
@@ -109,8 +115,9 @@ def inverseKinematics(dhTable, homTransMatrix): # perform inverse kinematics
         
         Dtemp = ( xc**2 + yc**2 + (zc-d1)**2 - a2**2 - d4**2 )/( 2*a2*d4 )
         if abs(Dtemp) > 1:
-            print( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
+            # pass #( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
             return dhTable
+        pass #( '{}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
         
         q3 = math.atan2( Dtemp, math.sqrt(1 - Dtemp**2) ) # assumes we chose to always have 'elbow up' solution
         
@@ -127,15 +134,15 @@ def inverseKinematics(dhTable, homTransMatrix): # perform inverse kinematics
         H23 = np.matrix( homogenousTransform(updatedDHTable[2]) )
         H03 = (H01 * H12 * H23).tolist()
         R03 = np.matrix( [H03[0][:3], H03[1][:3], H03[2][:3]] )
-        #print("R03: ")
-        #print(R03)
-        #print(R03)
-        #print(R03.transpose())
+        #pass #("R03: ")
+        #pass #(R03)
+        #pass #(R03)
+        #pass #(R03.transpose())
         R36 = R03.transpose() * Rd
-        #print("R36: ")
-        #print(R36)
-        #print( np.dot(R03, Rd) )
-        #print( np.dot(R03.transpose(), Rd) )
+        #pass #("R36: ")
+        #pass #(R36)
+        #pass #( np.dot(R03, Rd) )
+        #pass #( np.dot(R03.transpose(), Rd) )
 
         q4 = math.atan2( R36.tolist()[1][2], R36.tolist()[0][2] )
         q5 = math.atan2( math.sqrt(1 - R36.tolist()[2][2]**2), R36.tolist()[2][2] )
@@ -160,26 +167,26 @@ def inverseKinematicsPositional(dhTable, homTransMatrix, rotationVector):
         d4 = dhTable[3][2]
         d6 = dhTable[5][2]
 
-        #print("HomTransMatrix: ")
-        #print(homTransMatrix)
+        #pass #("HomTransMatrix: ")
+        #pass #(homTransMatrix)
         
         Rd = np.matrix( [ homTransMatrix[0][:3], homTransMatrix[1][:3], homTransMatrix[2][:3] ] )
-        #print("Rd: ")
-        #print(Rd)
+        #pass #("Rd: ")
+        #pass #(Rd)
         od = np.matrix( [ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ] ).transpose()
-        #print("od: ")
-        #print(od)
+        #pass #("od: ")
+        #pass #(od)
 
         arD6 = np.matrix( [ 0,0,d6] ).transpose()
-        #print("arD6: ")
-        #print(arD6)
-        #print(arD6.transpose())
-        #print(Rd)
+        #pass #("arD6: ")
+        #pass #(arD6)
+        #pass #(arD6.transpose())
+        #pass #(Rd)
         oc = od - Rd * arD6
-        #print(np.dot(Rd,arD6))
-        #print(np.dot(Rd,arD6.transpose()))
-        #print("oc: ")
-        #print(oc)
+        #pass #(np.dot(Rd,arD6))
+        #pass #(np.dot(Rd,arD6.transpose()))
+        #pass #("oc: ")
+        #pass #(oc)
 
         xc = oc.tolist()[0][0]
         yc = oc.tolist()[1][0]
@@ -189,7 +196,7 @@ def inverseKinematicsPositional(dhTable, homTransMatrix, rotationVector):
         
         Dtemp = ( xc**2 + yc**2 + (zc-d1)**2 - a2**2 - d4**2 )/( 2*a2*d4 )
         if abs(Dtemp) > 1:
-            print( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
+            pass #( 'Can not reach {}, {}, {}'.format( homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ) )
             return dhTable
         
         q3 = math.atan2( Dtemp, math.sqrt(1 - Dtemp**2) ) # assumes we chose to always have 'elbow up' solution
@@ -218,7 +225,7 @@ def updateHomTransMatrix(homTransMatrix, DHTable, translationVector, rotationVec
     for ind in range(3):
         translationVector[ind] = k * translationVector[ind]
         rotationVector[ind] = t * rotationVector[ind]
-
+   
     ### TYPE0 fancy motions, relative to the camera reference frame
     if ikType == 0:
         ## update movement in the end effector camera frame
@@ -247,9 +254,9 @@ def updateHomTransMatrix(homTransMatrix, DHTable, translationVector, rotationVec
         for i in range(len(z0_tilda)):
             x0_tilda[i] = x0_tilda[i]/x0_tildaNorm
 
-        #print(x0_tilda)
-        #print(y0_tilda)
-        #print(z0_tilda)
+        #pass #(x0_tilda)
+        #pass #(y0_tilda)
+        #pass #(z0_tilda)
 
         # construct R00_tilda
         x0 = x0.transpose().tolist()[0]
@@ -281,14 +288,17 @@ def updateHomTransMatrix(homTransMatrix, DHTable, translationVector, rotationVec
         updatedHomTransMatrix[2][3] += (xMovement.tolist()[2][0] + yMovement.tolist()[2][0] + zMovement.tolist()[2][0])
         #rotation is happening in the order: around z -> around y -> around x
         R06_updated = (Rx0_tilda * Ry0_tilda * Rz0_tilda * R06).tolist()
-        #print R06_updated
+        #pass # R06_updated
 
     ### TYPE 1 fancy motions (in the tip reference frame)
     elif ikType == 1:
         # update translation 
         R06 = np.matrix( [ updatedHomTransMatrix[0][:3], updatedHomTransMatrix[1][:3], updatedHomTransMatrix[2][:3] ] )
+        # print(R06)
+        print("")
         # forward-backward movement update
         xMovement = R06 * np.matrix( [0, 0, translationVector[0]] ).transpose()
+        # print(xMovement)
         updatedHomTransMatrix[0][3] += xMovement.tolist()[0][0]
         updatedHomTransMatrix[1][3] += xMovement.tolist()[1][0]
         updatedHomTransMatrix[2][3] += xMovement.tolist()[2][0]
@@ -317,105 +327,16 @@ def updateHomTransMatrix(homTransMatrix, DHTable, translationVector, rotationVec
         # update rotation matrix
         # rotation is happening in the order: around x -> around y -> around z
         R06_updated = (R06 * Rx * Ry * Rz).tolist()
-        #print R06_updated
+        print(R06_updated)
+        time.sleep(0.1)
 
-
-    # ###!!! move the end effector to the specific predAll DOFs modeefined orientation, based on the predefined rotation matrices
-    # buttons = getJoystickButtons()
-    # #print buttons
-
-    # turn to "Down" pose
-    # if buttons[18] == 1:
-    #     R06_updated = np.matrix( [ [1, 0, 0],
-    #                                 [0, -1, 0],
-    #                                 [0, 0, -1] ] ).tolist()
-    # # turn to "Forward" pose
-    # elif buttons[17] == 1:
-    #     R06_updated = np.matrix( [ [0, 0, 1],
-    #                                 [0, -1, 0],
-    #                                 [1, 0, 0] ] ).tolist()
-    # # turn to "Left" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [0, -1, 0],
-    #                                 [0, 0, -1],
-    #                                 [1, 0, 0] ] ).tolist()
-    # # turn to "Right" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [0, 1, 0],
-    #                                 [0, 0, 1],
-    #                                 [1, 0, 0] ] ).tolist()
-    # turn to "Left-Forward" orientation
-    # elif buttons[19] == 1:
-    #     R06_updated = np.matrix( [ [0, -1/math.sqrt(2), 1/math.sqrt(2)],
-    #                                 [0, -1/math.sqrt(2), -1/math.sqrt(2)],
-    #                                 [1, 0, 0] ] ).tolist()
-    # # turn to "Right-Forward" orientation
-    # elif buttons[20] == 1:
-    #     R06_updated = np.matrix( [ [0, 1/math.sqrt(2), 1/math.sqrt(2)],
-    #                                 [0, -1/math.sqrt(2), 1/math.sqrt(2)],
-    #                                 [1, 0, 0] ] ).tolist()
-    # # turn to "Forward-Down" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [1/math.sqrt(2), 0, 1/math.sqrt(2)],
-    #                                 [0, -1, 0],
-    #                                 [1/math.sqrt(2), 0, -1/math.sqrt(2)] ] ).tolist()
-    # # turn to "Forward-Up" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [-1/math.sqrt(2), 0, 1/math.sqrt(2)],
-    #                                 [0, -1, 0],
-    #                                 [1/math.sqrt(2), 0, 1/math.sqrt(2)] ] ).tolist()
-    # # turn to "Left-Down" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [1, 0, 0],
-    #                                 [0, -1/math.sqrt(2), -1/math.sqrt(2)],
-    #                                 [0, 1/math.sqrt(2), -1/math.sqrt(2)] ] ).tolist()
-    # # turn to "Right-Down" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [1, 0, 0],
-    #                                 [0, -1/math.sqrt(2), 1/math.sqrt(2)],
-    #                                 [0, -1/math.sqrt(2), -1/math.sqrt(2)] ] ).tolist()
-    # # turn to "Forward-Up-Left" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [-1/math.sqrt(3), -1/math.sqrt(3), 1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), -1/math.sqrt(3), -1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), -1/math.sqrt(3), 1/math.sqrt(3)] ] ).tolist()
-    # # turn to "Forward-Up-Right" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [-1/math.sqrt(3), 1/math.sqrt(3), 1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), -1/math.sqrt(3), 1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), 1/math.sqrt(3), 1/math.sqrt(3)] ] ).tolist()
-    # # turn to "Forward-Down-Left" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [1/math.sqrt(3), -1/math.sqrt(3), 1/math.sqrt(3)],
-    #                                 [-1/math.sqrt(3), -1/math.sqrt(3), -1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), 1/math.sqrt(3), -1/math.sqrt(3)] ] ).tolist()
-    # # turn to "Forward-Down-Right" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [1/math.sqrt(3), 1/math.sqrt(3), 1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), -1/math.sqrt(3), 1/math.sqrt(3)],
-    #                                 [1/math.sqrt(3), 1/math.sqrt(3), -1/math.sqrt(3)] ] ).tolist()
-    # # turn to "Up" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [-1, 0, 0],
-    #                                 [0, -1, 0],
-    #                                 [0, 0, 1] ] ).tolist()
-    # # turn to "Left-Up" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [-1, 0, 0],
-    #                                 [0, -1/math.sqrt(2), -1/math.sqrt(2)],
-    #                                 [0, -1/math.sqrt(2), 1/math.sqrt(2)] ] ).tolist()
-    # # turn to "Right-Up" orientation
-    # elif buttons[21] == 1:
-    #     R06_updated = np.matrix( [ [-1, 0, 0],
-    #                                 [0, -1/math.sqrt(2), 1/math.sqrt(2)],
-    #                                 [0, 1/math.sqrt(2), 1/math.sqrt(2)] ] ).tolist()
    
-    #print R06_updated
+    #pass # R06_updated
     # update homTrans matrix
     for i in range(3):
         for j in range(3):
             updatedHomTransMatrix[i][j] = R06_updated[i][j] 
-    #print updatedHomTransMatrix
+    #pass # updatedHomTransMatrix
     
     return updatedHomTransMatrix
 
@@ -439,14 +360,14 @@ def initializeJoystick():
     global joystick
     joystick = pygame.joystick.Joystick(0)
     joystick.init()
-    print('Initialized joystick: %s' % joystick.get_name())
+    pass #('Initialized joystick: %s' % joystick.get_name())
 
 
 def setupVisualEnv():
 # set up a visual environment that simulates arm in real time to give window that tells you arm is moving correctly
 # set up 3d model that moves in real time like the arm and shows us visual of how arm is moving throughout different tasks
     env = openravepy.Environment()
-    env.Load('src/ArmControl/environment.xml')
+    env.Load('src/rover/src/ArmControl/environment.xml')
     env.SetViewer('qtcoin')
     viewer = env.GetViewer()
     global robot
@@ -463,7 +384,7 @@ def setupVisualEnv():
         setupAngles.append( copySavedJointAngles[i]+initAngles[i] )
         
     robot.SetActiveDOFValues(setupAngles)
-    #print( robot.GetActiveDOFValues() )
+#     #pass #( robot.GetActiveDOFValues() )
 
 
 def getJoystickButtons(): # setting up the buttons
@@ -473,10 +394,11 @@ def getJoystickButtons(): # setting up the buttons
     for i in range(0, joystick.get_numbuttons()):
         button = joystick.get_button(i)
         buttons.append(button)
-    #print(buttons)
+    #pass #(buttons)
+
     return buttons
 
-
+0
 def sendAngleValues(qVect, start = 0): # sends a message with angle values?
     global limitFlag
     global modeOfOperation
@@ -494,7 +416,7 @@ def sendAngleValues(qVect, start = 0): # sends a message with angle values?
         
         command = 'm'
         message = command+" "+q1String+" "+q2String+" "+q3String+" "+q4String+" "+q5String+" "+q6String+" "+q7String
-        #print message
+        #pass # message
         sendMessage(message)
     else:   
         # encoder steps per 2*pi rotation
@@ -513,39 +435,16 @@ def sendAngleValues(qVect, start = 0): # sends a message with angle values?
         q5String = str( int(qVect[4] * q5Steps/(2*math.pi) ) )
         q6String = str( int(qVect[5] * q6Steps/(2*math.pi) ) )
 
-        if gripper_encoder_missing:
-            buttons = getJoystickButtons()
-            if buttons[22] == 1:
-                gripperSpeed = -255
-            elif buttons[25] == 1:
-                gripperSpeed = 255
-            else:
-                gripperSpeed = 0
-            q7String = str (gripperSpeed)
-        else:
-            q7String = str( int(qVect[6] * q7Steps ) ) # gripper
+
+        q7String = str( int(qVect[6] * q7Steps ) ) # gripper
 
         if limitFlag == True:
             command = 'p'
         elif limitFlag == False:
             command = 'f'
         message = command+" "+q1String+" "+q2String+" "+q3String+" "+q4String+" "+q5String+" "+q6String+" "+q7String
+        pass #("message:",message)
         sendMessage(message)
-
-    # emergency stop
-    if buttons[1] == 1:
-        message = 'e'
-        sendMessage(message)
-    # resume from emergency stop
-    if buttons[23] == 1:
-        message = 'c'
-        sendMessage(message)
-    # starting position calibration
-    if buttons[9] == 1:
-        message = 's'
-        sendMessage(message)
-
-    
 
 def getJoystickAxes(): # setting up the axes for the control stick
     out = [0,0,0,0,0,0]
@@ -554,6 +453,12 @@ def getJoystickAxes(): # setting up the axes for the control stick
     #Read input from the joystick       
     for i in range(0, joystick.get_numaxes()):
         out[i] = joystick.get_axis(i)
+        
+        # set L2 and R2 input equal to zero if at rest position (they default to -1 which triggers movement) 
+        if i == 2 or i == 5:
+            if out[i] == -1:
+                out[i] = 0
+    
     return out
 
 
@@ -563,22 +468,22 @@ def getJoystickDirection(): # read the position of the stick
     global modeOfOperation
 
     joystickValues = getJoystickAxes()
-    #print("Joystick direction values: {}".format(joystickValues))
+    #pass #("Joystick direction values: {}".format(joystickValues))
 
     if modeOfMovement == 0:
-        print("All DOFs mode")
+        pass #("All DOFs mode")
         # mode for all joints being controlled at once
         beforeDirectionVector = copy.deepcopy(joystickValues)
-        #print(beforeDirectionVector)
+        #pass #(beforeDirectionVector)
         directionVector = [0,0,0,0,0,0] #beforeDirectionVector
         index = -1
         for thing in beforeDirectionVector:
             index += 1
             if abs(thing) > 0.05: # sensitivity "gap", to avoid random movements
                 directionVector[index] = thing
-        #print(directionVector)
+        #pass #(directionVector)
     elif modeOfMovement == 1:
-        print("One DOF mode")
+        pass #("One DOF mode")
         # mode for only one joint at once rotation
         # determine direction
         directionVector = [0,0,0,0,0,0]
@@ -597,11 +502,12 @@ def getJoystickDirection(): # read the position of the stick
             #         directionVector[storedInd] = -storedVal
             # else:
             directionVector[storedInd] = storedVal
-        #print(directionVector)
+        #pass #(directionVector)
         
     # needed specifically to make thigs coincide with our arm
     for i in range( len(directionVector) ):
         directionVector[i] = -directionVector[i]
+    
     #xyz > yxz > zxy
     # swap x with y
     tempval = copy.deepcopy( directionVector[0] )
@@ -617,6 +523,8 @@ def getJoystickDirection(): # read the position of the stick
     directionVector[3] = -directionVector[3]
     directionVector[4] = directionVector[4]
     directionVector[5] = -directionVector[5]
+    # pass #("directionVector: ",directionVector)
+    
     return directionVector
 
 
@@ -634,30 +542,30 @@ def updateGripperAngle(localSavedGripperAngle): # updates the gripper condition 
     # servo moves in the range 0 -1023
     updatedGripperAngle = localSavedGripperAngle
     step = 200
-    if buttons[22] == 1:
+    if buttons[12] == 1:
         if updatedGripperAngle+step <= openedLimit:
             updatedGripperAngle += step
         else:
-            print("Gripper completely open")
-    elif buttons[25] == 1:
+            pass #("Gripper completely open")
+    elif buttons[11] == 1:
         if updatedGripperAngle-step >= closedLimit:
             updatedGripperAngle -= step
         else:
-            print("Gripper completely closed")
+            pass #("Gripper completely closed")
 
     return updatedGripperAngle
     
 
 def visualizeArm(jointAngles):
     copyJointAngles = copy.deepcopy(jointAngles)
-    #print("Values on visualization: {}".format(copyJointAngles))
+    #pass #("Values on visualization: {}".format(copyJointAngles))
     global robot
     global initAngles
     
     for i in range(len(copyJointAngles)):
         copyJointAngles[i] += initAngles[i]
     robot.SetActiveDOFValues(copyJointAngles)
-    #print("Initial angles: {}".format(initAngles))
+    #pass #("Initial angles: {}".format(initAngles))
 
 
 def sendMessage(message):
@@ -677,8 +585,8 @@ def sendMessage(message):
     
 
 def makeDHTable(jointAngles): # making a dh table for kinematics, specific for the exact robot
-    #print("Current joint angles: {}".format(jointAngles))
-    #print(jointAngles)
+    #pass #("Current joint angles: {}".format(jointAngles))
+    #pass #(jointAngles)
     
 	# DH Table with entries in the format: [a, alpha, d, theta]
     # First links are first entries
@@ -689,16 +597,17 @@ def makeDHTable(jointAngles): # making a dh table for kinematics, specific for t
                 [0, math.pi/2, 0, jointAngles[4]],
                 [0, 0, 18, jointAngles[5]] ]
     return DHTable
-'''
-    ed
-    DHTable = [ [0, math.pi/2, 6.162, jointAngles[0]],
-                [36, 0, 0, jointAngles[1]],
-                [27.94, 0, 0, jointAngles[2]],
-                [23.682, math.pi/2, 0, jointAngles[3]],
-                [0, math.pi/2, 0, jointAngles[4]],
-                [0, 0, 10, jointAngles[5]] ]
+
+
+    # DHTable = [ [0, math.pi/2, 6.162, jointAngles[0]],
+    #             [36, 0, 0, jointAngles[1]],
+    #             [27.94, 0, 0, jointAngles[2]],
+    #             [23.682, math.pi/2, 0, jointAngles[3]],
+    #             [0, math.pi/2, 0, jointAngles[4]],
+    #             [0, 0, 10, jointAngles[5]] ]
                 #end effector length not determined yet, 10 can change
-'''
+    return DHTable
+
 
 def updateAngles(DHTable, updatedDHTable, joystickDirection): # update angles during movement
     global k
@@ -747,8 +656,8 @@ def updateAngles(DHTable, updatedDHTable, joystickDirection): # update angles du
 def manual(): # manual mode of operating the arm
     # get the direction value to move in
     joystickDirection = getJoystickDirection()
-    #print("Current joystick direction:")
-    #print(joystickDirection)
+    #pass #("Current joystick direction:")
+    #pass #(joystickDirection)
     # get the current joint angles of the arm
     global savedJointAngles
     global savedGripperAngle
@@ -758,8 +667,8 @@ def manual(): # manual mode of operating the arm
     # do forward kinematics
     DHTableCopy = copy.deepcopy(DHTable)
     #homTransMatrix = forwardKinematics(DHTableCopy)
-    #print("Current position: " )
-    #print([ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ])
+    #pass #("Current position: " )
+    #pass #([ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ])
     visualizeArm(jointAngles)
     
     uq = updateAngles(DHTable, 0, joystickDirection)
@@ -768,8 +677,8 @@ def manual(): # manual mode of operating the arm
     gripperAngleNew = updateGripperAngle(savedGripperAngle)
     try:
         jointAngles = copy.deepcopy( uq )
-        #print("Updated joint angles: {}".format(jointAngles))
-        #print(jointAngles)
+        #pass #("Updated joint angles: {}".format(jointAngles))
+        #pass #(jointAngles)
         savedJointAngles = copy.deepcopy(jointAngles)
         savedGripperAngle = gripperAngleNew
         
@@ -778,13 +687,13 @@ def manual(): # manual mode of operating the arm
         sendAngleValues(sendAngles)
         
         visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
     except:
-        print("Exception encountered")
+        pass #("Exception encountered")
         # TODO: fix undefined q1, etc here
-        jointAngles = copy.deepcopy( [q1,q2,=q3,q4,q5,q6] )
-        #print("Updated joint angles: {}".format(jointAngles)) 
+        jointAngles = copy.deepcopy( [q1,q2,q3,q4,q5,q6] )
+        #pass #("Updated joint angles: {}".format(jointAngles)) 
         savedJointAngles = copy.deepcopy(jointAngles)
         savedGripperAngle = savedGripperAngle
         
@@ -793,15 +702,15 @@ def manual(): # manual mode of operating the arm
         sendAngleValues(sendAngles)
         
         visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
 
 
 def positionalIK(): # perform inverse kinematics, move the arm to the new position
     # get the direction value to move in
     joystickDirection = getJoystickDirection()
-    #print("Current joystick direction:")
-    #print(joystickDirection)
+    pass #("Current joystick direction:")
+    pass #(joystickDirection)
     # get the current joint angles of  the arm
     global savedJointAngles
     global savedGripperAngle
@@ -814,8 +723,8 @@ def positionalIK(): # perform inverse kinematics, move the arm to the new positi
     # do forward kinematics
     DHTableCopy = copy.deepcopy(DHTable)
     homTransMatrix = forwardKinematics(DHTableCopy)
-    #print("Current position: " )
-    #print([ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ])
+    #pass #("Current position: " )
+    #pass #([ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ])
     visualizeArm(jointAngles)
 
     # update homogenous transformation matrix based on joystick input
@@ -825,8 +734,8 @@ def positionalIK(): # perform inverse kinematics, move the arm to the new positi
     copyHomTransMatrix = copy.deepcopy(homTransMatrix)
     DHTableCopy2 = copy.deepcopy(DHTable)
     updatedHomTransMatrix = updateHomTransMatrixPositional(copyHomTransMatrix, DHTableCopy2, translationVector, rotationVector)
-    #print("Updated position: ")
-    #print([ updatedHomTransMatrix[0][3], updatedHomTransMatrix[1][3], updatedHomTransMatrix[2][3] ])
+    #pass #("Updated position: ")
+    #pass #([ updatedHomTransMatrix[0][3], updatedHomTransMatrix[1][3], updatedHomTransMatrix[2][3] ])
 
     # solve IK based on the new homTransMatrix
     DHTableCopy3 = copy.deepcopy(DHTable)
@@ -838,8 +747,8 @@ def positionalIK(): # perform inverse kinematics, move the arm to the new positi
     gripperAngleNew = updateGripperAngle(savedGripperAngle)
     try:
         jointAngles = copy.deepcopy( uq )
-        #print("Updated joint angles: {}".format(jointAngles))
-        #print(jointAngles)
+        #pass #("Updated joint angles: {}".format(jointAngles))
+        #pass #(jointAngles)
 
         savedGripperAngle = gripperAngleNew
         
@@ -849,12 +758,13 @@ def positionalIK(): # perform inverse kinematics, move the arm to the new positi
         
         savedJointAngles = copy.deepcopy(jointAngles)
         visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
     except:
-        print("Exception encountered")
+       # pass #("Exception encountered")
+       # pass #("q1: {} \n, q2: {}".format(q1,q2))
         jointAngles = copy.deepcopy( [q1,q2,q3,q4,q5,q6] )
-        #print("Updated joint angles: {}".format(jointAngles))
+       # pass #("Updated joint angles: {}".format(jointAngles))
 
         savedGripperAngle = savedGripperAngle
         
@@ -864,52 +774,62 @@ def positionalIK(): # perform inverse kinematics, move the arm to the new positi
         
         savedJointAngles = copy.deepcopy(jointAngles)
         visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
     
 
 def fullIK():
     # get the direction value to move in
     joystickDirection = getJoystickDirection()
-    #print("Current joystick direction: {}".format(joystickDirection))
-    # get the current joint angles of the arm
+    #pass #("Current joystick direction: {}".format(joystickDirection))
+    # get the current joint angles of the armWS
     global savedJointAngles
     global savedGripperAngle          
     jointAngles = copy.deepcopy(savedJointAngles)
+    #pass #("joint angles",jointAngles)
 
     DHTable = makeDHTable(jointAngles)
 
-    #print("Current position: " )
-    #print([ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ])
+    #pass #("Current position: " )
+    #pass #([ homTransMatrix[0][3], homTransMatrix[1][3], homTransMatrix[2][3] ])
+    
     visualizeArm(jointAngles)
 
     # update homogenous transformation matrix based on joystick input
     translationVector = joystickDirection[:3]
     rotationVector = joystickDirection[3:]
-
+    # print("Translation Vector: " + str(translationVector) + ", Rotation Vector: " + str(rotationVector))
+    # print("")
     DHTableCopy = copy.deepcopy(DHTable)
     homTransMatrix = forwardKinematics(DHTableCopy)
-    #print homTransMatrix
+    # pass #("forwardKinematics", homTransMatrix)
+    # print("Current Transformation: ", homTransMatrix)
+    # print("")
+    # time.sleep(1)
     copyHomTransMatrix = copy.deepcopy(homTransMatrix)
     updatedHomTransMatrix = updateHomTransMatrix(copyHomTransMatrix, DHTableCopy, translationVector, rotationVector)
-    #print("Updated position: ")
-    #print updatedHomTransMatrix
+    # time.sleep(1)
+    # print("Updated Transformation: ", updatedHomTransMatrix)
+    # print("")
+    # time.sleep(2)
+    #pass #("Updated position: ")
+    #pass # updatedHomTransMatrix
 
     # solve IK based on the new homTransMatrix
     DHTableCopy2 = copy.deepcopy(DHTable)
-    #print "DHTable: "
-    #print DHTableCopy2
+    #pass # "DHTable: "
+    #pass # DHTableCopy2
     copyUpdatedHomTransMatrix = copy.deepcopy(updatedHomTransMatrix)
     updatedDHTable = inverseKinematics(DHTableCopy2, copyUpdatedHomTransMatrix)
-    #print "DHTable updated: "
-    #print updatedDHTable
+    #pass # "DHTable updated: "
+    #pass # updatedDHTable
     
     uq = updateAngles(DHTable, updatedDHTable, joystickDirection)
     # update gripper value
     gripperAngleNew = updateGripperAngle(savedGripperAngle)
     try:
         jointAngles = copy.deepcopy( uq )
-        #print("Updated joint angles: {}".format(jointAngles))
+        #pass #("Updated joint angles: {}".format(jointAngles))
         
         savedJointAngles = copy.deepcopy(jointAngles)
 
@@ -920,12 +840,12 @@ def fullIK():
         sendAngleValues(sendAngles)
         
         visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
     except:
-        print("Exception encountered")
+        pass #("Exception encountered")
         jointAngles = copy.deepcopy( [q1,q2,q3,q4,q5,q6] )
-        #print("Updated joint angles: {}".format(jointAngles))
+        #pass #("Updated joint angles: {}".format(jointAngles))
         savedJointAngles = copy.deepcopy(jointAngles)
 
         savedGripperAngle = savedGripperAngle
@@ -935,8 +855,8 @@ def fullIK():
         sendAngleValues(sendAngles)
         
         visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
 
 
 def directControl(): # move the arm according to the joystick position
@@ -955,22 +875,22 @@ def directControl(): # move the arm according to the joystick position
                 modElem = -1.0
         joystickDirection[i] = modElem
         i += 1
-    # print("Current joystick direction:")
-    # print(joystickDirection)
+    # pass #("Current joystick direction:")
+    # pass #(joystickDirection)
     # get the current joint angles of the arm
     global savedJointAngles
     jointAngles = copy.deepcopy(savedJointAngles)
 
-    visualizeArm(jointAngles)
+    #visualizeArm(jointAngles)
 
     buttons = getJoystickButtons()
     
     try:
         
         # MOVE THE ARM TO THE NEW PLACE!!!!!!!!!!
-        if buttons[22] == 1:
+        if buttons[9] == 1:
             gripperSpeed = -255
-        elif buttons[25] == 1:
+        elif buttons[8] == 1:
             gripperSpeed = 255
         else:
             gripperSpeed = 0
@@ -979,70 +899,70 @@ def directControl(): # move the arm according to the joystick position
         sendAngleValues(sendSpeeds)
         
         
-        visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #visualizeArm(savedJointAngles)
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
     except:
-        print("Exception encountered")
+        pass #("Exception encountered")
         
         # MOVE THE ARM TO THE NEW PLACE!!!!!!!!!!
         sendSpeeds = [ 0, 0, 0, 0, 0, 0, 0 ]
         
         sendAngleValues(sendSpeeds)
              
-        visualizeArm(savedJointAngles)
-        print("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
-        #print( np.array(savedJointAngles) * 180/math.pi )
+        #visualizeArm(savedJointAngles)
+        #pass #("Joint angles and gripper: \n Shoulder Rotation(q1): {} \n Shoulder Pitch(q2): {} \n Elbow(q3): {} \n W1(q4): {} \n W2(q5): {} \n W3(q6): {} \n Gripper value: {} \n".format( savedJointAngles[0]*180/math.pi, savedJointAngles[1]*180/math.pi, savedJointAngles[2]*180/math.pi, savedJointAngles[3]*180/math.pi, savedJointAngles[4]*180/math.pi, savedJointAngles[5]*180/math.pi, savedGripperAngle ) )
+        #pass #( np.array(savedJointAngles) * 180/math.pi )
 
-def updateOperationMode(): # update the mode of operation based on actions on the joystick
-    global modeOfOperation
-    global savedJointAngles
+# def updateOperationMode(): # update the mode of operation based on actions on the joystick
+#     # global modeOfOperation
+#     # global savedJointAngles
 
-    buttons = getJoystickButtons()
-    if buttons[28] == 1:
-        modeOfOperation = 1
-        print("Switched to manual mode")
-        return modeOfOperation
-    elif buttons[27] == 1:
-        modeOfOperation = 2
-        print("Switched to positional IK mode")
-        return modeOfOperation
-    elif buttons[26] == 1:
-        modeOfOperation = 3
-        print("Switched to full IK mode")
-        return 
-    elif buttons[6] == 1:
-        modeOfOperation = 4
-        print("Switched to Direct control mode")
-        return modeOfOperation
+#     buttons = getJoystickButtons()
+#     if buttons[7] == 1:
+#         modeOfOperation = 1
+#         pass #("Switched to manual mode")
+#         return modeOfOperation
+#     elif buttons[4] == 1:
+#         modeOfOperation = 2
+#         pass #("Switched to positional IK mode")
+#         return modeOfOperation
+#     elif buttons[5] == 1:
+#         modeOfOperation = 3
+#         pass #("Switched to full IK mode")
+#         return 
+#     elif buttons[6] == 1:
+#         modeOfOperation = 4
+#         pass #("Switched to Direct control mode")
+#         return modeOfOperation
 
-def updateModeOfMovement(): # mode of movement - degrees of freedom involved 
-    global modeOfMovement
+# def updateModeOfMovement(): # mode of movement - degrees of freedom involved 
+#     global modeOfMovement
 
-    buttons = getJoystickButtons()
-    if buttons[24] == 1:
-        modeOfMovement = 0
-        print("Switched to all DOFs mode")
-        return modeOfMovement
-    elif buttons[0] == 1:
-        modeOfMovement = 1
-        print("Switched to one DOF mode")
-        return modeOfMovement
+#     buttons = getJoystickButtons()
+#     if buttons[4] == 1:
+#         modeOfMovement = 0
+#         pass #("Switched to all DOFs mode")
+#         return modeOfMovement
+#     elif buttons[0] == 1:
+#         modeOfMovement = 1
+#         pass #("Switched to one DOF mode")
+#         return modeOfMovement
 
 
 def updateSpeed(): # update on the speed based on joystick
     global k, t
     buttons = getJoystickButtons()
 
-    if buttons[29] == 1:
+    if buttons[10] == 1:
         k *= 1.5
         t *= 1.5
-        print("Speed increased")
-    if buttons[30] == 1:
+        pass #("Speed increased")
+    if buttons[0] == 1:
         k /= 1.5
         t /= 1.5
-        print("Speed decreased")
-    while buttons[30] or buttons[29]:
+        pass #("Speed decreased")
+    while buttons[3] or buttons[9]:
         buttons = getJoystickButtons()
         continue
 
@@ -1053,27 +973,27 @@ def updateLimitMode(): # angle limit mode - limited or no limits
     global limitFlag
 
     buttons = getJoystickButtons()
-    if buttons[7] == 1:
+    if buttons[7] == 0:
         qlim = np.array([[-1000000, 1000000], [-1000000, 1000000], [-1000000, 1000000], [-1000000, 1000000], [-1000000, 1000000], [-1000000, 1000000]]) * math.pi/180
-        #print qlim
+        #pass # qlim
         limitFlag = False
-        print("Switched to NO LIMITS to angles mode")
-    elif buttons[21] == 1:
+        pass #("Switched to NO LIMITS to angles mode")
+    elif buttons[1] == 0:
         qlim = np.array([[lim_q1_min, lim_q1_max], [lim_q2_min, lim_q2_max], [lim_q3_min, lim_q3_max], [lim_q4_min, lim_q4_max], [lim_q5_min, lim_q5_max], [lim_q6_min, lim_q6_max]]) * math.pi/180
-        #print qlim
+        #pass # qlim
         limitFlag = True
-        print("Switched to Limited angles mode")
+        pass #("Switched to Limited angles mode")
 
 
 def updateIKType(): # switch between ik axes - relative to the camera vs the tip of the arm
     global ikType
 
-    if buttons[19] == 1:
+    if buttons[9] == 1:
         ikType = 0
-        print("Switched to relative to the camera IK mode")
-    elif buttons[20] == 1:
+        pass #("Switched to relative to the camera IK mode")
+    elif buttons[0] == 1:
         ikType = 1
-        print("Switched to relative to the tip IK mode")
+        pass #("Switched to relative to the tip IK mode")
 
 
 
@@ -1098,69 +1018,69 @@ def main():
         init_q2 = 1956.0/(2048*4)*360
         init_q3 = 1263.0/(2048*4)*360
         savedJointAngles = np.array([0.0000000001,init_q2,init_q3,0.0000000001,0.0000000001,0.0000000001]) * math.pi/180 # degrees
-        print("Arm reset to the Initial pose")
+        pass #("Arm reset to the Initial pose")
     # Move arm to the "Forward" pose
-    if buttons[17] == 1:
+    if buttons[12] == 1:
         savedJointAngles = np.array([0.0000000001,74.571,-39.836,0.0000000001,55.265,0.0000000001]) * math.pi/180 # degrees
-        print("Arm reset to the Forward pose")
+        pass #("Arm reset to the Forward pose")
     # # Move arm to the "Left-Forward" pose
     # if buttons[19] == 1:
     #     savedJointAngles = np.array([19.847,65.963,-26.376,70.106,74.285,-36.814]) * math.pi/180 # degrees
-    #     print("Arm reset to the Left-Forward pose")
+    #     pass #("Arm reset to the Left-Forward pose")
     # # Move arm to the "Right-Forward" pose
     # if buttons[20] == 1:
     #     savedJointAngles = np.array([-19.847,65.963,-26.376,-70.106,74.285,36.814]) * math.pi/180 # degrees
-    #     print("Arm reset to the Right-Forward pose")
+    #     pass #("Arm reset to the Right-Forward pose")
     # Move arm to the "Down" pose
-    if buttons[18] == 1:
+    if buttons[12] == 1:
         savedJointAngles = np.array([0.0000000001,60.960,-7.230,0.0000000001,-61.231,0.0000000001]) * math.pi/180 # degrees
-        print("Arm reset to the Down pose")
+        pass #("Arm reset to the Down pose")
 
-    updateOperationMode()
-    updateModeOfMovement()
+    # updateOperationMode()
+    # updateModeOfMovement()
     updateSpeed()
     updateLimitMode()
     updateIKType()
     if modeOfOperation == 1:
-        print("Manual mode")
+        pass #("Manual mode")
         if limitFlag == True:
-            print(" Limited angles mode")
-            #print qlim
+            pass #(" Limited angles mode")
+            #pass # qlim
         elif limitFlag == False:
-            print("NO LIMITS to angles mode")
-            #print qlim
+            pass #("NO LIMITS to angles mode")
+            #pass # qlim
         manual()
     elif modeOfOperation == 2:
-        print("Positional IK mode")
+        pass #("Positional IK mode")
         if limitFlag == True:
-            print("Limited angles mode")
-            #print qlim
+            pass #("Limited angles mode")
+            #pass # qlim
         elif limitFlag == False:
-            print("NO LIMITS to angles mode")
-            #print qlim
+            pass #("NO LIMITS to angles mode")
+            #pass # qlim
         positionalIK()
     elif modeOfOperation == 3:
-        print("Full IK mode")
+        pass #("Full IK mode")
         if limitFlag == True:
-            print("Limited angles mode")
-            #print qlim
+            pass #("Limited angles mode")
+            #pass # qlim
         elif limitFlag == False:
-            print("NO LIMITS to angles mode")
-            #print qlim
+            pass #("NO LIMITS to angles mode")
+            #pass # qlim
         if ikType == 0:
-            print("IK relative to the camera")
+            pass #("IK relative to the camera")
         elif ikType == 1:
-            print("IK relative to the tip")
+            pass #("IK relative to the tip")
         fullIK()
     elif modeOfOperation == 4:
-        print("Direct control mode")
-        directControl()
+        pass #("Direct control mode")
+        #directControl()
 
     # saving the current arm status just in case
-    storageFile = open('src/ArmControl/savedJointAngles.txt', 'w')
+    storageFile = open('/home/spaceparm/Documents/rover_code/src/rover/src/ArmControl/savedJointAngles.txt', 'w')
     storageFile.write( str(savedJointAngles) )
     storageFile.close()
-    storageFile = open('src/ArmControl/savedGripperAngle.txt', 'w')
+    storageFile = open('/home/spaceparm/Documents/rover_code/src/rover/src/ArmControl/savedGripperAngle.txt', 'w')
     storageFile.write( str(savedGripperAngle) )
     storageFile.close()
 
@@ -1208,9 +1128,9 @@ if __name__ == "__main__":
     maxRot = 2*math.pi*10000/360 
     k = 0.6
     t = 0.03
-    modeOfMovement = 1 # One DOF mode by default
-    modeOfOperation = 2 # positional IK mode by default
-    ikType = 0 # by default move in the camera reference frame
+    modeOfMovement = 0 # One DOF mode by default
+    modeOfOperation =  3# positional IK mode by default
+    ikType = 1 # by default move in the camera reference frame
 
     serverIP = '192.168.0.3'
     serverHttpPort = '8080'
@@ -1227,7 +1147,7 @@ if __name__ == "__main__":
         angles = angles.split(',')
         for i in range( len(angles) ):
             angles[i] = float(angles[i])
-        #print( angles )
+        #pass #( angles )
         savedJointAngles = angles
 
         gripperFile = open('src/ArmControl/src/savedGripperAngle.txt','r')
@@ -1260,16 +1180,16 @@ if __name__ == "__main__":
 
     qlim = np.array([[lim_q1_min, lim_q1_max], [lim_q2_min, lim_q2_max], [lim_q3_min, lim_q3_max], [lim_q4_min, lim_q4_max], [lim_q5_min, lim_q5_max], [lim_q6_min, lim_q6_max]]) * math.pi/180
     #qlim = np.array([[-18000, 18000], [-18000, 18000], [-18000, 18000], [-18000, 18000], [-18000, 18000], [-18000, 18000]]) * math.pi/180
-    #print qlim
+    #pass # qlim
     setupVisualEnv()
     initializeJoystick()
-    
-    while True:
+    count = 0
+    while count < 50:
 
         # frequency of the model loop in Hz
-        frequency = 50
+        frequency = 20
         timeDelay =  1.0/frequency
-        #print(timeDelay)
+        #pass #(timeDelay)
         if modeOfOperation == 4: # need high frequency reliably for the directControl mode, so set a separate frequency specifically for it
             time.sleep(0.02)
         else:
@@ -1278,21 +1198,21 @@ if __name__ == "__main__":
         turnedOn = True
         axes = getJoystickAxes()
         buttons = getJoystickButtons()
-        #print axes
-        #print buttons
+        #pass # axes
+        #pass # buttons
         # absAxesSum = 0
         # for axis in axes:
         #     absAxesSum += abs(axis)
-        # #print absAxesSum
+        # #pass # absAxesSum
         # # if one of the buttons pressed or one of the axes moved, move on!
         # if (absAxesSum > 0.1 or 1 in buttons):
         #     turnedOn = True
-        #print turnedOn
+        #pass # turnedOn
         # TODO
         breakTrigger = False #GET THE BREAK TRIGGER FROM SOMEWHERE
         if turnedOn:
             if breakTrigger:
-                print("Break triggered")
+                pass #("Break triggered")
                 break
             else:
                 main()
@@ -1301,5 +1221,4 @@ if __name__ == "__main__":
             continue
 
     
-    print("Shut the operations down")
-    
+    pass #("Shut the operations down")
