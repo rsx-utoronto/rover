@@ -321,7 +321,7 @@ if __name__ == "__main__":
     pub = rospy.Publisher('arm', String, queue_size=10)
     rospy.init_node('arm_talker', anonymous=True)
     global rate
-    rate = rospy.Rate(100) # in Hz
+    rate = rospy.Rate(10) # in Hz
 
     # for sending message as a thread
     global message_to_send
@@ -400,7 +400,7 @@ if __name__ == "__main__":
                 manualControlMode()
         
         if CODE_LOOPS_A_SEC != 0:
-            time.sleep(0.08)
+            time.sleep(0.05)
 
     print("Shutting Down The Arm!")
     

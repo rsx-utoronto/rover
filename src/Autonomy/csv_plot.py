@@ -11,7 +11,8 @@ x = points['Longitude'].values
 y = points['Latitude'].values
 z = points['Altitude'].values
 
-ax.scatter(x, y, z, c='r', marker='*')
+ax.plot(x, y, z, c='r') # time-series 3D line plot
+# ax.scatter(x, y, z, 'r') # 3D scatter plot
 
 plt.show()
 
